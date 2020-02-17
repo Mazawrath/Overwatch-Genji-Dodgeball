@@ -1,0 +1,1201 @@
+settings
+{
+	main
+	{
+		Description: "Genji Dodgeball v2.2.0. Developed by u/Mazawath. v2.1.0 update by u/FearlessKat. Deflect the ball when it is red to target someone else! Use jump pads to get air! Make sure you have the latest version by going to www.workshop.codes/BDZ38"
+	}
+
+	lobby
+	{
+		Allow Players Who Are In Queue: Yes
+		Match Voice Chat: Enabled
+		Return To Lobby: Never
+	}
+
+	modes
+	{
+		Deathmatch
+		{
+			Game Length In Minutes: 15
+			Score To Win: 50
+			Self Initiated Respawn: Off
+
+			enabled maps
+			{
+				Blizzard World
+			}
+		}
+
+		General
+		{
+			Allow Hero Switching: Off
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Respawn As Random Hero: On
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Genji
+			{
+				Deflect Cooldown Time: 0%
+				No Ammunition Requirement: On
+				Primary Fire: Off
+				Quick Melee: Off
+				Secondary Fire: Off
+				Swift Strike Cooldown Time: 25%
+				Ultimate Generation - Combat Dragonblade: 0%
+				Ultimate Generation - Passive Dragonblade: 0%
+			}
+
+			enabled heroes
+			{
+				Genji
+			}
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: SlotOfTargetedPlayer
+		1: SlotOfPreviousTargetedPlayer
+		2: BallSpeed
+		3: BallPosition
+		4: BallSpawnCountdown
+		5: BallIsOut
+		6: BallDeleteRequested
+		7: RoundInProgress
+		8: BouncePadCooldownLength
+		9: BallSpawnSpeed
+		10: MaxBallSpeed
+		11: IsInFinalDuel
+		12: BallSpawnCountdownHUD
+		13: BouncePadDistance
+		14: BouncePadStrength
+		15: BouncePad1
+		16: BouncePad2
+		17: BouncePad3
+		18: BouncePad4
+		21: IsEnoughPlayersToStart
+		22: WaitingForPlayersHUD
+		23: CenterOffLimitsSize
+		24: SphereSize
+		25: CircleCenter
+		26: RedGreenColorblindMode
+		27: WatermarkEnabled
+		28: BouncepadDashingEnabled
+		29: GameEndEnabled
+		30: CooldownDashingEnabled
+
+	player:
+		0: hasMoved
+		1: CurrentUltPercent
+		2: BouncePadCooldown
+		4: PlayerDeflects
+		5: PlayerKills
+		6: PlayerDeaths
+		7: PlayerEffects
+		8: PlayerUI
+		9: IsDashEnabled
+}
+
+rule("// SETTINGS")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Enable Match Ending")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(GameEndEnabled, True);
+	}
+}
+
+rule("Enable Watermark")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(WatermarkEnabled, True);
+	}
+}
+
+disabled rule("Enable Bouncepad Dashing (Use the bouncepad to get a dash) - Only enable one!")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(BouncepadDashingEnabled, True);
+	}
+}
+
+disabled rule("Enable Cooldown Dashing (Configure the dash cooldown in custom game settings) - Only enable one!")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Skip If(Global Variable(BouncepadDashingEnabled), 1);
+		Set Global Variable(CooldownDashingEnabled, True);
+	}
+}
+
+disabled rule("Enable Red-Green Colorblind Filer")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(RedGreenColorblindMode, True);
+	}
+}
+
+rule("// MAP ZONES")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Set Oasis University Center")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(Oasis University);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(-192.609, 60.349, 2.252));
+		Set Global Variable(SphereSize, 20);
+	}
+}
+
+rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller then the others!)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(King's Row);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(-20.504, 40.538, -74.601));
+		Set Global Variable(SphereSize, 17);
+	}
+}
+
+rule("Set Blizard World center (fun fact: you can't use the name of the company who made this game in rule names)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(Blizzard World);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(2.554, -4.651, -71.211));
+		Set Global Variable(SphereSize, 20);
+	}
+}
+
+rule("// INITIALIZATION")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Init player variables")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, IsDashEnabled, False);
+		Set Status(Event Player, Null, Invincible, 9999);
+		Skip If(Global Variable(CooldownDashingEnabled), 1);
+		Set Ability 1 Enabled(Event Player, False);
+		Disable Built-In Game Mode Respawning(Event Player);
+		Enable Death Spectate All Players(Event Player);
+		Set Player Variable(Event Player, BouncePadCooldown, Global Variable(BouncePadCooldownLength));
+	}
+}
+
+rule("Init global variables")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(SlotOfTargetedPlayer, -1.000);
+		Set Global Variable(SlotOfPreviousTargetedPlayer, -1.000);
+		Set Global Variable(BallSpawnCountdown, 7);
+		Disable Built-In Game Mode Scoring;
+		Disable Built-In Game Mode Completion;
+		Disable Built-In Game Mode Music;
+		Disable Built-In Game Mode Announcer;
+		Set Global Variable(BouncePadStrength, 25);
+		Set Global Variable(BouncePadDistance, 12);
+		Set Global Variable(BallSpeed, 15);
+		Set Global Variable(BallSpawnSpeed, 5);
+		Set Global Variable(MaxBallSpeed, 25);
+		Set Global Variable(CenterOffLimitsSize, 3.500);
+		Set Global Variable(IsInFinalDuel, False);
+		Set Global Variable(BouncePadCooldownLength, 7);
+	}
+}
+
+rule("Create game sphere")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create Effect(All Players(All Teams), Light Shaft, Orange, Vector(X Component Of(Global Variable(CircleCenter)), Subtract(
+			Y Component Of(Global Variable(CircleCenter)), 15), Z Component Of(Global Variable(CircleCenter))), Global Variable(
+			SphereSize), Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Sky Blue, Vector(X Component Of(Global Variable(CircleCenter)), Subtract(
+			Y Component Of(Global Variable(CircleCenter)), 0), Z Component Of(Global Variable(CircleCenter))), Global Variable(
+			CenterOffLimitsSize), Visible To Position and Radius);
+	}
+}
+
+rule("Create global HUD elements")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Player Targeted: {0}", Players In Slot(Global Variable(
+			SlotOfTargetedPlayer), All Teams), Null, Null), Left, 2, White, White, White, Visible To and String, Default Visibility);
+		Create HUD Text(All Dead Players(All Teams), Custom String("Waiting for next round", Null, Null, Null), Custom String(
+			"You have been eliminated or joined during a round", Null, Null, Null), Custom String(
+			"You will spawn once the next round starts", Null, Null, Null), Top, 2, White, White, White, Visible To and String,
+			Default Visibility);
+		Skip If(Or(Global Variable(BouncepadDashingEnabled), Global Variable(CooldownDashingEnabled)), 2);
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: None", Null, Null, Null), Left, 3, White,
+			White, White, Visible To and String, Default Visibility);
+		Abort;
+		Skip If(Global Variable(CooldownDashingEnabled), 2);
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: Bouncepad", Null, Null, Null), Left, 3,
+			White, White, White, Visible To and String, Default Visibility);
+		Abort;
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: Cooldown", Null, Null, Null), Left, 3,
+			White, White, White, Visible To and String, Default Visibility);
+	}
+}
+
+rule("Create player HUD elements")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, String("{0}:{1}", Custom String("Deflects", Null, Null, Null), Player Variable(Event Player,
+			PlayerDeflects), Null), Null, Null, Right, 2, Yellow, White, White, Visible To and String, Default Visibility);
+		Set Player Variable At Index(Event Player, PlayerUI, 1, Last Created Entity);
+		Create HUD Text(Event Player, String("{0}:{1}", Custom String("Kills", Null, Null, Null), Player Variable(Event Player,
+			PlayerKills), Null), Null, Null, Right, 3, Orange, White, White, Visible To and String, Default Visibility);
+		Set Player Variable At Index(Event Player, PlayerUI, 2, Last Created Entity);
+		Set Player Variable At Index(Event Player, PlayerUI, 3, Last Created Entity);
+		Create HUD Text(Event Player, String("{0}:{1}", Custom String("Deaths", Null, Null, Null), Player Variable(Event Player,
+			PlayerDeaths), Null), Null, Null, Right, 4, Sky Blue, White, White, Visible To and String, Default Visibility);
+		Skip If(Global Variable(RedGreenColorblindMode), 2);
+		Create HUD Text(Event Player, Custom String("Bouncepad jump cooldown: {0}", Round To Integer(Player Variable(Event Player,
+			BouncePadCooldown), Up), Null, Null), Null, Null, Right, 0, Green, White, White, Visible To and String, Default Visibility);
+		Abort;
+		Create HUD Text(Event Player, Custom String("Bouncepad jump cooldown: {0}", Round To Integer(Player Variable(Event Player,
+			BouncePadCooldown), Up), Null, Null), Null, Null, Right, 0, Yellow, White, White, Visible To and String, Default Visibility);
+	}
+}
+
+rule("Create bounce pads")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(BouncePad1, Vector(Add(X Component Of(Global Variable(CircleCenter)), Global Variable(BouncePadDistance)),
+			Y Component Of(Global Variable(CircleCenter)), Z Component Of(Global Variable(CircleCenter))));
+		Set Global Variable(BouncePad2, Vector(Add(X Component Of(Global Variable(CircleCenter)), Multiply(Global Variable(
+			BouncePadDistance), -1.000)), Y Component Of(Global Variable(CircleCenter)), Z Component Of(Global Variable(CircleCenter))));
+		Set Global Variable(BouncePad3, Vector(X Component Of(Global Variable(CircleCenter)), Y Component Of(Global Variable(
+			CircleCenter)), Add(Z Component Of(Global Variable(CircleCenter)), Multiply(Global Variable(BouncePadDistance), 1))));
+		Set Global Variable(BouncePad4, Vector(X Component Of(Global Variable(CircleCenter)), Y Component Of(Global Variable(
+			CircleCenter)), Add(Z Component Of(Global Variable(CircleCenter)), Multiply(Global Variable(BouncePadDistance), -1.000))));
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), ==, 0)),
+			Ring, Green, Global Variable(BouncePad1), 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), ==, 0)),
+			Ring, Green, Global Variable(BouncePad2), 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), ==, 0)),
+			Ring, Green, Global Variable(BouncePad3), 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), ==, 0)),
+			Ring, Green, Global Variable(BouncePad4), 2, Visible To Position and Radius);
+		Skip If(Global Variable(RedGreenColorblindMode), 5);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), >, 0)),
+			Ring, Red, Global Variable(BouncePad1), 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), >, 0)),
+			Ring, Red, Global Variable(BouncePad2), 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), >, 0)),
+			Ring, Red, Global Variable(BouncePad3), 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), >, 0)),
+			Ring, Red, Global Variable(BouncePad4), 2, Visible To Position and Radius);
+		Abort;
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), >, 0)),
+			Ring, Yellow, Global Variable(BouncePad1), 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), >, 0)),
+			Ring, Yellow, Global Variable(BouncePad2), 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), >, 0)),
+			Ring, Yellow, Global Variable(BouncePad3), 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Player Variable(Current Array Element, BouncePadCooldown), >, 0)),
+			Ring, Yellow, Global Variable(BouncePad4), 2, Visible To Position and Radius);
+	}
+}
+
+rule("Create ball & targeted effect")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Slot Of(Current Array Element), !=, Global Variable(
+			SlotOfTargetedPlayer))), Orb, Blue, Global Variable(BallPosition), 0.400, Visible To Position and Radius);
+		Skip If(Global Variable(RedGreenColorblindMode), 3);
+		Create Effect(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams), Orb, Red, Global Variable(BallPosition), 0.400,
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Bad Aura, Red, Position Of(Players In Slot(Global Variable(SlotOfTargetedPlayer),
+			All Teams)), 1, Visible To Position and Radius);
+		Abort;
+		Create Effect(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams), Orb, Yellow, Global Variable(BallPosition), 0.400,
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Bad Aura, Yellow, Position Of(Players In Slot(Global Variable(SlotOfTargetedPlayer),
+			All Teams)), 1, Visible To Position and Radius);
+	}
+}
+
+rule("Create ball countdown HUD")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(BallSpawnCountdown) > 0;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("Ball Spawning In: {0}", Round To Integer(Global Variable(
+			BallSpawnCountdown), Up), Null, Null), Add(Global Variable(CircleCenter), Multiply(Vector(0, 1, 0), Divide(Global Variable(
+			SphereSize), 6))), 10, Clip Against Surfaces, Visible To Position and String, Sky Blue, Default Visibility);
+		Set Global Variable(BallSpawnCountdownHUD, Last Text ID);
+	}
+}
+
+rule("Delete ball countdown HUD")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(BallSpawnCountdown) == 0;
+	}
+
+	actions
+	{
+		Destroy In-World Text(Global Variable(BallSpawnCountdownHUD));
+	}
+}
+
+rule("// Not enough players testing")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Skip If(Not(Global Variable(WatermarkEnabled)), 1);
+		Create HUD Text(All Players(All Teams), Null, Custom String("Developed by u/Mazawrath. v2.1.0 update by u/FearlessKat", Null, Null,
+			Null), Null, Left, 0, White, White, White, Visible To and String, Visible Always);
+	}
+}
+
+rule("Check for <2 players")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Number of Players(All Teams) == 1;
+	}
+
+	actions
+	{
+		Set Global Variable(IsInFinalDuel, False);
+		Create HUD Text(All Players(All Teams), Custom String("Waiting for more players", Null, Null, Null), Null, Null, Top, 0, White,
+			White, White, Visible To and String, Default Visibility);
+		Set Global Variable(WaitingForPlayersHUD, Last Text ID);
+		Set Global Variable(IsEnoughPlayersToStart, False);
+		Stop Chasing Global Variable(BallSpawnCountdown);
+		Skip If(Compare(Global Variable(RoundInProgress), ==, False), 1);
+		Set Global Variable(BallDeleteRequested, True);
+		Set Global Variable(RoundInProgress, False);
+		Pause Match Time;
+	}
+}
+
+rule("Wait for more players")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Players(All Teams) > 1;
+		Global Variable(IsEnoughPlayersToStart) == False;
+	}
+
+	actions
+	{
+		Destroy HUD Text(Global Variable(WaitingForPlayersHUD));
+		Big Message(All Players(All Teams), Custom String("Starting game in 5 seconds!", Null, Null, Null));
+		Wait(5.500, Ignore Condition);
+		Abort If(Compare(Number of Players(All Teams), <, 2));
+		Unpause Match Time;
+		Set Global Variable(IsEnoughPlayersToStart, True);
+		Set Global Variable(SlotOfTargetedPlayer, -1.000);
+		Set Global Variable(SlotOfPreviousTargetedPlayer, -1.000);
+	}
+}
+
+rule("// GAME RULES")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Player joins game")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, hasMoved) == False;
+		disabled Is Game In Progress == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Skip If(Or(Not(Global Variable(RoundInProgress)), Not(Is Game In Progress)), 1);
+		Kill(Event Player, Null);
+		Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-15.000, 15), 8, Random Integer(-15.000, 15))));
+		Set Player Variable(Event Player, hasMoved, True);
+	}
+}
+
+rule("Shorten Deflect Length")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+		Is Using Ultimate(Event Player) == False;
+	}
+
+	actions
+	{
+		Wait(0.300, Ignore Condition);
+		Set Ability 2 Enabled(Event Player, False);
+		Wait(1, Ignore Condition);
+		Set Ability 2 Enabled(Event Player, True);
+	}
+}
+
+rule("Unlock dash after using jumppad")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global Variable(BouncepadDashingEnabled) == True;
+		Player Variable(Event Player, IsDashEnabled) == True;
+	}
+
+	actions
+	{
+		Set Ability 1 Enabled(Event Player, True);
+	}
+}
+
+rule("Disable dash after using")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global Variable(BouncepadDashingEnabled) == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Ability 1 Enabled(Event Player, False);
+		Set Player Variable(Event Player, IsDashEnabled, False);
+	}
+}
+
+rule("Target random player")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Global Variable(SlotOfTargetedPlayer) == -1.000;
+	}
+
+	actions
+	{
+		Set Global Variable(SlotOfTargetedPlayer, Slot Of(Random Value In Array(Filtered Array(All Living Players(All Teams), And(
+			Player Variable(Current Array Element, hasMoved), Compare(Global Variable(SlotOfPreviousTargetedPlayer), !=, Slot Of(
+			Players In Slot(Current Array Element, All Teams))))))));
+	}
+}
+
+rule("Push to circle")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Vector(X Component Of(Global Variable(CircleCenter)), Y Component Of(Position Of(
+			Event Player)), Z Component Of(Global Variable(CircleCenter)))) > Subtract(Global Variable(SphereSize), 1.500);
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Vector(X Component Of(Direction Towards(Position Of(Event Player), Global Variable(CircleCenter))), 0,
+			Z Component Of(Direction Towards(Position Of(Event Player), Global Variable(CircleCenter)))), 6, To World,
+			Cancel Contrary Motion);
+		Apply Impulse(Event Player, Up, 3, To World, Incorporate Contrary Motion);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Put out center")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global Variable(CircleCenter)) < Add(Global Variable(CenterOffLimitsSize), 0.500);
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Direction Towards(Global Variable(CircleCenter), Event Player), 10, To World, Cancel Contrary Motion);
+		Apply Impulse(Event Player, Up, 1.500, To World, Incorporate Contrary Motion);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Player dashes too far out of bounds")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Vector(X Component Of(Global Variable(CircleCenter)), Y Component Of(Position Of(
+			Event Player)), Z Component Of(Global Variable(CircleCenter)))) > Add(Global Variable(SphereSize), 1);
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Knocked Down, 2.500);
+		disabled Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-15.000, 15), 8, Random Integer(-15.000, 15))));
+		Apply Impulse(Event Player, Vector(X Component Of(Direction Towards(Position Of(Event Player), Global Variable(CircleCenter))), 0,
+			Z Component Of(Direction Towards(Position Of(Event Player), Global Variable(CircleCenter)))), 20, To World,
+			Cancel Contrary Motion);
+		Apply Impulse(Event Player, Up, 3, To World, Cancel Contrary Motion);
+		Big Message(Event Player, Custom String("Do not dash out of the arena!", Null, Null, Null));
+	}
+}
+
+rule("Bounce when near pad 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global Variable(BouncePad1)) <= 2.750;
+		Player Variable(Event Player, BouncePadCooldown) == 0;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Jump) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, IsDashEnabled, True);
+		Apply Impulse(Event Player, Up, Global Variable(BouncePadStrength), To World, Cancel Contrary Motion);
+		Set Player Variable(Event Player, BouncePadCooldown, Global Variable(BouncePadCooldownLength));
+		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global Variable(BouncePad1), 25);
+		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global Variable(BouncePad1), 2);
+		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
+		Set Player Variable At Index(Event Player, PlayerEffects, 1, Last Created Entity);
+		Wait(2, Ignore Condition);
+		Destroy Effect(Value In Array(Player Variable(Event Player, PlayerEffects), 1));
+	}
+}
+
+rule("Bounce when near pad 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global Variable(BouncePad2)) <= 2.750;
+		Player Variable(Event Player, BouncePadCooldown) == 0;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Jump) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, IsDashEnabled, True);
+		Apply Impulse(Event Player, Up, Global Variable(BouncePadStrength), To World, Cancel Contrary Motion);
+		Set Player Variable(Event Player, BouncePadCooldown, Global Variable(BouncePadCooldownLength));
+		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global Variable(BouncePad1), 25);
+		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global Variable(BouncePad2), 2);
+		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
+		Set Player Variable At Index(Event Player, PlayerEffects, 1, Last Created Entity);
+		Wait(2, Ignore Condition);
+		Destroy Effect(Value In Array(Player Variable(Event Player, PlayerEffects), 1));
+	}
+}
+
+rule("Bounce when near pad 3")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global Variable(BouncePad3)) <= 2.750;
+		Player Variable(Event Player, BouncePadCooldown) == 0;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Jump) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, IsDashEnabled, True);
+		Apply Impulse(Event Player, Up, Global Variable(BouncePadStrength), To World, Cancel Contrary Motion);
+		Set Player Variable(Event Player, BouncePadCooldown, Global Variable(BouncePadCooldownLength));
+		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global Variable(BouncePad1), 25);
+		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global Variable(BouncePad3), 2);
+		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
+		Set Player Variable At Index(Event Player, PlayerEffects, 1, Last Created Entity);
+		Wait(2, Ignore Condition);
+		Destroy Effect(Value In Array(Player Variable(Event Player, PlayerEffects), 1));
+	}
+}
+
+rule("Bounce when near pad 4")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global Variable(BouncePad4)) <= 2.750;
+		Player Variable(Event Player, BouncePadCooldown) == 0;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Jump) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, IsDashEnabled, True);
+		Apply Impulse(Event Player, Up, Global Variable(BouncePadStrength), To World, Cancel Contrary Motion);
+		Set Player Variable(Event Player, BouncePadCooldown, Global Variable(BouncePadCooldownLength));
+		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global Variable(BouncePad1), 25);
+		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global Variable(BouncePad4), 2);
+		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
+		Set Player Variable At Index(Event Player, PlayerEffects, 1, Last Created Entity);
+		Wait(2, Ignore Condition);
+		Destroy Effect(Value In Array(Player Variable(Event Player, PlayerEffects), 1));
+	}
+}
+
+rule("Ball delete requested")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(BallDeleteRequested) == True;
+	}
+
+	actions
+	{
+		Set Global Variable(BallDeleteRequested, False);
+		Set Global Variable(SlotOfTargetedPlayer, -1.000);
+		Stop Chasing Global Variable(BallPosition);
+		Set Global Variable(BallPosition, 0);
+		Set Global Variable(BallIsOut, False);
+		Set Global Variable(SlotOfPreviousTargetedPlayer, -1.000);
+		Set Global Variable(BallSpawnCountdown, 2);
+	}
+}
+
+disabled rule("Shoot knockback zone")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Filtered Array(Filtered Array(All Living Players(All Teams), Compare(Current Array Element, !=, Event Player)),
+			Compare(Distance Between(Position Of(Event Player), Position Of(Current Array Element)), <, 5)), Up, 70, To World,
+			Cancel Contrary Motion);
+		Apply Impulse(Event Player, Direction Towards(Global Variable(CircleCenter), Event Player), 10, To World, Cancel Contrary Motion);
+		Apply Impulse(Event Player, Up, 1.500, To World, Incorporate Contrary Motion);
+	}
+}
+
+rule("Only end game when there isn't a round in progress")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Match Time == 0;
+		Global Variable(RoundInProgress) == False;
+		Global Variable(GameEndEnabled) == True;
+	}
+
+	actions
+	{
+		Enable Built-In Game Mode Music;
+		Enable Built-In Game Mode Completion;
+	}
+}
+
+disabled rule("Update player ultimate (NOTE: Currently doesn't do anything)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Ultimate Charge Percent(Event Player) != Player Variable(Event Player, CurrentUltPercent);
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player, Player Variable(Event Player, CurrentUltPercent));
+	}
+}
+
+disabled rule("Player uses ultimate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Ultimate) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, CurrentUltPercent, 0);
+	}
+}
+
+rule("// ACTIVE GAME")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Start round")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(IsEnoughPlayersToStart) == True;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Chase Global Variable At Rate(BallSpawnCountdown, 0, 1, Destination and Rate);
+		Set Global Variable(RoundInProgress, True);
+		Chase Player Variable At Rate(All Players(All Teams), BouncePadCooldown, 0, 1, Destination and Rate);
+		Set Global Variable(BallSpawnCountdown, 7);
+	}
+}
+
+rule("Spawn ball")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(BallSpawnCountdown) == 0;
+	}
+
+	actions
+	{
+		Set Global Variable(BallPosition, Global Variable(CircleCenter));
+		Chase Global Variable At Rate(BallPosition, Eye Position(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams)),
+			Global Variable(BallSpeed), Destination and Rate);
+		Set Global Variable(BallIsOut, True);
+		Chase Global Variable At Rate(BallSpeed, Global Variable(MaxBallSpeed), 0.100, Destination and Rate);
+		Set Global Variable(BallSpeed, Min(15, Global Variable(BallSpeed)));
+	}
+}
+
+rule("Ball reaches player")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Distance Between(Global Variable(BallPosition), Eye Position(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams)))
+			<= 1.900;
+		Global Variable(BallIsOut) == True;
+	}
+
+	actions
+	{
+		Skip If(Is Using Ability 2(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams)), 9);
+		Set Player Variable(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams), BouncePadCooldown, 0);
+		Modify Player Variable(Players In Slot(Global Variable(SlotOfPreviousTargetedPlayer), All Teams), CurrentUltPercent, Add, 15);
+		Kill(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams), Players In Slot(Global Variable(
+			SlotOfPreviousTargetedPlayer), All Teams));
+		Modify Player Variable(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams), PlayerDeaths, Add, 1);
+		Modify Player Variable(Players In Slot(Global Variable(SlotOfPreviousTargetedPlayer), All Teams), PlayerKills, Add, 1);
+		Set Global Variable(BallDeleteRequested, True);
+		Play Effect(All Players(All Teams), Ring Explosion, Sky Blue, Add(Global Variable(CircleCenter), Vector(0, -1.250, 0)), Multiply(
+			Global Variable(SphereSize), 1.500));
+		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global Variable(CircleCenter), 40);
+		Abort;
+		Modify Player Variable(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams), CurrentUltPercent, Add, 5);
+		Play Effect(All Players(All Teams), Explosion Sound, White, Position Of(Players In Slot(Global Variable(SlotOfTargetedPlayer),
+			All Teams)), 200);
+		Modify Player Variable(Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams), PlayerDeflects, Add, 1);
+		Set Global Variable(SlotOfPreviousTargetedPlayer, Global Variable(SlotOfTargetedPlayer));
+		Set Global Variable(SlotOfTargetedPlayer, Slot Of(First Of(Sorted Array(Filtered Array(All Living Players(All Teams), Compare(
+			Slot Of(Current Array Element), !=, Global Variable(SlotOfPreviousTargetedPlayer))), Angle Between Vectors(Facing Direction Of(
+			Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams)), Direction Towards(Players In Slot(Global Variable(
+			SlotOfTargetedPlayer), All Teams), Position Of(Current Array Element)))))));
+		Set Global Variable(BallSpeed, Min(45, Add(Global Variable(BallSpeed), 1)));
+		Wait(0.001, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Final duel")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Count Of(Filtered Array(All Living Players(All Teams), Player Variable(Current Array Element, hasMoved))) == 2;
+		Global Variable(IsEnoughPlayersToStart) == True;
+		Global Variable(IsInFinalDuel) == False;
+	}
+
+	actions
+	{
+		Set Ability 1 Enabled(All Living Players(All Teams), False);
+		Set Player Variable(All Living Players(All Teams), IsDashEnabled, False);
+		Skip If(Compare(Global Variable(BallIsOut), ==, False), 1);
+		Set Global Variable(BallDeleteRequested, True);
+		Set Global Variable(IsInFinalDuel, True);
+		Set Player Variable(All Living Players(All Teams), BouncePadCooldown, Global Variable(BouncePadCooldownLength));
+		Skip If(Compare(Number of Players(All Teams), <=, 2), 1);
+		Big Message(All Players(All Teams), Custom String("Final Duel!", Null, Null, Null));
+		Teleport(Value In Array(All Living Players(All Teams), 0), Add(Global Variable(CircleCenter), Multiply(Vector(-1.000, 0, 0),
+			Divide(Global Variable(SphereSize), 1.500))));
+		Set Facing(Value In Array(All Living Players(All Teams), 0), Direction Towards(Value In Array(All Living Players(All Teams), 0),
+			Global Variable(CircleCenter)), To World);
+		Teleport(Value In Array(All Living Players(All Teams), 1), Add(Global Variable(CircleCenter), Multiply(Vector(1, 0, 0), Divide(
+			Global Variable(SphereSize), 1.500))));
+		Set Facing(Value In Array(All Living Players(All Teams), 1), Direction Towards(Value In Array(All Living Players(All Teams), 1),
+			Global Variable(CircleCenter)), To World);
+		Set Move Speed(All Living Players(All Teams), 10);
+		Wait(2, Ignore Condition);
+		Skip If(Not(Global Variable(CooldownDashingEnabled)), 1);
+		Set Ability 1 Enabled(All Living Players(All Teams), True);
+		Set Move Speed(All Living Players(All Teams), 100);
+	}
+}
+
+rule("Check for last player surviving")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Number of Living Players(All Teams) == 1;
+		Global Variable(IsEnoughPlayersToStart) == True;
+	}
+
+	actions
+	{
+		Set Global Variable(IsInFinalDuel, False);
+		Modify Player Score(All Living Players(All Teams), 1);
+		Stop Chasing Player Variable(All Players(All Teams), BouncePadCooldown);
+		Stop Chasing Global Variable(BallSpawnCountdown);
+		Big Message(All Players(All Teams), Custom String("{0} has won the round!", First Of(All Living Players(All Teams)), Null, Null));
+		Wait(2, Ignore Condition);
+		Resurrect(All Dead Players(All Teams));
+		Abort If(Not(Global Variable(IsEnoughPlayersToStart)));
+		Set Global Variable(RoundInProgress, False);
+		Set Player Variable(All Players(All Teams), BouncePadCooldown, Global Variable(BouncePadCooldownLength));
+		Set Global Variable(SlotOfTargetedPlayer, -1.000);
+		Set Global Variable(BallSpawnCountdown, 5);
+		Wait(1, Ignore Condition);
+		Set Global Variable(RoundInProgress, True);
+		Skip If(Not(Global Variable(BouncepadDashingEnabled)), 2);
+		Set Player Variable(All Players(All Teams), IsDashEnabled, False);
+		Set Ability 1 Enabled(All Players(All Teams), False);
+		Chase Global Variable At Rate(BallSpawnCountdown, 0, 1, Destination and Rate);
+		Chase Player Variable At Rate(All Players(All Teams), BouncePadCooldown, 0, 1, Destination and Rate);
+	}
+}
+
+rule("All players dead failsafe")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Living Players(All Teams) == 0;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Global Variable(IsInFinalDuel, False);
+		Skip If(Compare(Global Variable(BallIsOut), ==, False), 1);
+		Set Global Variable(BallDeleteRequested, True);
+		Set Global Variable(RoundInProgress, False);
+		Stop Chasing Global Variable(BallSpawnCountdown);
+		Resurrect(All Dead Players(All Teams));
+		Small Message(All Players(All Teams), Custom String("All players detected dead! Resetting game.", Null, Null, Null));
+		Stop Chasing Player Variable(All Players(All Teams), BouncePadCooldown);
+		Set Player Variable(All Players(All Teams), BouncePadCooldown, Global Variable(BouncePadCooldownLength));
+		Set Global Variable(BallSpawnCountdown, 5);
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+		Wait(2, Ignore Condition);
+		Abort If(Not(Global Variable(IsEnoughPlayersToStart)));
+		Chase Player Variable At Rate(All Players(All Teams), BouncePadCooldown, 0, 1, Destination and Rate);
+		Chase Global Variable At Rate(BallSpawnCountdown, 0, 1, Destination and Rate);
+		Set Global Variable(RoundInProgress, True);
+		Set Global Variable(BallPosition, 0);
+	}
+}
