@@ -316,6 +316,7 @@ rule("Init global variables")
 		Set Global Variable(CenterOffLimitsSize, 3.500);
 		Set Global Variable(IsInFinalDuel, False);
 		Set Global Variable(BouncePadCooldownLength, 7);
+		Set Global Variable(BallPosition, Vector(0, -1.000, 0));
 	}
 }
 
@@ -915,7 +916,7 @@ rule("Ball delete requested")
 		Set Global Variable(BallDeleteRequested, False);
 		Set Global Variable(SlotOfTargetedPlayer, -1.000);
 		Stop Chasing Global Variable(BallPosition);
-		Set Global Variable(BallPosition, 0);
+		Set Global Variable(BallPosition, Vector(0, -1.000, 0));
 		Set Global Variable(BallIsOut, False);
 		Set Global Variable(SlotOfPreviousTargetedPlayer, -1.000);
 		Set Global Variable(BallSpawnCountdown, 2);
@@ -1215,6 +1216,6 @@ rule("All players dead failsafe")
 		Chase Player Variable At Rate(All Players(All Teams), BouncePadCooldown, 0, 1, Destination and Rate);
 		Chase Global Variable At Rate(BallSpawnCountdown, 0, 1, Destination and Rate);
 		Set Global Variable(RoundInProgress, True);
-		Set Global Variable(BallPosition, 0);
+		Set Global Variable(BallPosition, Vector(0, -1.000, 0));
 	}
 }
