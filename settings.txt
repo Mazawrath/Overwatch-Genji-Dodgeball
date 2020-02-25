@@ -509,8 +509,9 @@ rule("Create ball countdown HUD")
 	actions
 	{
 		Create In-World Text(All Players(All Teams), Custom String("Ball Spawning In: {0}", Round To Integer(Global Variable(
-			BallSpawnCountdown), Up), Null, Null), Add(Global Variable(CircleCenter), Multiply(Vector(0, 1, 0), Divide(Global Variable(
-			SphereSize), 6))), 10, Clip Against Surfaces, Visible To Position and String, Sky Blue, Default Visibility);
+			BallSpawnCountdown), Up), Null, Null), Vector(X Component Of(Global Variable(CircleCenter)), Add(Y Component Of(
+			Global Variable(CircleCenter)), 2.500), Z Component Of(Global Variable(CircleCenter))), 10, Clip Against Surfaces,
+			Visible To Position and String, Sky Blue, Default Visibility);
 		Set Global Variable(BallSpawnCountdownHUD, Last Text ID);
 	}
 }
