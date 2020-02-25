@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v2.2.0. Developed by u/Mazawath. v2.1.0 update by u/FearlessKat. Deflect the ball when it is red to target someone else! Use jump pads to get air! Make sure you have the latest version by going to www.workshop.codes/BDZ38"
+		Description: "Genji Dodgeball v2.3.0. Developed by u/Mazawath. v2.1.0 update by u/FearlessKat. Deflect the ball when it is red to target someone else! Use jump pads to get air! Make sure you have the latest version by going to www.workshop.codes/BDZ38"
 	}
 
 	lobby
@@ -16,23 +16,25 @@ settings
 	{
 		Deathmatch
 		{
-			Game Length In Minutes: 15
-			Score To Win: 50
-			Self Initiated Respawn: Off
-
 			enabled maps
 			{
 				Blizzard World
+				Oasis University
+				Workshop Chamber
+				Workshop Island
 			}
 		}
 
 		General
 		{
 			Allow Hero Switching: Off
+			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Kill Cam: Off
 			Respawn As Random Hero: On
+			Score To Win: 50
+			Self Initiated Respawn: Off
 		}
 	}
 
@@ -152,7 +154,7 @@ disabled rule("Enable Bouncepad Dashing (Use the bouncepad to get a dash) - Only
 	}
 }
 
-disabled rule("Enable Cooldown Dashing (Configure the dash cooldown in custom game settings) - Only enable one!")
+rule("Enable Cooldown Dashing (Configure the dash cooldown in custom game settings) - Only enable one!")
 {
 	event
 	{
@@ -184,6 +186,44 @@ rule("// MAP ZONES")
 	event
 	{
 		Ongoing - Global;
+	}
+}
+
+rule("Set Workshop Island")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(Workshop Island);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
+		Set Global Variable(SphereSize, 20);
+	}
+}
+
+rule("Set Workshop Chamber")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(Workshop Chamber);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
+		Set Global Variable(SphereSize, 29.700);
 	}
 }
 
@@ -297,6 +337,7 @@ rule("Init global variables")
 		Set Global Variable(CenterOffLimitsSize, 3.500);
 		Set Global Variable(IsInFinalDuel, False);
 		Set Global Variable(BouncePadCooldownLength, 7);
+		Set Global Variable(BallPosition, Vector(0, -1.000, 0));
 	}
 }
 
@@ -309,12 +350,15 @@ rule("Create game sphere")
 
 	actions
 	{
-		Create Effect(All Players(All Teams), Light Shaft, Orange, Vector(X Component Of(Global Variable(CircleCenter)), Subtract(
-			Y Component Of(Global Variable(CircleCenter)), 15), Z Component Of(Global Variable(CircleCenter))), Global Variable(
-			SphereSize), Visible To Position and Radius);
 		Create Effect(All Players(All Teams), Sphere, Sky Blue, Vector(X Component Of(Global Variable(CircleCenter)), Subtract(
 			Y Component Of(Global Variable(CircleCenter)), 0), Z Component Of(Global Variable(CircleCenter))), Global Variable(
 			CenterOffLimitsSize), Visible To Position and Radius);
+		"Workshop Island doesn't need a circle."
+		If(Compare(Current Map, !=, Map(Workshop Island)));
+			Create Effect(All Players(All Teams), Light Shaft, Orange, Vector(X Component Of(Global Variable(CircleCenter)), Subtract(
+				Y Component Of(Global Variable(CircleCenter)), 15), Z Component Of(Global Variable(CircleCenter))), Global Variable(
+				SphereSize), Visible To Position and Radius);
+		End;
 	}
 }
 
@@ -465,8 +509,9 @@ rule("Create ball countdown HUD")
 	actions
 	{
 		Create In-World Text(All Players(All Teams), Custom String("Ball Spawning In: {0}", Round To Integer(Global Variable(
-			BallSpawnCountdown), Up), Null, Null), Add(Global Variable(CircleCenter), Multiply(Vector(0, 1, 0), Divide(Global Variable(
-			SphereSize), 6))), 10, Clip Against Surfaces, Visible To Position and String, Sky Blue, Default Visibility);
+			BallSpawnCountdown), Up), Null, Null), Vector(X Component Of(Global Variable(CircleCenter)), Add(Y Component Of(
+			Global Variable(CircleCenter)), 2.500), Z Component Of(Global Variable(CircleCenter))), 10, Clip Against Surfaces,
+			Visible To Position and String, Sky Blue, Default Visibility);
 		Set Global Variable(BallSpawnCountdownHUD, Last Text ID);
 	}
 }
@@ -499,6 +544,7 @@ rule("// Not enough players testing")
 	actions
 	{
 		Skip If(Not(Global Variable(WatermarkEnabled)), 1);
+		"Please don't be a child and try to take credit for this game. If you actually have contributed something you are free to add here. But if not, don't touch this. You are free to disable it."
 		Create HUD Text(All Players(All Teams), Null, Custom String("Developed by u/Mazawrath. v2.1.0 update by u/FearlessKat", Null, Null,
 			Null), Null, Left, 0, White, White, White, Visible To and String, Visible Always);
 	}
@@ -586,7 +632,7 @@ rule("Player joins game")
 	{
 		Skip If(Or(Not(Global Variable(RoundInProgress)), Not(Is Game In Progress)), 1);
 		Kill(Event Player, Null);
-		Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-15.000, 15), 8, Random Integer(-15.000, 15))));
+		Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-10.000, 10), 8, Random Integer(-10.000, 10))));
 		Set Player Variable(Event Player, hasMoved, True);
 	}
 }
@@ -692,6 +738,8 @@ rule("Push to circle")
 	{
 		Distance Between(Position Of(Event Player), Vector(X Component Of(Global Variable(CircleCenter)), Y Component Of(Position Of(
 			Event Player)), Z Component Of(Global Variable(CircleCenter)))) > Subtract(Global Variable(SphereSize), 1.500);
+		"Workshop Island Fix"
+		Current Map != Map(Workshop Island);
 	}
 
 	actions
@@ -741,6 +789,8 @@ rule("Player dashes too far out of bounds")
 	{
 		Distance Between(Position Of(Event Player), Vector(X Component Of(Global Variable(CircleCenter)), Y Component Of(Position Of(
 			Event Player)), Z Component Of(Global Variable(CircleCenter)))) > Add(Global Variable(SphereSize), 1);
+		"Workshop Island Fix"
+		Current Map != Map(Workshop Island);
 	}
 
 	actions
@@ -752,6 +802,62 @@ rule("Player dashes too far out of bounds")
 			Cancel Contrary Motion);
 		Apply Impulse(Event Player, Up, 3, To World, Cancel Contrary Motion);
 		Big Message(Event Player, Custom String("Do not dash out of the arena!", Null, Null, Null));
+	}
+}
+
+rule("Player tries to abuse ledge on Workshop Island")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		"Thanks DaftPunk for the wonderful exploit :)"
+		Current Map == Map(Workshop Island);
+		Y Component Of(Position Of(Event Player)) < -0.500;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		"People were jumping off the ledge to make the ball go through the floor so this will stun them so they don't"
+		Set Status(Event Player, Null, Knocked Down, 10);
+		Big Message(Event Player, Custom String("Do not abuse the ledge!", Null, Null, Null));
+	}
+}
+
+rule("Player falls off Workshop Island")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Current Map == Map(Workshop Island);
+		Y Component Of(Position Of(Event Player)) < -0.500;
+	}
+
+	actions
+	{
+		"A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!"
+		If(Not(Is Alive(Event Player)));
+			Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-10.000, 10), 8, Random Integer(-10.000, 10))));
+			If(Compare(Slot Of(Event Player), ==, Global Variable(SlotOfTargetedPlayer)));
+				If(Global Variable(BallIsOut));
+					Set Global Variable(BallDeleteRequested, True);
+				End;
+			End;
+		End;
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -896,7 +1002,7 @@ rule("Ball delete requested")
 		Set Global Variable(BallDeleteRequested, False);
 		Set Global Variable(SlotOfTargetedPlayer, -1.000);
 		Stop Chasing Global Variable(BallPosition);
-		Set Global Variable(BallPosition, 0);
+		Set Global Variable(BallPosition, Vector(0, -1.000, 0));
 		Set Global Variable(BallIsOut, False);
 		Set Global Variable(SlotOfPreviousTargetedPlayer, -1.000);
 		Set Global Variable(BallSpawnCountdown, 2);
@@ -1196,6 +1302,6 @@ rule("All players dead failsafe")
 		Chase Player Variable At Rate(All Players(All Teams), BouncePadCooldown, 0, 1, Destination and Rate);
 		Chase Global Variable At Rate(BallSpawnCountdown, 0, 1, Destination and Rate);
 		Set Global Variable(RoundInProgress, True);
-		Set Global Variable(BallPosition, 0);
+		Set Global Variable(BallPosition, Vector(0, -1.000, 0));
 	}
 }
