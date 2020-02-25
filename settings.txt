@@ -16,23 +16,25 @@ settings
 	{
 		Deathmatch
 		{
-			Game Length In Minutes: 15
-			Score To Win: 50
-			Self Initiated Respawn: Off
-
 			enabled maps
 			{
 				Blizzard World
+				Oasis University
+				Workshop Chamber
+				Workshop Island
 			}
 		}
 
 		General
 		{
 			Allow Hero Switching: Off
+			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Kill Cam: Off
 			Respawn As Random Hero: On
+			Score To Win: 50
+			Self Initiated Respawn: Off
 		}
 	}
 
