@@ -187,6 +187,25 @@ rule("// MAP ZONES")
 	}
 }
 
+rule("Set Workshop Island")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(Workshop Island);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
+		Set Global Variable(SphereSize, 20);
+	}
+}
+
 rule("Set Workshop Chamber")
 {
 	event
