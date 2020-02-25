@@ -538,6 +538,7 @@ rule("// Not enough players testing")
 	actions
 	{
 		Skip If(Not(Global Variable(WatermarkEnabled)), 1);
+		"Please don't be a child and try to take credit for this game. If you actually have contributed something you are free to add here. But if not, don't touch this. You are free to disable it."
 		Create HUD Text(All Players(All Teams), Null, Custom String("Developed by u/Mazawrath. v2.1.0 update by u/FearlessKat", Null, Null,
 			Null), Null, Left, 0, White, White, White, Visible To and String, Visible Always);
 	}
