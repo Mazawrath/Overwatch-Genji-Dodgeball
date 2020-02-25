@@ -626,7 +626,7 @@ rule("Player joins game")
 	{
 		Skip If(Or(Not(Global Variable(RoundInProgress)), Not(Is Game In Progress)), 1);
 		Kill(Event Player, Null);
-		Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-15.000, 15), 8, Random Integer(-15.000, 15))));
+		Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-10.000, 10), 8, Random Integer(-10.000, 10))));
 		Set Player Variable(Event Player, hasMoved, True);
 	}
 }
@@ -817,10 +817,10 @@ rule("Player falls off Workshop Island")
 	actions
 	{
 		"A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!"
-		Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-15.000, 15), 8, Random Integer(-15.000, 15))));
 		If(Compare(Slot Of(Event Player), ==, Global Variable(SlotOfTargetedPlayer)));
 			If(Global Variable(BallIsOut));
 				Set Global Variable(BallDeleteRequested, True);
+			Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-10.000, 10), 8, Random Integer(-10.000, 10))));
 			End;
 		End;
 	}
