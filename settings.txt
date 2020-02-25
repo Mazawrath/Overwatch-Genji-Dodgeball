@@ -202,7 +202,7 @@ rule("Set Workshop Chamber")
 	actions
 	{
 		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
-		Set Global Variable(SphereSize, 50);
+		Set Global Variable(SphereSize, 29.750);
 	}
 }
 
