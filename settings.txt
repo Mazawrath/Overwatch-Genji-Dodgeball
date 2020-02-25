@@ -350,12 +350,15 @@ rule("Create game sphere")
 
 	actions
 	{
-		Create Effect(All Players(All Teams), Light Shaft, Orange, Vector(X Component Of(Global Variable(CircleCenter)), Subtract(
-			Y Component Of(Global Variable(CircleCenter)), 15), Z Component Of(Global Variable(CircleCenter))), Global Variable(
-			SphereSize), Visible To Position and Radius);
 		Create Effect(All Players(All Teams), Sphere, Sky Blue, Vector(X Component Of(Global Variable(CircleCenter)), Subtract(
 			Y Component Of(Global Variable(CircleCenter)), 0), Z Component Of(Global Variable(CircleCenter))), Global Variable(
 			CenterOffLimitsSize), Visible To Position and Radius);
+		"Workshop Island doesn't need a circle."
+		If(Compare(Current Map, !=, Map(Workshop Island)));
+			Create Effect(All Players(All Teams), Light Shaft, Orange, Vector(X Component Of(Global Variable(CircleCenter)), Subtract(
+				Y Component Of(Global Variable(CircleCenter)), 15), Z Component Of(Global Variable(CircleCenter))), Global Variable(
+				SphereSize), Visible To Position and Radius);
+		End;
 	}
 }
 
@@ -805,7 +808,7 @@ rule("Player falls off Workshop Island")
 {
 	event
 	{
-		Player Died;
+		Ongoing - Each Player;
 		All;
 		All;
 	}
@@ -813,18 +816,22 @@ rule("Player falls off Workshop Island")
 	conditions
 	{
 		Current Map == Map(Workshop Island);
-		Y Component Of(Position Of(Event Player)) < -0.500;
+		Y Component Of(Position Of(Event Player)) < -0.100;
 	}
 
 	actions
 	{
 		"A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!"
-		If(Compare(Slot Of(Event Player), ==, Global Variable(SlotOfTargetedPlayer)));
-			If(Global Variable(BallIsOut));
-				Set Global Variable(BallDeleteRequested, True);
+		If(Not(Is Alive(Event Player)));
 			Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-10.000, 10), 8, Random Integer(-10.000, 10))));
+			If(Compare(Slot Of(Event Player), ==, Global Variable(SlotOfTargetedPlayer)));
+				If(Global Variable(BallIsOut));
+					Set Global Variable(BallDeleteRequested, True);
+				End;
 			End;
 		End;
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
