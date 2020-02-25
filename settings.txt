@@ -49,7 +49,7 @@ settings
 				Primary Fire: Off
 				Quick Melee: Off
 				Secondary Fire: Off
-				Swift Strike Cooldown Time: 25%
+				Swift Strike Cooldown Time: 50%
 				Ultimate Generation - Combat Dragonblade: 0%
 				Ultimate Generation - Passive Dragonblade: 0%
 			}
@@ -154,7 +154,7 @@ disabled rule("Enable Bouncepad Dashing (Use the bouncepad to get a dash) - Only
 	}
 }
 
-disabled rule("Enable Cooldown Dashing (Configure the dash cooldown in custom game settings) - Only enable one!")
+rule("Enable Cooldown Dashing (Configure the dash cooldown in custom game settings) - Only enable one!")
 {
 	event
 	{
