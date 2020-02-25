@@ -731,6 +731,8 @@ rule("Push to circle")
 	{
 		Distance Between(Position Of(Event Player), Vector(X Component Of(Global Variable(CircleCenter)), Y Component Of(Position Of(
 			Event Player)), Z Component Of(Global Variable(CircleCenter)))) > Subtract(Global Variable(SphereSize), 1.500);
+		"Workshop Island Fix"
+		Current Map != Map(Workshop Island);
 	}
 
 	actions
@@ -780,6 +782,8 @@ rule("Player dashes too far out of bounds")
 	{
 		Distance Between(Position Of(Event Player), Vector(X Component Of(Global Variable(CircleCenter)), Y Component Of(Position Of(
 			Event Player)), Z Component Of(Global Variable(CircleCenter)))) > Add(Global Variable(SphereSize), 1);
+		"Workshop Island Fix"
+		Current Map != Map(Workshop Island);
 	}
 
 	actions
@@ -791,6 +795,33 @@ rule("Player dashes too far out of bounds")
 			Cancel Contrary Motion);
 		Apply Impulse(Event Player, Up, 3, To World, Cancel Contrary Motion);
 		Big Message(Event Player, Custom String("Do not dash out of the arena!", Null, Null, Null));
+	}
+}
+
+rule("Player falls off Workshop Island")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Current Map == Map(Workshop Island);
+		Y Component Of(Position Of(Event Player)) < -0.500;
+	}
+
+	actions
+	{
+		"A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!"
+		Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-15.000, 15), 8, Random Integer(-15.000, 15))));
+		If(Compare(Slot Of(Event Player), ==, Global Variable(SlotOfTargetedPlayer)));
+			If(Global Variable(BallIsOut));
+				Set Global Variable(BallDeleteRequested, True);
+			End;
+		End;
 	}
 }
 
