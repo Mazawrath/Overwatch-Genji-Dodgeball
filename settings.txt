@@ -804,6 +804,31 @@ rule("Player dashes too far out of bounds")
 	}
 }
 
+rule("Player tries to abuse ledge on Workshop Island")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		"Thanks DaftPunk for the wonderful exploit :)"
+		Current Map == Map(Workshop Island);
+		Y Component Of(Position Of(Event Player)) < -0.500;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		"People were jumping off the ledge to make the ball go through the floor so this will stun them so they don't"
+		Set Status(Event Player, Null, Knocked Down, 10);
+		Big Message(Event Player, Custom String("Do not abuse the ledge!", Null, Null, Null));
+	}
+}
+
 rule("Player falls off Workshop Island")
 {
 	event
@@ -816,7 +841,7 @@ rule("Player falls off Workshop Island")
 	conditions
 	{
 		Current Map == Map(Workshop Island);
-		Y Component Of(Position Of(Event Player)) < -0.100;
+		Y Component Of(Position Of(Event Player)) < -0.500;
 	}
 
 	actions
