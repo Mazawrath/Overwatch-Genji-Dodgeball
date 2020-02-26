@@ -1238,10 +1238,11 @@ rule("Final duel")
 		Big Message(All Players(All Teams), Custom String("Final Duel!", Null, Null, Null));
 		Teleport(Value In Array(All Living Players(All Teams), 0), Add(Global Variable(CircleCenter), Multiply(Vector(-1.000, 0, 0),
 			Divide(Global Variable(SphereSize), 1.500))));
-		Set Facing(Value In Array(All Living Players(All Teams), 0), Direction Towards(Value In Array(All Living Players(All Teams), 0),
-			Global Variable(CircleCenter)), To World);
 		Teleport(Value In Array(All Living Players(All Teams), 1), Add(Global Variable(CircleCenter), Multiply(Vector(1, 0, 0), Divide(
 			Global Variable(SphereSize), 1.500))));
+		Wait(0.050, Ignore Condition);
+		Set Facing(Value In Array(All Living Players(All Teams), 0), Direction Towards(Value In Array(All Living Players(All Teams), 0),
+			Global Variable(CircleCenter)), To World);
 		Set Facing(Value In Array(All Living Players(All Teams), 1), Direction Towards(Value In Array(All Living Players(All Teams), 1),
 			Global Variable(CircleCenter)), To World);
 		Set Move Speed(All Living Players(All Teams), 10);
