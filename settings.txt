@@ -8,6 +8,7 @@ settings
 	lobby
 	{
 		Allow Players Who Are In Queue: Yes
+		Map Rotation: After A Game
 		Match Voice Chat: Enabled
 		Return To Lobby: Never
 	}
