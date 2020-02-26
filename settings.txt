@@ -1255,9 +1255,10 @@ rule("Final duel")
 			Global Variable(CircleCenter)), To World);
 		Set Move Speed(All Living Players(All Teams), 10);
 		Wait(2, Ignore Condition);
+		Set Move Speed(All Living Players(All Teams), 100);
+		Wait(4, Ignore Condition);
 		Skip If(Not(Global Variable(CooldownDashingEnabled)), 1);
 		Set Ability 1 Enabled(All Living Players(All Teams), True);
-		Set Move Speed(All Living Players(All Teams), 100);
 	}
 }
 
