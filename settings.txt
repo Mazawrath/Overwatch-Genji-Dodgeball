@@ -208,7 +208,7 @@ rule("Set Blizard World center (fun fact: you can't use the name of the company 
 	}
 }
 
-rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller then the others!)")
+rule("Set Oasis University Center")
 {
 	event
 	{
@@ -217,13 +217,13 @@ rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller t
 
 	conditions
 	{
-		Current Map == Map(King's Row);
+		Current Map == Map(Oasis University);
 	}
 
 	actions
 	{
-		Set Global Variable(CircleCenter, Vector(-20.504, 40.538, -74.601));
-		Set Global Variable(SphereSize, 17);
+		Set Global Variable(CircleCenter, Vector(-192.609, 60.349, 2.252));
+		Set Global Variable(SphereSize, 20);
 	}
 }
 
@@ -265,6 +265,25 @@ rule("Set Workshop Chamber")
 	}
 }
 
+rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller then the others!)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(King's Row);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(-20.504, 40.538, -74.601));
+		Set Global Variable(SphereSize, 17);
+	}
+}
+
 rule("Set Workshop Expanse (I don't suggest using this one)")
 {
 	event
@@ -280,25 +299,6 @@ rule("Set Workshop Expanse (I don't suggest using this one)")
 	actions
 	{
 		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
-		Set Global Variable(SphereSize, 20);
-	}
-}
-
-rule("Set Oasis University Center")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	conditions
-	{
-		Current Map == Map(Oasis University);
-	}
-
-	actions
-	{
-		Set Global Variable(CircleCenter, Vector(-192.609, 60.349, 2.252));
 		Set Global Variable(SphereSize, 20);
 	}
 }
@@ -837,7 +837,7 @@ rule("Player tries to abuse ledge on Workshop Island")
 	{
 		"Thanks DaftPunk for the wonderful exploit :)"
 		Current Map == Map(Workshop Island);
-		Y Component Of(Position Of(Event Player)) < -1.750;
+		Y Component Of(Position Of(Event Player)) < -1.000;
 		Is Alive(Event Player) == True;
 		Has Status(Event Player, Knocked Down) == False;
 	}
