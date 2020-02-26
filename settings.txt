@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v2.3.1. Developed by u/Mazawath. v2.1.0 update by u/FearlessKat. Deflect the ball when it is red to target someone else! Use jump pads to get air! Make sure you have the latest version by going to www.workshop.codes/BDZ38"
+		Description: "Genji Dodgeball v2.3.2. Developed by u/Mazawath. v2.1.0 update by u/FearlessKat. Deflect the ball when it is red to target someone else! Use jump pads to get air! Make sure you have the latest version by going to www.workshop.codes/BDZ38"
 	}
 
 	lobby
@@ -1255,9 +1255,10 @@ rule("Final duel")
 			Global Variable(CircleCenter)), To World);
 		Set Move Speed(All Living Players(All Teams), 10);
 		Wait(2, Ignore Condition);
+		Set Move Speed(All Living Players(All Teams), 100);
+		Wait(4, Ignore Condition);
 		Skip If(Not(Global Variable(CooldownDashingEnabled)), 1);
 		Set Ability 1 Enabled(All Living Players(All Teams), True);
-		Set Move Speed(All Living Players(All Teams), 100);
 	}
 }
 
