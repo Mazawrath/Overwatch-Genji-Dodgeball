@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v2.3.0. Developed by u/Mazawath. v2.1.0 update by u/FearlessKat. Deflect the ball when it is red to target someone else! Use jump pads to get air! Make sure you have the latest version by going to www.workshop.codes/BDZ38"
+		Description: "Genji Dodgeball v2.3.1. Developed by u/Mazawath. v2.1.0 update by u/FearlessKat. Deflect the ball when it is red to target someone else! Use jump pads to get air! Make sure you have the latest version by going to www.workshop.codes/BDZ38"
 	}
 
 	lobby
@@ -189,6 +189,44 @@ rule("// MAP ZONES")
 	}
 }
 
+rule("Set Blizard World center (fun fact: you can't use the name of the company who made this game in rule names)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(Blizzard World);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(2.554, -4.651, -71.211));
+		Set Global Variable(SphereSize, 20);
+	}
+}
+
+rule("Set Oasis University Center")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(Oasis University);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(-192.609, 60.349, 2.252));
+		Set Global Variable(SphereSize, 20);
+	}
+}
+
 rule("Set Workshop Island")
 {
 	event
@@ -227,25 +265,6 @@ rule("Set Workshop Chamber")
 	}
 }
 
-rule("Set Oasis University Center")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	conditions
-	{
-		Current Map == Map(Oasis University);
-	}
-
-	actions
-	{
-		Set Global Variable(CircleCenter, Vector(-192.609, 60.349, 2.252));
-		Set Global Variable(SphereSize, 20);
-	}
-}
-
 rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller then the others!)")
 {
 	event
@@ -265,7 +284,7 @@ rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller t
 	}
 }
 
-rule("Set Blizard World center (fun fact: you can't use the name of the company who made this game in rule names)")
+rule("Set Workshop Expanse (I don't suggest using this one)")
 {
 	event
 	{
@@ -274,12 +293,12 @@ rule("Set Blizard World center (fun fact: you can't use the name of the company 
 
 	conditions
 	{
-		Current Map == Map(Blizzard World);
+		Current Map == Map(Workshop Expanse);
 	}
 
 	actions
 	{
-		Set Global Variable(CircleCenter, Vector(2.554, -4.651, -71.211));
+		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
 		Set Global Variable(SphereSize, 20);
 	}
 }
@@ -818,14 +837,15 @@ rule("Player tries to abuse ledge on Workshop Island")
 	{
 		"Thanks DaftPunk for the wonderful exploit :)"
 		Current Map == Map(Workshop Island);
-		Y Component Of(Position Of(Event Player)) < -0.500;
+		Y Component Of(Position Of(Event Player)) < -1.000;
 		Is Alive(Event Player) == True;
+		Has Status(Event Player, Knocked Down) == False;
 	}
 
 	actions
 	{
 		"People were jumping off the ledge to make the ball go through the floor so this will stun them so they don't"
-		Set Status(Event Player, Null, Knocked Down, 10);
+		Set Status(Event Player, Null, Knocked Down, 5);
 		Big Message(Event Player, Custom String("Do not abuse the ledge!", Null, Null, Null));
 	}
 }
@@ -847,7 +867,7 @@ rule("Player falls off Workshop Island")
 
 	actions
 	{
-		"A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!"
+		"A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORKSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!"
 		If(Not(Is Alive(Event Player)));
 			Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-10.000, 10), 8, Random Integer(-10.000, 10))));
 			If(Compare(Slot Of(Event Player), ==, Global Variable(SlotOfTargetedPlayer)));
