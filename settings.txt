@@ -8,6 +8,7 @@ settings
 	lobby
 	{
 		Allow Players Who Are In Queue: Yes
+		Map Rotation: After A Game
 		Match Voice Chat: Enabled
 		Return To Lobby: Never
 	}
@@ -28,7 +29,6 @@ settings
 		General
 		{
 			Allow Hero Switching: Off
-			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Kill Cam: Off
@@ -94,6 +94,8 @@ variables
 		28: BouncepadDashingEnabled
 		29: GameEndEnabled
 		30: CooldownDashingEnabled
+		31: PlayerWon
+		32: BallIncreaseSpeed
 
 	player:
 		0: hasMoved
@@ -205,6 +207,7 @@ rule("Set Blizard World center (fun fact: you can't use the name of the company 
 	{
 		Set Global Variable(CircleCenter, Vector(2.554, -4.651, -71.211));
 		Set Global Variable(SphereSize, 20);
+		Set Global Variable(BallIncreaseSpeed, 1);
 	}
 }
 
@@ -224,6 +227,7 @@ rule("Set Oasis University Center")
 	{
 		Set Global Variable(CircleCenter, Vector(-192.609, 60.349, 2.252));
 		Set Global Variable(SphereSize, 20);
+		Set Global Variable(BallIncreaseSpeed, 1);
 	}
 }
 
@@ -243,6 +247,7 @@ rule("Set Workshop Island")
 	{
 		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
 		Set Global Variable(SphereSize, 20);
+		Set Global Variable(BallIncreaseSpeed, 1.500);
 	}
 }
 
@@ -262,6 +267,7 @@ rule("Set Workshop Chamber")
 	{
 		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
 		Set Global Variable(SphereSize, 29.700);
+		Set Global Variable(BallIncreaseSpeed, 1.500);
 	}
 }
 
@@ -279,8 +285,9 @@ rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller t
 
 	actions
 	{
-		Set Global Variable(CircleCenter, Vector(-20.504, 40.538, -74.601));
+		Set Global Variable(CircleCenter, Vector(-20.504, 40, -74.601));
 		Set Global Variable(SphereSize, 17);
+		Set Global Variable(BallIncreaseSpeed, 1);
 	}
 }
 
@@ -300,6 +307,7 @@ rule("Set Workshop Expanse (I don't suggest using this one)")
 	{
 		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
 		Set Global Variable(SphereSize, 20);
+		Set Global Variable(BallIncreaseSpeed, 1);
 	}
 }
 
@@ -1205,7 +1213,7 @@ rule("Ball reaches player")
 			Slot Of(Current Array Element), !=, Global Variable(SlotOfPreviousTargetedPlayer))), Angle Between Vectors(Facing Direction Of(
 			Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams)), Direction Towards(Players In Slot(Global Variable(
 			SlotOfTargetedPlayer), All Teams), Position Of(Current Array Element)))))));
-		Set Global Variable(BallSpeed, Min(45, Add(Global Variable(BallSpeed), 1)));
+		Set Global Variable(BallSpeed, Min(45, Add(Global Variable(BallSpeed), Global Variable(BallIncreaseSpeed))));
 		Wait(0.001, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -1238,10 +1246,11 @@ rule("Final duel")
 		Big Message(All Players(All Teams), Custom String("Final Duel!", Null, Null, Null));
 		Teleport(Value In Array(All Living Players(All Teams), 0), Add(Global Variable(CircleCenter), Multiply(Vector(-1.000, 0, 0),
 			Divide(Global Variable(SphereSize), 1.500))));
-		Set Facing(Value In Array(All Living Players(All Teams), 0), Direction Towards(Value In Array(All Living Players(All Teams), 0),
-			Global Variable(CircleCenter)), To World);
 		Teleport(Value In Array(All Living Players(All Teams), 1), Add(Global Variable(CircleCenter), Multiply(Vector(1, 0, 0), Divide(
 			Global Variable(SphereSize), 1.500))));
+		Wait(0.050, Ignore Condition);
+		Set Facing(Value In Array(All Living Players(All Teams), 0), Direction Towards(Value In Array(All Living Players(All Teams), 0),
+			Global Variable(CircleCenter)), To World);
 		Set Facing(Value In Array(All Living Players(All Teams), 1), Direction Towards(Value In Array(All Living Players(All Teams), 1),
 			Global Variable(CircleCenter)), To World);
 		Set Move Speed(All Living Players(All Teams), 10);
@@ -1268,11 +1277,13 @@ rule("Check for last player surviving")
 
 	actions
 	{
+		Set Global Variable(PlayerWon, First Of(Filtered Array(All Living Players(All Teams), Player Variable(Current Array Element,
+			hasMoved))));
 		Set Global Variable(IsInFinalDuel, False);
-		Modify Player Score(All Living Players(All Teams), 1);
+		Modify Player Score(Global Variable(PlayerWon), 1);
 		Stop Chasing Player Variable(All Players(All Teams), BouncePadCooldown);
 		Stop Chasing Global Variable(BallSpawnCountdown);
-		Big Message(All Players(All Teams), Custom String("{0} has won the round!", First Of(All Living Players(All Teams)), Null, Null));
+		Big Message(All Players(All Teams), Custom String("{0} has won the round!", Global Variable(PlayerWon), Null, Null));
 		Wait(2, Ignore Condition);
 		Resurrect(All Dead Players(All Teams));
 		Abort If(Not(Global Variable(IsEnoughPlayersToStart)));
