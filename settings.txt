@@ -94,6 +94,7 @@ variables
 		28: BouncepadDashingEnabled
 		29: GameEndEnabled
 		30: CooldownDashingEnabled
+		31: PlayerWon
 
 	player:
 		0: hasMoved
@@ -1269,11 +1270,13 @@ rule("Check for last player surviving")
 
 	actions
 	{
+		Set Global Variable(PlayerWon, First Of(Filtered Array(All Living Players(All Teams), Player Variable(Current Array Element,
+			hasMoved))));
 		Set Global Variable(IsInFinalDuel, False);
-		Modify Player Score(All Living Players(All Teams), 1);
+		Modify Player Score(Global Variable(PlayerWon), 1);
 		Stop Chasing Player Variable(All Players(All Teams), BouncePadCooldown);
 		Stop Chasing Global Variable(BallSpawnCountdown);
-		Big Message(All Players(All Teams), Custom String("{0} has won the round!", First Of(All Living Players(All Teams)), Null, Null));
+		Big Message(All Players(All Teams), Custom String("{0} has won the round!", Global Variable(PlayerWon), Null, Null));
 		Wait(2, Ignore Condition);
 		Resurrect(All Dead Players(All Teams));
 		Abort If(Not(Global Variable(IsEnoughPlayersToStart)));
