@@ -94,6 +94,7 @@ variables
 		29: GameEndEnabled
 		30: CooldownDashingEnabled
 		31: PlayerWon
+		32: BallIncreaseSpeed
 
 	player:
 		0: hasMoved
@@ -205,6 +206,7 @@ rule("Set Blizard World center (fun fact: you can't use the name of the company 
 	{
 		Set Global Variable(CircleCenter, Vector(2.554, -4.651, -71.211));
 		Set Global Variable(SphereSize, 20);
+		Set Global Variable(BallIncreaseSpeed, 1);
 	}
 }
 
@@ -224,6 +226,7 @@ rule("Set Oasis University Center")
 	{
 		Set Global Variable(CircleCenter, Vector(-192.609, 60.349, 2.252));
 		Set Global Variable(SphereSize, 20);
+		Set Global Variable(BallIncreaseSpeed, 1);
 	}
 }
 
@@ -243,6 +246,7 @@ rule("Set Workshop Island")
 	{
 		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
 		Set Global Variable(SphereSize, 20);
+		Set Global Variable(BallIncreaseSpeed, 1.500);
 	}
 }
 
@@ -262,6 +266,7 @@ rule("Set Workshop Chamber")
 	{
 		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
 		Set Global Variable(SphereSize, 29.700);
+		Set Global Variable(BallIncreaseSpeed, 1.500);
 	}
 }
 
@@ -281,6 +286,7 @@ rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller t
 	{
 		Set Global Variable(CircleCenter, Vector(-20.504, 40.538, -74.601));
 		Set Global Variable(SphereSize, 17);
+		Set Global Variable(BallIncreaseSpeed, 1);
 	}
 }
 
@@ -300,6 +306,7 @@ rule("Set Workshop Expanse (I don't suggest using this one)")
 	{
 		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
 		Set Global Variable(SphereSize, 20);
+		Set Global Variable(BallIncreaseSpeed, 1);
 	}
 }
 
@@ -1205,7 +1212,7 @@ rule("Ball reaches player")
 			Slot Of(Current Array Element), !=, Global Variable(SlotOfPreviousTargetedPlayer))), Angle Between Vectors(Facing Direction Of(
 			Players In Slot(Global Variable(SlotOfTargetedPlayer), All Teams)), Direction Towards(Players In Slot(Global Variable(
 			SlotOfTargetedPlayer), All Teams), Position Of(Current Array Element)))))));
-		Set Global Variable(BallSpeed, Min(45, Add(Global Variable(BallSpeed), 1)));
+		Set Global Variable(BallSpeed, Min(45, Add(Global Variable(BallSpeed), Global Variable(BallIncreaseSpeed))));
 		Wait(0.001, Ignore Condition);
 		Loop If Condition Is True;
 	}
