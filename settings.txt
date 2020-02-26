@@ -837,14 +837,15 @@ rule("Player tries to abuse ledge on Workshop Island")
 	{
 		"Thanks DaftPunk for the wonderful exploit :)"
 		Current Map == Map(Workshop Island);
-		Y Component Of(Position Of(Event Player)) < -0.500;
+		Y Component Of(Position Of(Event Player)) < -1.750;
 		Is Alive(Event Player) == True;
+		Has Status(Event Player, Knocked Down) == False;
 	}
 
 	actions
 	{
 		"People were jumping off the ledge to make the ball go through the floor so this will stun them so they don't"
-		Set Status(Event Player, Null, Knocked Down, 10);
+		Set Status(Event Player, Null, Knocked Down, 5);
 		Big Message(Event Player, Custom String("Do not abuse the ledge!", Null, Null, Null));
 	}
 }
