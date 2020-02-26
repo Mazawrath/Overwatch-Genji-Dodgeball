@@ -285,7 +285,7 @@ rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller t
 
 	actions
 	{
-		Set Global Variable(CircleCenter, Vector(-20.504, 40.538, -74.601));
+		Set Global Variable(CircleCenter, Vector(-20.504, 40, -74.601));
 		Set Global Variable(SphereSize, 17);
 		Set Global Variable(BallIncreaseSpeed, 1);
 	}
