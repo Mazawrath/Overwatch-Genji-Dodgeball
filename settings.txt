@@ -189,6 +189,44 @@ rule("// MAP ZONES")
 	}
 }
 
+rule("Set Blizard World center (fun fact: you can't use the name of the company who made this game in rule names)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(Blizzard World);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(2.554, -4.651, -71.211));
+		Set Global Variable(SphereSize, 20);
+	}
+}
+
+rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller then the others!)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(King's Row);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(-20.504, 40.538, -74.601));
+		Set Global Variable(SphereSize, 17);
+	}
+}
+
 rule("Set Workshop Island")
 {
 	event
@@ -227,6 +265,25 @@ rule("Set Workshop Chamber")
 	}
 }
 
+rule("Set Workshop Expanse (I don't suggest using this one)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Current Map == Map(Workshop Expanse);
+	}
+
+	actions
+	{
+		Set Global Variable(CircleCenter, Vector(0, 1.199, 0));
+		Set Global Variable(SphereSize, 20);
+	}
+}
+
 rule("Set Oasis University Center")
 {
 	event
@@ -242,44 +299,6 @@ rule("Set Oasis University Center")
 	actions
 	{
 		Set Global Variable(CircleCenter, Vector(-192.609, 60.349, 2.252));
-		Set Global Variable(SphereSize, 20);
-	}
-}
-
-rule("Set Kings Row center (NOTE: Lower the max players! This arena is smaller then the others!)")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	conditions
-	{
-		Current Map == Map(King's Row);
-	}
-
-	actions
-	{
-		Set Global Variable(CircleCenter, Vector(-20.504, 40.538, -74.601));
-		Set Global Variable(SphereSize, 17);
-	}
-}
-
-rule("Set Blizard World center (fun fact: you can't use the name of the company who made this game in rule names)")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	conditions
-	{
-		Current Map == Map(Blizzard World);
-	}
-
-	actions
-	{
-		Set Global Variable(CircleCenter, Vector(2.554, -4.651, -71.211));
 		Set Global Variable(SphereSize, 20);
 	}
 }
