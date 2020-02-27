@@ -822,13 +822,49 @@ rule("Player dashes too far out of bounds")
 
 	actions
 	{
+		"I REALLY suggest not messing with numbers here. They are tuned to stop people from exploiting the outer area and the stuns are to stop the player from dashing"
 		Set Status(Event Player, Null, Knocked Down, 2.500);
-		disabled Teleport(Event Player, Add(Global Variable(CircleCenter), Vector(Random Integer(-15.000, 15), 8, Random Integer(-15.000, 15))));
+		"Thanks Spikespiegel for doing the exploit right in front of me :)"
+		Wait(2.500, Ignore Condition);
+		Loop If Condition Is True;
+		Big Message(Event Player, Custom String("Do not dash out of the arena!", Null, Null, Null));
+	}
+}
+
+rule("Keep pushing player back inbounds")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Vector(X Component Of(Global Variable(CircleCenter)), Y Component Of(Position Of(
+			Event Player)), Z Component Of(Global Variable(CircleCenter)))) > Add(Global Variable(SphereSize), 1);
+		"Workshop Island Fix"
+		Current Map != Map(Workshop Island);
+	}
+
+	actions
+	{
+		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
+		If(Or(Global Variable(BouncepadDashingEnabled), Global Variable(CooldownDashingEnabled)));
+			Set Ability 1 Enabled(Event Player, False);
+		End;
 		Apply Impulse(Event Player, Vector(X Component Of(Direction Towards(Position Of(Event Player), Global Variable(CircleCenter))), 0,
 			Z Component Of(Direction Towards(Position Of(Event Player), Global Variable(CircleCenter)))), 20, To World,
 			Cancel Contrary Motion);
 		Apply Impulse(Event Player, Up, 3, To World, Cancel Contrary Motion);
-		Big Message(Event Player, Custom String("Do not dash out of the arena!", Null, Null, Null));
+		"Thanks Spikespiegel for doing the exploit right in front of me :)"
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+		Stop Forcing Throttle(Event Player);
+		If(Or(Global Variable(BouncepadDashingEnabled), Global Variable(CooldownDashingEnabled)));
+			Set Ability 1 Enabled(Event Player, True);
+		End;
 	}
 }
 
@@ -1280,6 +1316,9 @@ rule("Check for last player surviving")
 	{
 		Set Global Variable(PlayerWon, First Of(Filtered Array(All Living Players(All Teams), Player Variable(Current Array Element,
 			hasMoved))));
+		Set Move Speed(All Players(All Teams), 100);
+		Skip If(Not(Global Variable(CooldownDashingEnabled)), 1);
+		Set Ability 1 Enabled(All Living Players(All Teams), True);
 		Set Global Variable(IsInFinalDuel, False);
 		Modify Player Score(Global Variable(PlayerWon), 1);
 		Stop Chasing Player Variable(All Players(All Teams), BouncePadCooldown);
