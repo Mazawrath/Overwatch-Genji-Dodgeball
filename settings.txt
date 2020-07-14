@@ -1381,6 +1381,12 @@ rule("Final duel")
 			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 1.500));
 			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 1.500));
 		End;
+		Apply Impulse(All Living Players(All Teams), Down, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Up, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Backward, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Forward, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Right, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Left, 0.001, To World, Cancel Contrary Motion);
 		Set Facing(All Living Players(All Teams)[0], Direction Towards(All Living Players(All Teams)[0], Global.CircleCenter), To World);
 		Set Facing(All Living Players(All Teams)[1], Direction Towards(All Living Players(All Teams)[1], Global.CircleCenter), To World);
 		Set Status(All Living Players(All Teams), Null, Rooted, 2);
