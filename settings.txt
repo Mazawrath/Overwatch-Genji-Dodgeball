@@ -27,7 +27,6 @@ settings
 		General
 		{
 			Allow Hero Switching: Off
-			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Respawn As Random Hero: On
@@ -227,7 +226,7 @@ rule("Set Workshop Island")
 	actions
 	{
 		Global.CircleCenter = Vector(0, 1.199, 0);
-		Global.SphereSize = 50;
+		Global.SphereSize = 60;
 	}
 }
 
@@ -1376,8 +1375,8 @@ rule("Final duel")
 		Skip If(Number of Players(All Teams) <= 2, 1);
 		Big Message(All Players(All Teams), Custom String("Final Duel!"));
 		If(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night));
-			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 3));
-			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 3));
+			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 4));
+			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 4));
 		Else;
 			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 1.500));
 			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 1.500));
