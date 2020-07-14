@@ -185,6 +185,20 @@ disabled rule("Enable Red-Green Colorblind Filer")
 	}
 }
 
+rule("Enable game ending (NOTE: READ COMMENT INSIDE RULE BEFORE DISABLING)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
+		Global.GameEndEnabled = True;
+	}
+}
+
 rule("// MAP ZONES")
 {
 	event
@@ -1126,7 +1140,7 @@ rule("Only end game when there isn't a round in progress")
 	{
 		Match Time == 0;
 		Global.RoundInProgress == False;
-		disabled Global.GameEndEnabled == True;
+		Global.GameEndEnabled == True;
 	}
 
 	actions
