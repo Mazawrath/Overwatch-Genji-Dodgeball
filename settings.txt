@@ -27,6 +27,7 @@ settings
 		General
 		{
 			Allow Hero Switching: Off
+			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Respawn As Random Hero: On
