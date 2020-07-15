@@ -463,7 +463,7 @@ rule("Create global HUD elements")
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.BallSpeed > 55), Null, Null, Custom String("Current Ball Speed: {0}",
 			Global.BallSpeed), Left, -3, White, White, Purple, Visible To and String, Default Visibility);
 		Create HUD Text(All Players(All Teams), Null, Custom String(
-			"Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and tumtum9000#1232"), Null, Left, -10, White, White, White,
+			"Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232"), Null, Left, -10, White, White, White,
 			Visible To and String, Default Visibility);
 	}
 }
