@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v5.0.0 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "Genji Dodgeball v5.1.0 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
 	}
 
 	lobby
@@ -31,7 +31,6 @@ settings
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Respawn As Random Hero: On
-			Score To Win: 3
 			Self Initiated Respawn: Off
 		}
 	}
@@ -104,6 +103,8 @@ variables
 		38: BallTail1
 		39: BallTail2
 		40: BallColor
+		41: HighestScore
+		42: TieBreakerActive
 
 	player:
 		0: hasMoved
@@ -227,7 +228,7 @@ rule("Set Workshop Island")
 	actions
 	{
 		Global.CircleCenter = Vector(0, 1.199, 0);
-		Global.SphereSize = 50;
+		Global.SphereSize = 60;
 	}
 }
 
@@ -400,8 +401,8 @@ rule("Create game sphere")
 				Global.CircleCenter) - 15, Z Component Of(Global.CircleCenter)), Global.SphereSize, Visible To Position and Radius);
 		Else;
 			Create Effect(Filtered Array(All Players(All Teams), Distance Between(Position Of(Current Array Element), Global.CircleCenter)
-				>= Global.SphereSize - 10), Light Shaft, Sky Blue, Vector(X Component Of(Global.CircleCenter), Y Component Of(
-				Global.CircleCenter) - 15, Z Component Of(Global.CircleCenter)), Global.SphereSize, Visible To Position and Radius);
+				>= Global.SphereSize - 10), Light Shaft, Green, Vector(X Component Of(Global.CircleCenter), Y Component Of(Global.CircleCenter)
+				- 15, Z Component Of(Global.CircleCenter)), Global.SphereSize, Visible To Position and Radius);
 		End;
 	}
 }
@@ -437,9 +438,9 @@ rule("Create global HUD elements")
 		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: Cooldown"), Left, -1, White, White, White,
 			Visible To and String, Default Visibility);
 		"server load text for lobby owner only"
-		Create HUD Text(Host Player, Null, Custom String("Server Load"), Server Load, Right, 0, White, White, White, Visible To and String,
+		disabled Create HUD Text(Host Player, Null, Custom String("Server Load"), Server Load, Right, 0, White, White, White, Visible To and String,
 			Default Visibility);
-		Create HUD Text(Host Player, Null, Custom String("Server Load Average"), Server Load Average, Right, 0, White, White, White,
+		disabled Create HUD Text(Host Player, Null, Custom String("Server Load Average"), Server Load Average, Right, 0, White, White, White,
 			Visible To and String, Default Visibility);
 		Create HUD Text(Host Player, Null, Custom String("Server Load Peak"), Server Load Peak, Right, 0, White, White, White,
 			Visible To and String, Default Visibility);
@@ -461,7 +462,8 @@ rule("Create global HUD elements")
 			"Current Ball Speed: {0}", Global.BallSpeed), Left, -3, White, White, Red, Visible To and String, Default Visibility);
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.BallSpeed > 55), Null, Null, Custom String("Current Ball Speed: {0}",
 			Global.BallSpeed), Left, -3, White, White, Purple, Visible To and String, Default Visibility);
-		Create HUD Text(All Players(All Teams), Null, Custom String("Version T1.0"), Null, Left, -10, Aqua, Aqua, White,
+		Create HUD Text(All Players(All Teams), Null, Custom String(
+			"Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232"), Null, Left, -10, White, White, White,
 			Visible To and String, Default Visibility);
 	}
 }
@@ -636,9 +638,8 @@ rule("// Not enough players testing")
 	{
 		Skip If(!Global.WatermarkEnabled, 1);
 		"Please don't be a child and try to take credit for this game. If you actually have contributed something you are free to add here. But if not, don't touch this. You are free to disable it."
-		Create HUD Text(All Players(All Teams), Null, Custom String(
-			"Original by u/Mazawrath. Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze"), Null, Left, -1000, White, White, White,
-			Visible To and String, Visible Always);
+		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.1.0"), Null, Left, -1000, White,
+			Aqua, White, Visible To and String, Visible Always);
 	}
 }
 
@@ -1141,6 +1142,7 @@ rule("Only end game when there isn't a round in progress")
 		Match Time == 0;
 		Global.RoundInProgress == False;
 		Global.GameEndEnabled == True;
+		Global.TieBreakerActive == False;
 	}
 
 	actions
@@ -1375,9 +1377,15 @@ rule("Final duel")
 		All Living Players(All Teams).BouncePadCooldown = Global.BouncePadCooldownLength;
 		Skip If(Number of Players(All Teams) <= 2, 1);
 		Big Message(All Players(All Teams), Custom String("Final Duel!"));
+		Apply Impulse(All Living Players(All Teams), Down, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Up, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Backward, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Forward, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Right, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Left, 0.001, To World, Cancel Contrary Motion);
 		If(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night));
-			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 3));
-			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 3));
+			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 4));
+			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 4));
 		Else;
 			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 1.500));
 			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 1.500));
@@ -1406,11 +1414,36 @@ rule("Check for last player surviving")
 	{
 		Global.IsInFinalDuel = False;
 		Modify Player Score(All Living Players(All Teams), 1);
-		Stop Chasing Player Variable(All Players(All Teams), BouncePadCooldown);
+		Wait(0.250, Ignore Condition);
+		If((Match Time == 0 || Global.TieBreakerActive) && Global.GameEndEnabled);
+			"If there is alredy a tiebreaker, then the tiebreaker has ended."
+			disabled If(Global.TieBreakerActive);
+			disabled Break;
+			disabled End;
+			Global.HighestScore = Score Of(Last Of(Sorted Array(All Players(All Teams), Score Of(Current Array Element))));
+			"Check if there is more then 1 person with the highest score"
+			If(Count Of(Filtered Array(All Players(All Teams), Score Of(Current Array Element) == Global.HighestScore)) > 1);
+				"There is more then 1, activate tie breaker"
+				Global.TieBreakerActive = True;
+			Else;
+				Global.TieBreakerActive = False;
+			End;
+		End;
 		Stop Chasing Global Variable(BallSpawnCountdown);
+		Stop Chasing Player Variable(All Players(All Teams), BouncePadCooldown);
 		Big Message(All Players(All Teams), Custom String("{0} has won the round!", First Of(All Living Players(All Teams))));
 		Wait(2, Ignore Condition);
-		Resurrect(All Dead Players(All Teams));
+		If(!Global.TieBreakerActive);
+			Resurrect(All Dead Players(All Teams));
+		Else;
+			"Kill anyone alive who doesn't have the highest score."
+			Kill(Filtered Array(All Living Players(All Teams), Score Of(Current Array Element) != Global.HighestScore), Null);
+			"During tiebreaker, only revive the people who have the same score as the highest score."
+			Resurrect(Filtered Array(All Dead Players(All Teams), Score Of(Current Array Element) == Global.HighestScore));
+			Wait(0.250, Ignore Condition);
+			Global.SlotOfTargetedPlayer = -1;
+			Big Message(All Players(All Teams), Custom String("Tiebreaker!"));
+		End;
 		Abort If(!Global.IsEnoughPlayersToStart);
 		Global.RoundInProgress = False;
 		All Players(All Teams).BouncePadCooldown = Global.BouncePadCooldownLength;
@@ -1460,6 +1493,7 @@ rule("All players dead failsafe")
 	{
 		Number of Living Players(All Teams) == 0;
 		Is Game In Progress == True;
+		Global.TieBreakerActive == False;
 	}
 
 	actions
