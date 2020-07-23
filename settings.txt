@@ -980,7 +980,6 @@ rule("Bounce when near pad 1")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global.BouncePad1, 2);
 		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
@@ -1011,7 +1010,6 @@ rule("Bounce when near pad 2")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global.BouncePad2, 2);
 		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
@@ -1042,7 +1040,6 @@ rule("Bounce when near pad 3")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global.BouncePad3, 2);
 		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
@@ -1073,7 +1070,6 @@ rule("Bounce when near pad 4")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global.BouncePad4, 2);
 		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
