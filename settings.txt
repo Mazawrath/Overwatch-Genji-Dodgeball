@@ -1366,9 +1366,12 @@ rule("Final duel")
 			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 1.500));
 			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 1.500));
 		End;
-		Set Facing(All Living Players(All Teams)[0], Direction Towards(All Living Players(All Teams)[0], Global.CircleCenter), To World);
-		Set Facing(All Living Players(All Teams)[1], Direction Towards(All Living Players(All Teams)[1], Global.CircleCenter), To World);
 		Set Status(All Living Players(All Teams), Null, Rooted, 2);
+		Wait(0.001, Ignore Condition);
+		Set Facing(All Living Players(All Teams)[0], Direction Towards(Position Of(All Living Players(All Teams)[0]), Global.CircleCenter),
+			To World);
+		Set Facing(All Living Players(All Teams)[1], Direction Towards(Position Of(All Living Players(All Teams)[1]), Global.CircleCenter),
+			To World);
 	}
 }
 
