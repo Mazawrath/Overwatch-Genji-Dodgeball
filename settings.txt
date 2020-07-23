@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v5.1.0 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "Genji Dodgeball v5.1.1 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
 	}
 
 	lobby
@@ -10,7 +10,7 @@ settings
 		Allow Players Who Are In Queue: Yes
 		Map Rotation: After A Game
 		Match Voice Chat: Enabled
-		Max Spectators: 12
+		Max Spectators: 6
 		Return To Lobby: Never
 	}
 
@@ -638,7 +638,7 @@ rule("// Not enough players testing")
 	{
 		Skip If(!Global.WatermarkEnabled, 1);
 		"Please don't be a child and try to take credit for this game. If you actually have contributed something you are free to add here. But if not, don't touch this. You are free to disable it."
-		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.1.0"), Null, Left, -1000, White,
+		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.1.1"), Null, Left, -1000, White,
 			Aqua, White, Visible To and String, Visible Always);
 	}
 }
@@ -980,7 +980,6 @@ rule("Bounce when near pad 1")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global.BouncePad1, 2);
 		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
@@ -1011,7 +1010,6 @@ rule("Bounce when near pad 2")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global.BouncePad2, 2);
 		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
@@ -1042,7 +1040,6 @@ rule("Bounce when near pad 3")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global.BouncePad3, 2);
 		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
@@ -1073,7 +1070,6 @@ rule("Bounce when near pad 4")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Play Effect(All Players(All Teams), Good Pickup Effect, White, Global.BouncePad4, 2);
 		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
@@ -1107,26 +1103,6 @@ rule("Ball delete requested")
 		Global.BallSpawnCountdown = 2;
 		Global.PrevBallPos = Vector(0, 0, 0);
 		Global.PrevBallPos2 = Vector(0, 0, 0);
-	}
-}
-
-rule("Ball repsawn")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Custom String("{0}", Event Player) == Custom String("Smokey");
-	}
-
-	actions
-	{
-		Kill(Event Player, Null);
 	}
 }
 
@@ -1390,9 +1366,12 @@ rule("Final duel")
 			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 1.500));
 			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 1.500));
 		End;
-		Set Facing(All Living Players(All Teams)[0], Direction Towards(All Living Players(All Teams)[0], Global.CircleCenter), To World);
-		Set Facing(All Living Players(All Teams)[1], Direction Towards(All Living Players(All Teams)[1], Global.CircleCenter), To World);
 		Set Status(All Living Players(All Teams), Null, Rooted, 2);
+		Wait(0.001, Ignore Condition);
+		Set Facing(All Living Players(All Teams)[0], Direction Towards(Position Of(All Living Players(All Teams)[0]), Global.CircleCenter),
+			To World);
+		Set Facing(All Living Players(All Teams)[1], Direction Towards(Position Of(All Living Players(All Teams)[1]), Global.CircleCenter),
+			To World);
 	}
 }
 
