@@ -1110,26 +1110,6 @@ rule("Ball delete requested")
 	}
 }
 
-rule("Ball repsawn")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Custom String("{0}", Event Player) == Custom String("Smokey");
-	}
-
-	actions
-	{
-		Kill(Event Player, Null);
-	}
-}
-
 rule("Only end game when there isn't a round in progress")
 {
 	event
