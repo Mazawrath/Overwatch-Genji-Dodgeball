@@ -10,7 +10,7 @@ settings
 		Allow Players Who Are In Queue: Yes
 		Map Rotation: After A Game
 		Match Voice Chat: Enabled
-		Max Spectators: 12
+		Max Spectators: 6
 		Return To Lobby: Never
 	}
 
