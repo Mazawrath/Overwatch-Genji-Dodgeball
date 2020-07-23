@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v5.1.0 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "Genji Dodgeball v5.1.1 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
 	}
 
 	lobby
@@ -638,7 +638,7 @@ rule("// Not enough players testing")
 	{
 		Skip If(!Global.WatermarkEnabled, 1);
 		"Please don't be a child and try to take credit for this game. If you actually have contributed something you are free to add here. But if not, don't touch this. You are free to disable it."
-		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.1.0"), Null, Left, -1000, White,
+		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.1.1"), Null, Left, -1000, White,
 			Aqua, White, Visible To and String, Visible Always);
 	}
 }
