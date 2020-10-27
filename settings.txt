@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v5.1.1 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "Genji Dodgeball v5.2.0 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
 	}
 
 	lobby
@@ -379,7 +379,7 @@ rule("Init global variables")
 		Global.MaxBallSpeed = 1000;
 		Global.CenterOffLimitsSize = 3.500;
 		Global.IsInFinalDuel = False;
-		Global.BouncePadCooldownLength = 2;
+		Global.BouncePadCooldownLength = 3;
 		Global.BallPosition = Vector(0, -1, 0);
 	}
 }
@@ -638,7 +638,7 @@ rule("// Not enough players testing")
 	{
 		Skip If(!Global.WatermarkEnabled, 1);
 		"Please don't be a child and try to take credit for this game. If you actually have contributed something you are free to add here. But if not, don't touch this. You are free to disable it."
-		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.1.1"), Null, Left, -1000, White,
+		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.2.1"), Null, Left, -1000, White,
 			Aqua, White, Visible To and String, Visible Always);
 	}
 }
@@ -980,7 +980,6 @@ rule("Bounce when near pad 1")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
 		Destroy Effect(Event Player.PlayerEffects[1]);
@@ -1010,7 +1009,6 @@ rule("Bounce when near pad 2")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
 		Destroy Effect(Event Player.PlayerEffects[1]);
@@ -1040,7 +1038,6 @@ rule("Bounce when near pad 3")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
 		Destroy Effect(Event Player.PlayerEffects[1]);
@@ -1070,7 +1067,6 @@ rule("Bounce when near pad 4")
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
-		Create Effect(All Players(All Teams), Bad Aura, White, Event Player, 0.750, Visible To Position and Radius);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
 		Destroy Effect(Event Player.PlayerEffects[1]);
