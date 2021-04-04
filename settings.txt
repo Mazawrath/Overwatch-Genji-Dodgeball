@@ -62,11 +62,12 @@ settings
 	workshop
 	{
 		Cooldown Dashing Enabled: On
-		RedGreen Colorblind Mode: On
 	}
 
 	extensions
 	{
+		Beam Effects
+		Beam Sounds
 		Energy Explosion Effects
 		Kinetic Explosion Effects
 		Explosion Sounds
@@ -863,9 +864,9 @@ rule("Push to circle")
 
 	actions
 	{
-		Apply Impulse(Event Player, Vector(X Component Of(Direction Towards(Position Of(Event Player), Global.CircleCenter)), 0,
-			Z Component Of(Direction Towards(Position Of(Event Player), Global.CircleCenter))), 6, To World, Cancel Contrary Motion);
-		Apply Impulse(Event Player, Up, 3, To World, Incorporate Contrary Motion);
+		disabled Apply Impulse(Event Player, Up, 3, To World, Cancel Contrary Motion);
+		Apply Impulse(Event Player, Vector(X Component Of(Direction Towards(Position Of(Event Player), Global.CircleCenter)), 3,
+			Z Component Of(Direction Towards(Position Of(Event Player), Global.CircleCenter))), 6, To World, Cancel Contrary Motion XYZ);
 		Wait(0.250, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -887,8 +888,8 @@ rule("Put out center")
 
 	actions
 	{
-		Apply Impulse(Event Player, Direction Towards(Global.CircleCenter, Event Player), 10, To World, Cancel Contrary Motion);
-		Apply Impulse(Event Player, Up, 1.500, To World, Incorporate Contrary Motion);
+		Apply Impulse(Event Player, Direction Towards(Global.CircleCenter, Event Player), 10, To World, Cancel Contrary Motion XYZ);
+		Apply Impulse(Event Player, Up, 1.500, To World, Cancel Contrary Motion XYZ);
 		Wait(0.250, Ignore Condition);
 		Loop If Condition Is True;
 	}
