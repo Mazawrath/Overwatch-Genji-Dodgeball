@@ -58,6 +58,20 @@ settings
 			}
 		}
 	}
+
+	workshop
+	{
+		Cooldown Dashing Enabled: On
+		RedGreen Colorblind Mode: On
+	}
+
+	extensions
+	{
+		Energy Explosion Effects
+		Kinetic Explosion Effects
+		Explosion Sounds
+		Spawn More Dummy Bots
+	}
 }
 
 variables
@@ -143,7 +157,7 @@ rule("Enable Watermark")
 
 	actions
 	{
-		Global.WatermarkEnabled = True;
+		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Genji Dodgeball"), Custom String("Enable Watermark"), True, 0);
 	}
 }
 
@@ -170,11 +184,12 @@ rule("Enable Cooldown Dashing (Configure the dash cooldown in custom game settin
 	actions
 	{
 		Skip If(Global.BouncepadDashingEnabled, 1);
-		Global.CooldownDashingEnabled = True;
+		Global.CooldownDashingEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String(
+			"Cooldown Dashing Enabled"), False, 0);
 	}
 }
 
-disabled rule("Enable Red-Green Colorblind Filer")
+rule("Enable Red-Green Colorblind Filer")
 {
 	event
 	{
@@ -183,7 +198,8 @@ disabled rule("Enable Red-Green Colorblind Filer")
 
 	actions
 	{
-		Global.RedGreenColorblindMode = True;
+		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String(
+			"Red/Green Colorblind Mode"), False, 0);
 	}
 }
 
