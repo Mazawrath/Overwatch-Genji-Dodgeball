@@ -28,7 +28,6 @@ settings
 		General
 		{
 			Allow Hero Switching: Off
-			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Respawn As Random Hero: On
@@ -628,7 +627,7 @@ rule("Create ball countdown HUD")
 	{
 		Create In-World Text(All Players(All Teams), Custom String("Ball Spawning In: {0}", Round To Integer(Global.BallSpawnCountdown,
 			Up)), Vector(X Component Of(Global.CircleCenter), Y Component Of(Global.CircleCenter) + 2.500, Z Component Of(
-			Global.CircleCenter)), 10, Clip Against Surfaces, Visible To Position and String, Color(Sky Blue), Default Visibility);
+			Global.CircleCenter)), 2.500, Clip Against Surfaces, Visible To Position and String, Color(Sky Blue), Default Visibility);
 		Global.BallSpawnCountdownHUD = Last Text ID;
 	}
 }
