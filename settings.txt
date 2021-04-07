@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v5.3.0 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "Genji Dodgeball v5.3.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
 	}
 
 	lobby
@@ -142,9 +142,6 @@ rule("// SETTINGS")
 		Global.CooldownDashingEnabled = True;
 		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String(
 			"Red/Green Colorblind Mode"), False, 2);
-		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
-		Global.GameEndEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Game Ends At Timeout"), True,
-			1);
 	}
 }
 
@@ -329,6 +326,8 @@ rule("Init global variables")
 		Global.IsInFinalDuel = False;
 		Global.BouncePadCooldownLength = 3;
 		Global.BallPosition = Vector(0, -1, 0);
+		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
+		Global.GameEndEnabled = True;
 	}
 }
 
