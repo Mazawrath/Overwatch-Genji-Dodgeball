@@ -58,16 +58,6 @@ settings
 			}
 		}
 	}
-
-	extensions
-	{
-		Beam Effects
-		Beam Sounds
-		Energy Explosion Effects
-		Kinetic Explosion Effects
-		Explosion Sounds
-		Spawn More Dummy Bots
-	}
 }
 
 variables
@@ -145,60 +135,16 @@ rule("// SETTINGS")
 	{
 		Ongoing - Global;
 	}
-}
-
-rule("Enable Watermark")
-{
-	event
-	{
-		Ongoing - Global;
-	}
 
 	actions
 	{
 		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Enable Watermark"), True, 0);
-	}
-}
-
-rule("Enable Cooldown Dashing (Configure the dash cooldown in custom game settings) - Only enable one!")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	actions
-	{
-		Skip If(Global.BouncepadDashingEnabled, 1);
 		Global.CooldownDashingEnabled = True;
-	}
-}
-
-rule("Enable Red-Green Colorblind Filer")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	actions
-	{
 		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String(
-			"Red/Green Colorblind Mode"), False, 0);
-	}
-}
-
-rule("Enable game ending (NOTE: READ COMMENT INSIDE RULE BEFORE DISABLING)")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	actions
-	{
+			"Red/Green Colorblind Mode"), False, 2);
 		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
-		Global.GameEndEnabled = True;
+		Global.GameEndEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Game Ends At Timeout"), True,
+			1);
 	}
 }
 
