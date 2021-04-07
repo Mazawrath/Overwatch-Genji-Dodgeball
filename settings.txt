@@ -2,12 +2,13 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v5.2.0 Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "Genji Dodgeball v5.2.1P Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
 	}
 
 	lobby
 	{
 		Allow Players Who Are In Queue: Yes
+		Data Center Preference: USA - Central
 		Map Rotation: After A Game
 		Match Voice Chat: Enabled
 		Max Spectators: 6
@@ -393,16 +394,16 @@ rule("Create game sphere")
 
 	actions
 	{
-		Create Effect(All Players(All Teams), Sphere, Sky Blue, Vector(X Component Of(Global.CircleCenter), Y Component Of(
+		Create Effect(All Players(All Teams), Sphere, Color(Black), Vector(X Component Of(Global.CircleCenter), Y Component Of(
 			Global.CircleCenter) - 0, Z Component Of(Global.CircleCenter)), Global.CenterOffLimitsSize, Visible To Position and Radius);
 		"Workshop Island doesn't need a circle."
 		If(Current Map != Map(Workshop Island) && Current Map != Map(Workshop Island Night));
-			Create Effect(All Players(All Teams), Light Shaft, Orange, Vector(X Component Of(Global.CircleCenter), Y Component Of(
+			Create Effect(All Players(All Teams), Light Shaft, Color(Orange), Vector(X Component Of(Global.CircleCenter), Y Component Of(
 				Global.CircleCenter) - 15, Z Component Of(Global.CircleCenter)), Global.SphereSize, Visible To Position and Radius);
 		Else;
 			Create Effect(Filtered Array(All Players(All Teams), Distance Between(Position Of(Current Array Element), Global.CircleCenter)
-				>= Global.SphereSize - 10), Light Shaft, Green, Vector(X Component Of(Global.CircleCenter), Y Component Of(Global.CircleCenter)
-				- 15, Z Component Of(Global.CircleCenter)), Global.SphereSize, Visible To Position and Radius);
+				>= Global.SphereSize - 10), Light Shaft, Color(Blue), Vector(X Component Of(Global.CircleCenter), Y Component Of(
+				Global.CircleCenter) - 15, Z Component Of(Global.CircleCenter)), Global.SphereSize, Visible To Position and Radius);
 		End;
 	}
 }
@@ -419,52 +420,58 @@ rule("Create global HUD elements")
 		"white normal"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element != Players In Slot(Global.SlotOfTargetedPlayer,
 			All Teams)), Null, Null, Custom String("Current Player Targeted: {0}", Players In Slot(Global.SlotOfTargetedPlayer,
-			All Teams)), Left, -2, White, White, White, Visible To and String, Default Visibility);
+			All Teams)), Left, -2, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
 		"red when you're targeted"
 		Create HUD Text(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Null, Null, Custom String("Current Player Targeted: {0}",
-			Players In Slot(Global.SlotOfTargetedPlayer, All Teams)), Left, -2, White, White, Red, Visible To and String,
-			Default Visibility);
+			Players In Slot(Global.SlotOfTargetedPlayer, All Teams)), Left, -2, Color(White), Color(White), Color(Red),
+			Visible To and String, Default Visibility);
 		Create HUD Text(All Dead Players(All Teams), Custom String("Waiting for next round"), Custom String(
 			"You have been eliminated or joined during a round"), Custom String("You will spawn once the next round starts"), Top, 2,
-			White, White, White, Visible To and String, Default Visibility);
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
 		Skip If(Global.BouncepadDashingEnabled || Global.CooldownDashingEnabled, 2);
-		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: None"), Left, -1, White, White, White,
-			Visible To and String, Default Visibility);
-		Abort;
-		Skip If(Global.CooldownDashingEnabled, 2);
-		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: Bouncepad"), Left, -1, White, White,
-			White, Visible To and String, Default Visibility);
-		Abort;
-		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: Cooldown"), Left, -1, White, White, White,
-			Visible To and String, Default Visibility);
+		disabled Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: None"), Left, -1, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
+		disabled Abort;
+		disabled Skip If(Global.CooldownDashingEnabled, 2);
+		disabled Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: Bouncepad"), Left, -1, Color(White),
+			Color(White), Color(White), Visible To and String, Default Visibility);
+		disabled Abort;
+		disabled Create HUD Text(All Players(All Teams), Null, Null, Custom String("Current Dashing Mode: Cooldown"), Left, -1, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
 		"server load text for lobby owner only"
-		disabled Create HUD Text(Host Player, Null, Custom String("Server Load"), Server Load, Right, 0, White, White, White, Visible To and String,
-			Default Visibility);
-		disabled Create HUD Text(Host Player, Null, Custom String("Server Load Average"), Server Load Average, Right, 0, White, White, White,
+		disabled Create HUD Text(Host Player, Null, Custom String("Server Load"), Server Load, Right, 0, Color(White), Color(White), Color(White),
 			Visible To and String, Default Visibility);
-		Create HUD Text(Host Player, Null, Custom String("Server Load Peak"), Server Load Peak, Right, 0, White, White, White,
-			Visible To and String, Default Visibility);
+		disabled Create HUD Text(Host Player, Null, Custom String("Server Load Average"), Server Load Average, Right, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		disabled Create HUD Text(Host Player, Null, Custom String("Server Load Peak"), Server Load Peak, Right, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
 		"gameplay tips text"
-		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Deflect or Dash will deflect the ball to an enemy"), Right, -10,
-			White, White, White, Visible To and String, Default Visibility);
-		Create HUD Text(All Players(All Teams), Null, Null, Custom String("If you get hit, you die.  Last man standing wins!"), Right, -9,
-			White, White, White, Visible To and String, Default Visibility);
+		disabled Create HUD Text(All Players(All Teams), Null, Null, Custom String("Deflect or Dash will deflect the ball to an enemy"), Right, -10,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		disabled Create HUD Text(All Players(All Teams), Null, Null, Custom String("If you get hit, you die.  Last man standing wins!"), Right, -9,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
 		"ball speed text color change with speed"
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.BallSpeed < 20), Null, Null, Custom String("Current Ball Speed: {0}",
-			Global.BallSpeed), Left, -3, White, White, Blue, Visible To and String, Default Visibility);
+			Global.BallSpeed), Left, -3, Color(White), Color(White), Color(Blue), Visible To and String, Default Visibility);
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.BallSpeed >= 20 && Global.BallSpeed < 25), Null, Null, Custom String(
-			"Current Ball Speed: {0}", Global.BallSpeed), Left, -3, White, White, Green, Visible To and String, Default Visibility);
+			"Current Ball Speed: {0}", Global.BallSpeed), Left, -3, Color(White), Color(White), Color(Green), Visible To and String,
+			Default Visibility);
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.BallSpeed >= 25 && Global.BallSpeed < 30), Null, Null, Custom String(
-			"Current Ball Speed: {0}", Global.BallSpeed), Left, -3, White, White, Yellow, Visible To and String, Default Visibility);
+			"Current Ball Speed: {0}", Global.BallSpeed), Left, -3, Color(White), Color(White), Color(Yellow), Visible To and String,
+			Default Visibility);
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.BallSpeed >= 30 && Global.BallSpeed < 35), Null, Null, Custom String(
-			"Current Ball Speed: {0}", Global.BallSpeed), Left, -3, White, White, Orange, Visible To and String, Default Visibility);
+			"Current Ball Speed: {0}", Global.BallSpeed), Left, -3, Color(White), Color(White), Color(Orange), Visible To and String,
+			Default Visibility);
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.BallSpeed >= 35 && Global.BallSpeed < 55), Null, Null, Custom String(
-			"Current Ball Speed: {0}", Global.BallSpeed), Left, -3, White, White, Red, Visible To and String, Default Visibility);
+			"Current Ball Speed: {0}", Global.BallSpeed), Left, -3, Color(White), Color(White), Color(Red), Visible To and String,
+			Default Visibility);
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.BallSpeed > 55), Null, Null, Custom String("Current Ball Speed: {0}",
-			Global.BallSpeed), Left, -3, White, White, Purple, Visible To and String, Default Visibility);
-		Create HUD Text(All Players(All Teams), Null, Custom String(
-			"Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232"), Null, Left, -10, White, White, White,
-			Visible To and String, Default Visibility);
+			Global.BallSpeed), Left, -3, Color(White), Color(White), Color(Purple), Visible To and String, Default Visibility);
+		disabled Create HUD Text(All Players(All Teams), Null, Custom String(
+			"Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523"), Null, Left, -10, Color(White),
+			Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Discord.gg/GenjiDodgeball"), Left, 0, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
 	}
 }
 
@@ -479,21 +486,21 @@ rule("Create player HUD elements")
 
 	actions
 	{
-		Create HUD Text(Event Player, Event Player.PlayerDeflects, Custom String("Deflects"), Null, Left, 1, Yellow, White, Yellow,
-			Visible To and String, Default Visibility);
-		Event Player.PlayerUI[1] = Last Created Entity;
-		Create HUD Text(Event Player, Event Player.PlayerKills, Custom String("Kills"), Null, Left, 2, Orange, White, Orange,
-			Visible To and String, Default Visibility);
-		Event Player.PlayerUI[2] = Last Created Entity;
-		Create HUD Text(Event Player, Event Player.PlayerDeaths, Custom String("Deaths"), Null, Left, 3, Sky Blue, White, Sky Blue,
-			Visible To and String, Default Visibility);
-		Event Player.PlayerUI[3] = Last Created Entity;
-		Create HUD Text(Event Player, Event Player.maxBallSpeed, Custom String("Max Deflect Speed"), Null, Left, 4, Red, White, Turquoise,
-			Visible To and String, Default Visibility);
-		Event Player.PlayerUI[4] = Last Created Entity;
-		Create HUD Text(Event Player, Round To Integer(Event Player.BouncePadCooldown, Up), Custom String("Bouncepad"), Custom String(
-			"Cooldown"), Right, -1, Green, White, White, Visible To and String, Default Visibility);
-		Event Player.PlayerUI[5] = Last Created Entity;
+		disabled Create HUD Text(Event Player, Event Player.PlayerDeflects, Custom String("Deflects"), Null, Left, 1, Color(Yellow), Color(White),
+			Color(Yellow), Visible To and String, Default Visibility);
+		disabled Event Player.PlayerUI[1] = Last Created Entity;
+		disabled Create HUD Text(Event Player, Event Player.PlayerKills, Custom String("Kills"), Null, Left, 2, Color(Orange), Color(White), Color(
+			Orange), Visible To and String, Default Visibility);
+		disabled Event Player.PlayerUI[2] = Last Created Entity;
+		disabled Create HUD Text(Event Player, Event Player.PlayerDeaths, Custom String("Deaths"), Null, Left, 3, Color(Sky Blue), Color(White),
+			Color(Sky Blue), Visible To and String, Default Visibility);
+		disabled Event Player.PlayerUI[3] = Last Created Entity;
+		disabled Create HUD Text(Event Player, Event Player.maxBallSpeed, Custom String("Max Deflect Speed"), Null, Left, 4, Color(Red), Color(
+			White), Color(Turquoise), Visible To and String, Default Visibility);
+		disabled Event Player.PlayerUI[4] = Last Created Entity;
+		disabled Create HUD Text(Event Player, Round To Integer(Event Player.BouncePadCooldown, Up), Custom String("Bouncepad"), Custom String(
+			"Cooldown"), Right, -1, Color(Green), Color(White), Color(White), Visible To and String, Default Visibility);
+		disabled Event Player.PlayerUI[5] = Last Created Entity;
 	}
 }
 
@@ -514,32 +521,32 @@ rule("Create bounce pads")
 			Global.CircleCenter) + Global.BouncePadDistance * 1);
 		Global.BouncePad4 = Vector(X Component Of(Global.CircleCenter), Y Component Of(Global.CircleCenter), Z Component Of(
 			Global.CircleCenter) + Global.BouncePadDistance * -1);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown == 0), Ring, Green, Global.BouncePad1,
-			2, Visible To Position and Radius);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown == 0), Ring, Green, Global.BouncePad2,
-			2, Visible To Position and Radius);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown == 0), Ring, Green, Global.BouncePad3,
-			2, Visible To Position and Radius);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown == 0), Ring, Green, Global.BouncePad4,
-			2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown == 0), Ring, Color(Sky Blue),
+			Global.BouncePad1, 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown == 0), Ring, Color(Sky Blue),
+			Global.BouncePad2, 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown == 0), Ring, Color(Sky Blue),
+			Global.BouncePad3, 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown == 0), Ring, Color(Sky Blue),
+			Global.BouncePad4, 2, Visible To Position and Radius);
 		Skip If(Global.RedGreenColorblindMode, 5);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Red, Global.BouncePad1, 2,
-			Visible To Position and Radius);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Red, Global.BouncePad2, 2,
-			Visible To Position and Radius);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Red, Global.BouncePad3, 2,
-			Visible To Position and Radius);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Red, Global.BouncePad4, 2,
-			Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Color(White),
+			Global.BouncePad1, 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Color(White),
+			Global.BouncePad2, 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Color(White),
+			Global.BouncePad3, 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Color(White),
+			Global.BouncePad4, 2, Visible To Position and Radius);
 		Abort;
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Yellow, Global.BouncePad1,
-			2, Visible To Position and Radius);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Yellow, Global.BouncePad2,
-			2, Visible To Position and Radius);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Yellow, Global.BouncePad3,
-			2, Visible To Position and Radius);
-		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Yellow, Global.BouncePad4,
-			2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Color(Yellow),
+			Global.BouncePad1, 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Color(Yellow),
+			Global.BouncePad2, 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Color(Yellow),
+			Global.BouncePad3, 2, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Current Array Element.BouncePadCooldown > 0), Ring, Color(Yellow),
+			Global.BouncePad4, 2, Visible To Position and Radius);
 	}
 }
 
@@ -557,32 +564,32 @@ rule("Create ball & targeted effect")
 
 	actions
 	{
-		Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Orb, White,
-			Global.BallPosition, 0.400, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Orb, Color(
+			White), Global.BallPosition, 0.400, Visible To Position and Radius);
 		If(!Global.RedGreenColorblindMode);
-			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Red, Global.BallPosition, 0.400,
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Color(Red), Global.BallPosition, 0.400,
 				Visible To Position and Radius);
 			Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Good Aura,
-				Red, Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1, Visible To Position and Radius);
-			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Red, Players In Slot(Global.SlotOfTargetedPlayer,
-				All Teams), 1, Visible To Position and Radius);
-			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Red, Global.BallPosition, 1,
+				Color(Red), Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1, Visible To Position and Radius);
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Red), Players In Slot(
+				Global.SlotOfTargetedPlayer, All Teams), 1, Visible To Position and Radius);
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Red), Global.BallPosition, 1,
 				Visible To Position and Radius);
 		Else;
-			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Yellow, Global.BallPosition, 0.400,
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Color(Yellow), Global.BallPosition, 0.400,
 				Visible To Position and Radius);
-			Create Effect(All Players(All Teams), Good Aura, Yellow, Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1,
+			Create Effect(All Players(All Teams), Good Aura, Color(Yellow), Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1,
 				Visible To Position and Radius);
-			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Yellow, Eye Position(Players In Slot(
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Yellow), Eye Position(Players In Slot(
 				Global.SlotOfTargetedPlayer, All Teams)), 1, Visible To Position and Radius);
 		End;
 		"ball trail change color with speed"
-		disabled Create Effect(All Players(All Teams), Bad Aura, Blue, Global.BallPosition, 1, Visible To Position and Radius);
+		disabled Create Effect(All Players(All Teams), Bad Aura, Color(Blue), Global.BallPosition, 1, Visible To Position and Radius);
 		disabled Global.BallSmoke = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Blue,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Color(Blue),
 			Visible To Position and Radius);
 		disabled Global.BallTail1 = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Blue,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Color(Blue),
 			Visible To Position and Radius);
 		disabled Global.BallTail2 = Last Created Entity;
 	}
@@ -604,7 +611,7 @@ rule("Create ball countdown HUD")
 	{
 		Create In-World Text(All Players(All Teams), Custom String("Ball Spawning In: {0}", Round To Integer(Global.BallSpawnCountdown,
 			Up)), Vector(X Component Of(Global.CircleCenter), Y Component Of(Global.CircleCenter) + 2.500, Z Component Of(
-			Global.CircleCenter)), 10, Clip Against Surfaces, Visible To Position and String, Sky Blue, Default Visibility);
+			Global.CircleCenter)), 10, Clip Against Surfaces, Visible To Position and String, Color(Sky Blue), Default Visibility);
 		Global.BallSpawnCountdownHUD = Last Text ID;
 	}
 }
@@ -638,8 +645,8 @@ rule("// Not enough players testing")
 	{
 		Skip If(!Global.WatermarkEnabled, 1);
 		"Please don't be a child and try to take credit for this game. If you actually have contributed something you are free to add here. But if not, don't touch this. You are free to disable it."
-		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.2.1"), Null, Left, -1000, White,
-			Aqua, White, Visible To and String, Visible Always);
+		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.2.1P"), Null, Left, -1000, Color(
+			White), Color(Aqua), Color(White), Visible To and String, Visible Always);
 	}
 }
 
@@ -653,14 +660,14 @@ rule("Check for <2 players")
 	conditions
 	{
 		Is Game In Progress == True;
-		Number of Players(All Teams) == 1;
+		Number Of Players(All Teams) == 1;
 	}
 
 	actions
 	{
 		Global.IsInFinalDuel = False;
-		Create HUD Text(All Players(All Teams), Custom String("Waiting for more players"), Null, Null, Top, 0, White, White, White,
-			Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Custom String("Waiting for more players"), Null, Null, Top, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
 		Global.WaitingForPlayersHUD = Last Text ID;
 		Global.IsEnoughPlayersToStart = False;
 		Stop Chasing Global Variable(BallSpawnCountdown);
@@ -680,7 +687,7 @@ rule("Wait for more players")
 
 	conditions
 	{
-		Number of Players(All Teams) > 1;
+		Number Of Players(All Teams) > 1;
 		Global.IsEnoughPlayersToStart == False;
 	}
 
@@ -689,7 +696,7 @@ rule("Wait for more players")
 		Destroy HUD Text(Global.WaitingForPlayersHUD);
 		Big Message(All Players(All Teams), Custom String("Starting game in 5 seconds!"));
 		Wait(5.500, Ignore Condition);
-		Abort If(Number of Players(All Teams) < 2);
+		Abort If(Number Of Players(All Teams) < 2);
 		Unpause Match Time;
 		Global.IsEnoughPlayersToStart = True;
 		Global.SlotOfTargetedPlayer = -1;
@@ -921,7 +928,7 @@ rule("Player tries to abuse ledge on Workshop Island (push up and to center)")
 		"Prevents people from going under the ledge on Workshop Island, which caused ball to go into floor.  Used to be an annoying stunkill"
 		Apply Impulse(Event Player, Up, 2, To World, Cancel Contrary Motion);
 		Apply Impulse(Event Player, Direction Towards(Event Player, Global.CircleCenter), 2, To World, Incorporate Contrary Motion);
-		Wait(0.016, Ignore Condition);
+		Wait(0.008, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
@@ -971,7 +978,7 @@ rule("Bounce when near pad 1")
 		Distance Between(Position Of(Event Player), Global.BouncePad1) <= 2.750;
 		Event Player.BouncePadCooldown == 0;
 		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Jump) == True;
+		Is Button Held(Event Player, Button(Jump)) == True;
 	}
 
 	actions
@@ -979,7 +986,7 @@ rule("Bounce when near pad 1")
 		Event Player.IsDashEnabled = True;
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
-		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
+		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
 		Destroy Effect(Event Player.PlayerEffects[1]);
@@ -1000,7 +1007,7 @@ rule("Bounce when near pad 2")
 		Distance Between(Position Of(Event Player), Global.BouncePad2) <= 2.750;
 		Event Player.BouncePadCooldown == 0;
 		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Jump) == True;
+		Is Button Held(Event Player, Button(Jump)) == True;
 	}
 
 	actions
@@ -1008,7 +1015,7 @@ rule("Bounce when near pad 2")
 		Event Player.IsDashEnabled = True;
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
-		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
+		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
 		Destroy Effect(Event Player.PlayerEffects[1]);
@@ -1029,7 +1036,7 @@ rule("Bounce when near pad 3")
 		Distance Between(Position Of(Event Player), Global.BouncePad3) <= 2.750;
 		Event Player.BouncePadCooldown == 0;
 		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Jump) == True;
+		Is Button Held(Event Player, Button(Jump)) == True;
 	}
 
 	actions
@@ -1037,7 +1044,7 @@ rule("Bounce when near pad 3")
 		Event Player.IsDashEnabled = True;
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
-		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
+		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
 		Destroy Effect(Event Player.PlayerEffects[1]);
@@ -1058,7 +1065,7 @@ rule("Bounce when near pad 4")
 		Distance Between(Position Of(Event Player), Global.BouncePad4) <= 2.750;
 		Event Player.BouncePadCooldown == 0;
 		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Jump) == True;
+		Is Button Held(Event Player, Button(Jump)) == True;
 	}
 
 	actions
@@ -1066,7 +1073,7 @@ rule("Bounce when near pad 4")
 		Event Player.IsDashEnabled = True;
 		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
-		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.BouncePad1, 25);
+		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
 		Destroy Effect(Event Player.PlayerEffects[1]);
@@ -1135,13 +1142,13 @@ rule("primary = dash")
 
 	conditions
 	{
-		Is Button Held(Event Player, Primary Fire) == True;
+		Is Button Held(Event Player, Button(Primary Fire)) == True;
 		Custom String("{0}", Event Player) != Custom String("bytestats");
 	}
 
 	actions
 	{
-		Press Button(Event Player, Ability 1);
+		Press Button(Event Player, Button(Ability 1));
 	}
 }
 
@@ -1156,13 +1163,13 @@ rule("secondary = deflect")
 
 	conditions
 	{
-		Is Button Held(Event Player, Secondary Fire) == True;
+		Is Button Held(Event Player, Button(Secondary Fire)) == True;
 		Custom String("{0}", Event Player) != Custom String("bytestats");
 	}
 
 	actions
 	{
-		Press Button(Event Player, Ability 2);
+		Press Button(Event Player, Button(Ability 2));
 	}
 }
 
@@ -1213,7 +1220,7 @@ rule("Spawn ball")
 		Global.BallPosition = Global.CircleCenter;
 		Global.BallDirection = Direction Towards(Global.BallPosition, Eye Position(Players In Slot(Global.SlotOfTargetedPlayer,
 			All Teams)));
-		Global.BallSpeed = Min(25, Global.BallSpeed);
+		Global.BallSpeed = Min(30, Global.BallSpeed);
 		Global.BallIsOut = True;
 	}
 }
@@ -1238,7 +1245,7 @@ rule("ball motion (has to be done weird due to chase vector variable bugs)")
 			Destination and Rate);
 		Chase Global Variable At Rate(BallDirection, Direction Towards(Global.BallPosition, Eye Position(Players In Slot(
 			Global.SlotOfTargetedPlayer, All Teams))), 1.750, Destination and Rate);
-		Chase Global Variable At Rate(BallSpeed, Global.MaxBallSpeed, 0.500, Destination and Rate);
+		Chase Global Variable At Rate(BallSpeed, Global.MaxBallSpeed, 0.250, Destination and Rate);
 		Wait(0.050, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -1276,8 +1283,8 @@ rule("Ball reaches player")
 			Teleport(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Global.BallPosition);
 		End;
 		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).CurrentUltPercent += 5;
-		Play Effect(All Players(All Teams), Explosion Sound, White, Position Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)),
-			200);
+		Play Effect(All Players(All Teams), Explosion Sound, Color(White), Position Of(Players In Slot(Global.SlotOfTargetedPlayer,
+			All Teams)), 200);
 		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).PlayerDeflects += 1;
 		Global.SlotOfPreviousTargetedPlayer = Global.SlotOfTargetedPlayer;
 		Global.BallSpeed = Min(500, Global.BallSpeed * 1.050);
@@ -1308,19 +1315,20 @@ rule("CoolDeathEffects sub")
 	actions
 	{
 		Create Beam Effect(All Players(All Teams), Bad Beam, Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams),
-			Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Red, Visible To Position and Radius);
+			Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Color(Sky Blue), Visible To Position and Radius);
 		Global.deathBeam = Last Created Entity;
 		Global.deathSpherePos = Position Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams));
 		Global.deathSphereRad = 30;
 		Chase Global Variable Over Time(deathSphereRad, 0, 0.250, Destination and Duration);
-		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Global.deathSpherePos, 40);
-		Create Effect(All Players(All Teams), Sphere, Red, Global.deathSpherePos, Global.deathSphereRad, Visible To Position and Radius);
+		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Sky Blue), Global.deathSpherePos, 40);
+		Create Effect(All Players(All Teams), Sphere, Color(Black), Global.deathSpherePos, Global.deathSphereRad,
+			Visible To Position and Radius);
 		Global.deathSphere = Last Created Entity;
-		Play Effect(All Players(All Teams), Good Explosion, White, Global.deathSpherePos, 5);
+		Play Effect(All Players(All Teams), Good Explosion, Color(White), Global.deathSpherePos, 5);
 		Wait(0.250, Ignore Condition);
 		Destroy Effect(Global.deathSphere);
-		disabled Play Effect(All Players(All Teams), Ring Explosion, Red, Global.deathSpherePos, Global.SphereSize * 1.500);
-		disabled Play Effect(All Players(All Teams), Explosion Sound, White, Global.deathSpherePos, 40);
+		disabled Play Effect(All Players(All Teams), Ring Explosion, Color(Red), Global.deathSpherePos, Global.SphereSize * 1.500);
+		disabled Play Effect(All Players(All Teams), Explosion Sound, Color(White), Global.deathSpherePos, 40);
 		Destroy Effect(Global.deathBeam);
 	}
 }
@@ -1347,7 +1355,7 @@ rule("Final duel")
 		Global.BallDeleteRequested = True;
 		Global.IsInFinalDuel = True;
 		All Living Players(All Teams).BouncePadCooldown = Global.BouncePadCooldownLength;
-		Skip If(Number of Players(All Teams) <= 2, 1);
+		Skip If(Number Of Players(All Teams) <= 2, 1);
 		Big Message(All Players(All Teams), Custom String("Final Duel!"));
 		Apply Impulse(All Living Players(All Teams), Down, 0.001, To World, Cancel Contrary Motion);
 		Apply Impulse(All Living Players(All Teams), Up, 0.001, To World, Cancel Contrary Motion);
@@ -1381,7 +1389,7 @@ rule("Check for last player surviving")
 	conditions
 	{
 		Is Game In Progress == True;
-		Number of Living Players(All Teams) == 1;
+		Number Of Living Players(All Teams) == 1;
 		Global.IsEnoughPlayersToStart == True;
 	}
 
@@ -1466,7 +1474,7 @@ rule("All players dead failsafe")
 
 	conditions
 	{
-		Number of Living Players(All Teams) == 0;
+		Number Of Living Players(All Teams) == 0;
 		Is Game In Progress == True;
 		Global.TieBreakerActive == False;
 	}
@@ -1541,11 +1549,11 @@ rule("Ball bounce off surface")
 	{
 		"normal of the plane of the surface with which the ball collides, n"
 		Global.BallCollisionSurfaceNormal = Ray Cast Hit Normal(Global.BallPosition,
-			Global.BallPosition + Global.BallDirection * Global.BallSpeed * 0.033, Null, All Players(All Teams), False);
+			Global.BallPosition + Global.BallDirection * Global.BallSpeed * 0.066, Null, All Players(All Teams), False);
 		"reflected vector formula --- new v = v - 2 * (v•n)/(n•n) * n"
-		Global.BallDirection = Global.BallDirection - 2 * Dot Product(Global.BallDirection, Global.BallCollisionSurfaceNormal)
-			/ Dot Product(Global.BallCollisionSurfaceNormal, Global.BallCollisionSurfaceNormal) * Global.BallCollisionSurfaceNormal;
-		Play Effect(All Players(All Teams), Bad Explosion, White, Global.BallPosition, 1);
+		Global.BallDirection = Global.BallDirection - 2 * Global.BallDirection * Global.BallCollisionSurfaceNormal / Dot Product(
+			Global.BallCollisionSurfaceNormal, Global.BallCollisionSurfaceNormal) * Global.BallCollisionSurfaceNormal;
+		Play Effect(All Players(All Teams), Bad Explosion, Color(White), Global.BallPosition, 1);
 		Wait(0.020, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -1568,7 +1576,7 @@ rule("Ball no down when y < -0.5")
 	actions
 	{
 		Global.BallDirection *= Vector(1, 0, 1);
-		Play Effect(All Players(All Teams), Ring Explosion, White, Global.BallPosition, 2);
+		Play Effect(All Players(All Teams), Ring Explosion, Color(White), Global.BallPosition, 2);
 	}
 }
 
@@ -1585,12 +1593,12 @@ rule("Ball change color")
 		disabled Destroy Effect(Global.BallSmoke);
 		disabled Destroy Effect(Global.BallTail1);
 		disabled Destroy Effect(Global.BallTail2);
-		disabled Create Effect(All Players(All Teams), Bad Aura, Blue, Global.BallPosition, 1, Visible To Position and Radius);
+		disabled Create Effect(All Players(All Teams), Bad Aura, Color(Blue), Global.BallPosition, 1, Visible To Position and Radius);
 		disabled Global.BallSmoke = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Blue,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Color(Blue),
 			Visible To Position and Radius);
 		disabled Global.BallTail1 = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Blue,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Color(Blue),
 			Visible To Position and Radius);
 		disabled Global.BallTail2 = Last Created Entity;
 		disabled Global.BallColor = 0;
@@ -1598,12 +1606,12 @@ rule("Ball change color")
 		disabled Destroy Effect(Global.BallSmoke);
 		disabled Destroy Effect(Global.BallTail1);
 		disabled Destroy Effect(Global.BallTail2);
-		disabled Create Effect(All Players(All Teams), Bad Aura, Green, Global.BallPosition, 1, Visible To Position and Radius);
+		disabled Create Effect(All Players(All Teams), Bad Aura, Color(Green), Global.BallPosition, 1, Visible To Position and Radius);
 		disabled Global.BallSmoke = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Green,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Color(Green),
 			Visible To Position and Radius);
 		disabled Global.BallTail1 = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Green,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Color(Green),
 			Visible To Position and Radius);
 		disabled Global.BallTail2 = Last Created Entity;
 		disabled Global.BallColor = 1;
@@ -1611,12 +1619,12 @@ rule("Ball change color")
 		Destroy Effect(Global.BallSmoke);
 		Destroy Effect(Global.BallTail1);
 		Destroy Effect(Global.BallTail2);
-		disabled Create Effect(All Players(All Teams), Bad Aura, Yellow, Global.BallPosition, 1, Visible To Position and Radius);
+		disabled Create Effect(All Players(All Teams), Bad Aura, Color(Yellow), Global.BallPosition, 1, Visible To Position and Radius);
 		disabled Global.BallSmoke = Last Created Entity;
-		Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Yellow,
+		Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Color(Sky Blue),
 			Visible To Position and Radius);
 		Global.BallTail1 = Last Created Entity;
-		Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Yellow,
+		Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Color(Sky Blue),
 			Visible To Position and Radius);
 		Global.BallTail2 = Last Created Entity;
 		Global.BallColor = 2;
@@ -1624,12 +1632,12 @@ rule("Ball change color")
 		disabled Destroy Effect(Global.BallSmoke);
 		disabled Destroy Effect(Global.BallTail1);
 		disabled Destroy Effect(Global.BallTail2);
-		disabled Create Effect(All Players(All Teams), Bad Aura, Orange, Global.BallPosition, 1, Visible To Position and Radius);
+		disabled Create Effect(All Players(All Teams), Bad Aura, Color(Orange), Global.BallPosition, 1, Visible To Position and Radius);
 		disabled Global.BallSmoke = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Orange,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Color(Orange),
 			Visible To Position and Radius);
 		disabled Global.BallTail1 = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Orange,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Color(Orange),
 			Visible To Position and Radius);
 		disabled Global.BallTail2 = Last Created Entity;
 		disabled Global.BallColor = 3;
@@ -1637,34 +1645,36 @@ rule("Ball change color")
 		disabled Destroy Effect(Global.BallSmoke);
 		disabled Destroy Effect(Global.BallTail1);
 		disabled Destroy Effect(Global.BallTail2);
-		disabled Create Effect(All Players(All Teams), Bad Aura, Red, Global.BallPosition, 1, Visible To Position and Radius);
+		disabled Create Effect(All Players(All Teams), Bad Aura, Color(Red), Global.BallPosition, 1, Visible To Position and Radius);
 		disabled Global.BallSmoke = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Red, Visible To Position and Radius);
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Color(Red),
+			Visible To Position and Radius);
 		disabled Global.BallTail1 = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Red, Visible To Position and Radius);
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Color(Red),
+			Visible To Position and Radius);
 		disabled Global.BallTail2 = Last Created Entity;
 		disabled Global.BallColor = 4;
 		disabled Else If(Global.BallColor != 5 && Global.BallSpeed >= 55 && True);
 		disabled Destroy Effect(Global.BallSmoke);
 		disabled Destroy Effect(Global.BallTail1);
 		disabled Destroy Effect(Global.BallTail2);
-		disabled Create Effect(All Players(All Teams), Bad Aura, Purple, Global.BallPosition, 1, Visible To Position and Radius);
+		disabled Create Effect(All Players(All Teams), Bad Aura, Color(Purple), Global.BallPosition, 1, Visible To Position and Radius);
 		disabled Global.BallSmoke = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Purple,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Color(Purple),
 			Visible To Position and Radius);
 		disabled Global.BallTail1 = Last Created Entity;
-		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Purple,
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Color(Purple),
 			Visible To Position and Radius);
 		disabled Global.BallTail2 = Last Created Entity;
 		disabled Global.BallColor = 5;
 		disabled End;
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
-		Play Effect(All Players(All Teams), Bad Explosion, Green, Global.BallPosition, 2);
-		Play Effect(All Players(All Teams), Bad Explosion, Yellow, Global.BallPosition, 2);
-		Play Effect(All Players(All Teams), Bad Explosion, Orange, Global.BallPosition, 2);
-		Play Effect(All Players(All Teams), Bad Explosion, Red, Global.BallPosition, 2);
-		Play Effect(All Players(All Teams), Bad Explosion, Purple, Global.BallPosition, 4);
+		Play Effect(All Players(All Teams), Bad Explosion, Color(Green), Global.BallPosition, 2);
+		Play Effect(All Players(All Teams), Bad Explosion, Color(Yellow), Global.BallPosition, 2);
+		Play Effect(All Players(All Teams), Bad Explosion, Color(Orange), Global.BallPosition, 2);
+		Play Effect(All Players(All Teams), Bad Explosion, Color(Red), Global.BallPosition, 2);
+		Play Effect(All Players(All Teams), Bad Explosion, Color(Purple), Global.BallPosition, 4);
 	}
 }
 
@@ -1689,7 +1699,7 @@ rule("Chamber x collision")
 			Global.BallPosition) - 0.400 <= -20 && X Component Of(Global.BallDirection) < 0));
 			Global.BallDirection = Vector(X Component Of(Global.BallDirection) * -1, Y Component Of(Global.BallDirection), Z Component Of(
 				Global.BallDirection));
-			Play Effect(All Players(All Teams), Bad Explosion, White, Global.BallPosition, 1);
+			Play Effect(All Players(All Teams), Bad Explosion, Color(White), Global.BallPosition, 1);
 		End;
 		Wait(0.016, Ignore Condition);
 		Loop If Condition Is True;
@@ -1716,7 +1726,7 @@ rule("Chamber y collision")
 			Global.BallPosition) - 0.400 <= 0 && Y Component Of(Global.BallDirection) < 0));
 			Global.BallDirection = Vector(X Component Of(Global.BallDirection), Y Component Of(Global.BallDirection) * -1, Z Component Of(
 				Global.BallDirection));
-			Play Effect(All Players(All Teams), Bad Explosion, White, Global.BallPosition, 1);
+			Play Effect(All Players(All Teams), Bad Explosion, Color(White), Global.BallPosition, 1);
 		End;
 		Wait(0.016, Ignore Condition);
 		Loop If Condition Is True;
@@ -1743,7 +1753,7 @@ rule("Chamber z collision")
 			Global.BallPosition) - 0.400 <= -20 && Z Component Of(Global.BallDirection) < 0));
 			Global.BallDirection = Vector(X Component Of(Global.BallDirection), Y Component Of(Global.BallDirection), Z Component Of(
 				Global.BallDirection) * -1);
-			Play Effect(All Players(All Teams), Bad Explosion, White, Global.BallPosition, 1);
+			Play Effect(All Players(All Teams), Bad Explosion, Color(White), Global.BallPosition, 1);
 		End;
 		Wait(0.016, Ignore Condition);
 		Loop If Condition Is True;
@@ -1768,6 +1778,6 @@ rule("No Undermaps")
 	actions
 	{
 		Global.BallDirection *= Vector(1, 0, 1);
-		Play Effect(All Players(All Teams), Ring Explosion, White, Global.BallPosition, 2);
+		Play Effect(All Players(All Teams), Ring Explosion, Color(White), Global.BallPosition, 2);
 	}
 }
