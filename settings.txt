@@ -1865,6 +1865,7 @@ rule("Anti-Stuck Detection")
 	conditions
 	{
 		Y Component Of(Position Of(Event Player)) <= -4;
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
 	}
 
 	actions
@@ -1887,6 +1888,7 @@ rule("Anti-Stuck Activation")
 	{
 		Event Player.antiStuckProtection == True;
 		Event Player.antiStuckTimer == 2;
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
 	}
 
 	actions
@@ -1910,6 +1912,7 @@ rule("Anti-Stuck Deactivation")
 	{
 		Y Component Of(Position Of(Event Player)) >= 0;
 		Event Player.antiStuckProtection == True;
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
 	}
 
 	actions
