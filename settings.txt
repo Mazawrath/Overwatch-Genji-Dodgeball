@@ -59,11 +59,6 @@ settings
 		}
 	}
 
-	workshop
-	{
-		Cooldown Dashing Enabled: On
-	}
-
 	extensions
 	{
 		Beam Effects
@@ -161,20 +156,7 @@ rule("Enable Watermark")
 
 	actions
 	{
-		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Genji Dodgeball"), Custom String("Enable Watermark"), True, 0);
-	}
-}
-
-disabled rule("Enable Bouncepad Dashing (Use the bouncepad to get a dash) - Only enable one!")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	actions
-	{
-		Global.BouncepadDashingEnabled = True;
+		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Enable Watermark"), True, 0);
 	}
 }
 
@@ -188,8 +170,7 @@ rule("Enable Cooldown Dashing (Configure the dash cooldown in custom game settin
 	actions
 	{
 		Skip If(Global.BouncepadDashingEnabled, 1);
-		Global.CooldownDashingEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String(
-			"Cooldown Dashing Enabled"), False, 0);
+		Global.CooldownDashingEnabled = True;
 	}
 }
 
