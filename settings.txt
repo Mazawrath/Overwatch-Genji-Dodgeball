@@ -58,6 +58,12 @@ settings
 			}
 		}
 	}
+
+	extensions
+	{
+		Kinetic Explosion Effects
+		Explosion Sounds
+	}
 }
 
 variables
@@ -106,6 +112,10 @@ variables
 		40: BallColor
 		41: HighestScore
 		42: TieBreakerActive
+		43: RandomExplosionPicker
+		44: ExplosionSoundVolume
+		45: ImprovedExplosions
+		46: RandomExplosionSounds
 
 	player:
 		0: hasMoved
@@ -127,6 +137,7 @@ variables
 subroutines
 {
 	0: CoolDeathEffects
+	1: UpdatedDeathEffects
 }
 
 rule("// SETTINGS")
@@ -140,6 +151,10 @@ rule("// SETTINGS")
 	{
 		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Enable Watermark"), True, 0);
 		Global.CooldownDashingEnabled = True;
+		Global.ImprovedExplosions = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Improved Explosions"), True,
+			0);
+		Global.RandomExplosionSounds = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Random Explosion Sounds"),
+			True, 1);
 		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String(
 			"Red/Green Colorblind Mode"), False, 2);
 	}
@@ -328,6 +343,7 @@ rule("Init global variables")
 		Global.BallPosition = Vector(0, -1, 0);
 		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
 		Global.GameEndEnabled = True;
+		Global.ExplosionSoundVolume = 20;
 	}
 }
 
@@ -1212,10 +1228,14 @@ rule("Ball reaches player")
 	actions
 	{
 		Skip If(Is Using Ability 2(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)) || Is Using Ability 1(Players In Slot(
-			Global.SlotOfTargetedPlayer, All Teams)), 9);
+			Global.SlotOfTargetedPlayer, All Teams)), 13);
 		Set Status(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer,
 			All Teams), Stunned, 1);
-		Call Subroutine(CoolDeathEffects);
+		If(Global.ImprovedExplosions == True);
+			Call Subroutine(UpdatedDeathEffects);
+		Else;
+			Call Subroutine(CoolDeathEffects);
+		End;
 		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).BouncePadCooldown = 0;
 		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).CurrentUltPercent += 15;
 		Kill(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams));
@@ -1275,6 +1295,47 @@ rule("CoolDeathEffects sub")
 		disabled Play Effect(All Players(All Teams), Ring Explosion, Color(Red), Global.deathSpherePos, Global.SphereSize * 1.500);
 		disabled Play Effect(All Players(All Teams), Explosion Sound, Color(White), Global.deathSpherePos, 40);
 		Destroy Effect(Global.deathBeam);
+	}
+}
+
+rule("Updated Death Effects Sub")
+{
+	event
+	{
+		Subroutine;
+		UpdatedDeathEffects;
+	}
+
+	actions
+	{
+		Global.deathSpherePos = Position Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams));
+		Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Effect, Color(White), Global.deathSpherePos, 100);
+		Play Effect(All Players(All Teams), Bastion Tank Cannon Explosion Effect, Color(White), Global.deathSpherePos, 1);
+		If(Global.RandomExplosionSounds);
+			"Pick a random explosion sound"
+			Global.RandomExplosionPicker = Random Integer(0, 4);
+			If(Global.RandomExplosionPicker == 0);
+				Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			Else If(Global.RandomExplosionPicker == 1);
+				Play Effect(All Players(All Teams), Bastion Tank Cannon Explosion Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			Else If(Global.RandomExplosionPicker == 2);
+				Play Effect(All Players(All Teams), Ashe Dynamite Explosion Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			Else If(Global.RandomExplosionPicker == 3);
+				Play Effect(All Players(All Teams), Pharah Barrage Explosion Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			Else If(Global.RandomExplosionPicker == 4);
+				Play Effect(All Players(All Teams), Junkrat Frag Launcher Explosion Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			End;
+		Else;
+			disabled Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Sound, Color(White), Global.deathSpherePos,
+				Global.ExplosionSoundVolume);
+			Play Effect(All Players(All Teams), Junkrat Frag Launcher Explosion Sound, Color(White), Global.deathSpherePos,
+				Global.ExplosionSoundVolume);
+		End;
 	}
 }
 
