@@ -149,13 +149,13 @@ rule("// SETTINGS")
 
 	actions
 	{
-		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Enable Watermark"), True, 0);
+		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Enable Watermark"), True, 0);
 		Global.CooldownDashingEnabled = True;
 		Global.ImprovedExplosions = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Improved Explosions"), True,
 			0);
 		Global.RandomExplosionSounds = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Random Explosion Sounds"),
 			True, 1);
-		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String(
+		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String(
 			"Red/Green Colorblind Mode"), False, 2);
 	}
 }
