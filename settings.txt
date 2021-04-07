@@ -133,6 +133,7 @@ variables
 		9: IsDashEnabled
 		10: moveSpeed
 		11: maxBallSpeed
+		12: antiFloatProtection
 }
 
 subroutines
@@ -1795,5 +1796,56 @@ rule("No Undermaps")
 	{
 		Global.BallDirection *= Vector(1, 0, 1);
 		Play Effect(All Players(All Teams), Ring Explosion, Color(White), Global.BallPosition, 2);
+	}
+}
+
+rule("Activate Anti-Bounce Protection")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) < 0;
+		"Workshop Island Fix"
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		disabled Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Vector(0, 1, 0)), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
+		"Busted!"
+		Event Player.antiFloatProtection = True;
+	}
+}
+
+rule("Disable Anti-Bounce")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) >= 0;
+		Event Player.antiFloatProtection == True;
+		"Workshop Island Fix"
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		disabled Stop Throttle In Direction(Event Player);
+		Stop Forcing Throttle(Event Player);
+		Event Player.antiFloatProtection = False;
 	}
 }
