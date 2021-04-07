@@ -28,6 +28,7 @@ settings
 		General
 		{
 			Allow Hero Switching: Off
+			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Respawn As Random Hero: On
@@ -134,6 +135,8 @@ variables
 		10: moveSpeed
 		11: maxBallSpeed
 		12: antiFloatProtection
+		13: antiStuckTimer
+		14: antiStuckProtection
 }
 
 subroutines
@@ -1799,7 +1802,7 @@ rule("No Undermaps")
 	}
 }
 
-rule("Activate Anti-Bounce Protection")
+rule("Activate Anti-Bounce")
 {
 	event
 	{
@@ -1847,5 +1850,72 @@ rule("Disable Anti-Bounce")
 		disabled Stop Throttle In Direction(Event Player);
 		Stop Forcing Throttle(Event Player);
 		Event Player.antiFloatProtection = False;
+	}
+}
+
+rule("Anti-Stuck Detection")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) <= -4;
+	}
+
+	actions
+	{
+		Event Player.antiStuckProtection = True;
+		Chase Player Variable At Rate(Event Player, antiStuckTimer, 2, 1, Destination and Rate);
+	}
+}
+
+rule("Anti-Stuck Activation")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.antiStuckProtection == True;
+		Event Player.antiStuckTimer == 2;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Up, 5, To World, Cancel Contrary Motion XYZ);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Anti-Stuck Deactivation")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) >= 0;
+		Event Player.antiStuckProtection == True;
+	}
+
+	actions
+	{
+		Event Player.antiStuckProtection = False;
+		Stop Chasing Player Variable(Event Player, antiStuckTimer);
+		Event Player.antiStuckTimer = 0;
 	}
 }
