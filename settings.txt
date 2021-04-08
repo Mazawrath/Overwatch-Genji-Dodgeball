@@ -130,8 +130,6 @@ variables
 		10: moveSpeed
 		11: maxBallSpeed
 		12: antiFloatProtection
-		13: antiStuckTimer
-		14: antiStuckProtection
 }
 
 subroutines
@@ -343,7 +341,7 @@ rule("Init global variables")
 		Global.BallPosition = Vector(0, -1, 0);
 		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
 		Global.GameEndEnabled = True;
-		Global.ExplosionSoundVolume = 20;
+		Global.ExplosionSoundVolume = 30;
 	}
 }
 
@@ -463,6 +461,8 @@ rule("Create player HUD elements")
 		disabled Create HUD Text(Event Player, Round To Integer(Event Player.BouncePadCooldown, Up), Custom String("Bouncepad"), Custom String(
 			"Cooldown"), Right, -1, Color(Green), Color(White), Color(White), Visible To and String, Default Visibility);
 		disabled Event Player.PlayerUI[5] = Last Created Entity;
+		Create HUD Text(All Players(All Teams), Custom String("{0}", Y Component Of(Position Of(Event Player))), Null, Null, Left, 0,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
 	}
 }
 
@@ -1309,7 +1309,10 @@ rule("Updated Death Effects Sub")
 	actions
 	{
 		Global.deathSpherePos = Position Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams));
-		Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Effect, Color(White), Global.deathSpherePos, 100);
+		If(Y Component Of(Global.deathSpherePos) <= 5);
+			Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Effect, Color(White), Vector(X Component Of(
+				Global.deathSpherePos), 0, Z Component Of(Global.deathSpherePos)), 0);
+		End;
 		Play Effect(All Players(All Teams), Bastion Tank Cannon Explosion Effect, Color(White), Global.deathSpherePos, 1);
 		If(Global.RandomExplosionSounds);
 			"Pick a random explosion sound"
@@ -1839,28 +1842,6 @@ rule("Disable Anti-Bounce")
 	}
 }
 
-rule("Anti-Stuck Detection")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Y Component Of(Position Of(Event Player)) <= -4;
-		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
-	}
-
-	actions
-	{
-		Event Player.antiStuckProtection = True;
-		Chase Player Variable At Rate(Event Player, antiStuckTimer, 2, 1, Destination and Rate);
-	}
-}
-
 rule("Anti-Stuck Activation")
 {
 	event
@@ -1872,39 +1853,14 @@ rule("Anti-Stuck Activation")
 
 	conditions
 	{
-		Event Player.antiStuckProtection == True;
-		Event Player.antiStuckTimer == 2;
+		Y Component Of(Position Of(Event Player)) < -4;
 		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
 	}
 
 	actions
 	{
 		Apply Impulse(Event Player, Up, 5, To World, Cancel Contrary Motion XYZ);
-		Wait(0.250, Ignore Condition);
+		Wait(0.500, Ignore Condition);
 		Loop If Condition Is True;
-	}
-}
-
-rule("Anti-Stuck Deactivation")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Y Component Of(Position Of(Event Player)) >= 0;
-		Event Player.antiStuckProtection == True;
-		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
-	}
-
-	actions
-	{
-		Event Player.antiStuckProtection = False;
-		Stop Chasing Player Variable(Event Player, antiStuckTimer);
-		Event Player.antiStuckTimer = 0;
 	}
 }
