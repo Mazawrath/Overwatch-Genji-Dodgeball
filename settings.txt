@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v5.3.1. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "Genji Dodgeball v5.4.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
 	}
 
 	lobby
@@ -18,20 +18,17 @@ settings
 	{
 		Deathmatch
 		{
-			enabled maps
-			{
-				Workshop Island Night
-			}
-		}
-
-		General
-		{
 			Allow Hero Switching: Off
 			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Respawn As Random Hero: On
 			Self Initiated Respawn: Off
+
+			enabled maps
+			{
+				Workshop Island Night
+			}
 		}
 	}
 
@@ -115,6 +112,7 @@ variables
 		44: ExplosionSoundVolume
 		45: ImprovedExplosions
 		46: RandomExplosionSounds
+		47: FinalDuelNuke
 
 	player:
 		0: hasMoved
@@ -152,6 +150,7 @@ rule("// SETTINGS")
 		Global.CooldownDashingEnabled = True;
 		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String(
 			"Red/Green Colorblind Mode"), False, 2);
+		Global.FinalDuelNuke = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Final Duel Explosion"), True, 3);
 	}
 }
 
@@ -606,7 +605,7 @@ rule("// Not enough players testing")
 	actions
 	{
 		Skip If(!Global.WatermarkEnabled, 1);
-		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.3.1"), Null, Left, -1000, Color(
+		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.4.0"), Null, Left, -1000, Color(
 			White), Color(Aqua), Color(White), Visible To and String, Visible Always);
 	}
 }
@@ -1460,9 +1459,12 @@ rule("Updated Death Effects Sub")
 	actions
 	{
 		Global.deathSpherePos = Position Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams));
-		If(Y Component Of(Global.deathSpherePos) <= 10);
-			Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Effect, Color(White), Vector(X Component Of(
-				Global.deathSpherePos), 0, Z Component Of(Global.deathSpherePos)), 0);
+		"Make sure it is final duel AND there are at least 3 or more players"
+		If(Number Of Living Players(All Teams) == 2 && Number Of Players(All Teams) != 2);
+			If(Global.FinalDuelNuke);
+				Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Effect, Color(White), Vector(X Component Of(
+					Global.deathSpherePos), 0, Z Component Of(Global.deathSpherePos)), 0);
+			End;
 		End;
 		Play Effect(All Players(All Teams), Bastion Tank Cannon Explosion Effect, Color(White), Global.deathSpherePos, 1);
 		If(Global.RandomExplosionSounds);
