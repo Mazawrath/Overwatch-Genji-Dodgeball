@@ -1381,7 +1381,7 @@ rule("Updated Death Effects Sub")
 	actions
 	{
 		Global.deathSpherePos = Position Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams));
-		If(Y Component Of(Global.deathSpherePos) <= 5);
+		If(Y Component Of(Global.deathSpherePos) <= 10);
 			Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Effect, Color(White), Vector(X Component Of(
 				Global.deathSpherePos), 0, Z Component Of(Global.deathSpherePos)), 0);
 		End;
