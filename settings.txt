@@ -808,9 +808,9 @@ rule("Push to circle")
 
 	actions
 	{
-		disabled Apply Impulse(Event Player, Up, 3, To World, Cancel Contrary Motion);
-		Apply Impulse(Event Player, Vector(X Component Of(Direction Towards(Position Of(Event Player), Global.CircleCenter)), 3,
-			Z Component Of(Direction Towards(Position Of(Event Player), Global.CircleCenter))), 6, To World, Cancel Contrary Motion XYZ);
+		Apply Impulse(Event Player, Vector(X Component Of(Direction Towards(Position Of(Event Player), Global.CircleCenter)), 0,
+			Z Component Of(Direction Towards(Position Of(Event Player), Global.CircleCenter))), 6, To World, Cancel Contrary Motion);
+		Apply Impulse(Event Player, Up, 3, To World, Incorporate Contrary Motion);
 		Wait(0.250, Ignore Condition);
 		Loop If Condition Is True;
 	}
