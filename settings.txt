@@ -150,8 +150,6 @@ rule("// SETTINGS")
 	{
 		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Enable Watermark"), True, 0);
 		Global.CooldownDashingEnabled = True;
-		Global.ImprovedExplosions = True;
-		Global.RandomExplosionSounds = True;
 		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String(
 			"Red/Green Colorblind Mode"), False, 2);
 	}
@@ -343,6 +341,9 @@ rule("Init global variables")
 		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
 		Global.GameEndEnabled = True;
 		Global.ExplosionSoundVolume = 30;
+		Global.ImprovedExplosions = True;
+		Global.RandomExplosionSounds = True;
+		Global.CooldownDashingEnabled = True;
 	}
 }
 
