@@ -948,7 +948,6 @@ rule("Anti-Bounce Detection Positive X")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
-		Small Message(All Players(All Teams), Custom String("{0} THIS IS YOUR FAULT YOU POO POO DUMB POO POO HEAD DUMB", Event Player));
 	}
 }
 
@@ -975,7 +974,6 @@ rule("Anti-Bounce Detection Netgative X")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
-		Small Message(All Players(All Teams), Custom String("{0} THIS IS YOUR FAULT YOU POO POO DUMB POO POO HEAD DUMB", Event Player));
 	}
 }
 
@@ -1002,7 +1000,6 @@ rule("Anti-Bounce Detection Positive Z")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
-		Small Message(All Players(All Teams), Custom String("{0} THIS IS YOUR FAULT YOU POO POO DUMB POO POO HEAD DUMB", Event Player));
 	}
 }
 
@@ -1029,7 +1026,6 @@ rule("Anti-Bounce Detection Negative Z")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
-		Small Message(All Players(All Teams), Custom String("{0} THIS IS YOUR FAULT YOU POO POO DUMB POO POO HEAD DUMB", Event Player));
 	}
 }
 
