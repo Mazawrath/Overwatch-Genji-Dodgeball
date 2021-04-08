@@ -2,13 +2,12 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v5.2.1P Community Edition! Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "Genji Dodgeball v5.3.1. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
 	}
 
 	lobby
 	{
 		Allow Players Who Are In Queue: Yes
-		Data Center Preference: USA - Central
 		Map Rotation: After A Game
 		Match Voice Chat: Enabled
 		Max Spectators: 6
@@ -58,6 +57,12 @@ settings
 			}
 		}
 	}
+
+	extensions
+	{
+		Kinetic Explosion Effects
+		Explosion Sounds
+	}
 }
 
 variables
@@ -106,6 +111,10 @@ variables
 		40: BallColor
 		41: HighestScore
 		42: TieBreakerActive
+		43: RandomExplosionPicker
+		44: ExplosionSoundVolume
+		45: ImprovedExplosions
+		46: RandomExplosionSounds
 
 	player:
 		0: hasMoved
@@ -119,11 +128,15 @@ variables
 		9: IsDashEnabled
 		10: moveSpeed
 		11: maxBallSpeed
+		12: antiFloatProtection
+		13: antiFloatTimer
+		14: antiStuckProtection
 }
 
 subroutines
 {
 	0: CoolDeathEffects
+	1: UpdatedDeathEffects
 }
 
 rule("// SETTINGS")
@@ -132,72 +145,13 @@ rule("// SETTINGS")
 	{
 		Ongoing - Global;
 	}
-}
-
-rule("Enable Watermark")
-{
-	event
-	{
-		Ongoing - Global;
-	}
 
 	actions
 	{
-		Global.WatermarkEnabled = True;
-	}
-}
-
-disabled rule("Enable Bouncepad Dashing (Use the bouncepad to get a dash) - Only enable one!")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	actions
-	{
-		Global.BouncepadDashingEnabled = True;
-	}
-}
-
-rule("Enable Cooldown Dashing (Configure the dash cooldown in custom game settings) - Only enable one!")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	actions
-	{
-		Skip If(Global.BouncepadDashingEnabled, 1);
+		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Enable Watermark"), True, 0);
 		Global.CooldownDashingEnabled = True;
-	}
-}
-
-disabled rule("Enable Red-Green Colorblind Filer")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	actions
-	{
-		Global.RedGreenColorblindMode = True;
-	}
-}
-
-rule("Enable game ending (NOTE: READ COMMENT INSIDE RULE BEFORE DISABLING)")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	actions
-	{
-		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
-		Global.GameEndEnabled = True;
+		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String(
+			"Red/Green Colorblind Mode"), False, 2);
 	}
 }
 
@@ -354,6 +308,8 @@ rule("Init player variables")
 		Disable Built-In Game Mode Respawning(Event Player);
 		Enable Death Spectate All Players(Event Player);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
+		Event Player.antiFloatProtection = False;
+		Event Player.antiStuckProtection = False;
 	}
 }
 
@@ -382,6 +338,12 @@ rule("Init global variables")
 		Global.IsInFinalDuel = False;
 		Global.BouncePadCooldownLength = 3;
 		Global.BallPosition = Vector(0, -1, 0);
+		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
+		Global.GameEndEnabled = True;
+		Global.ExplosionSoundVolume = 30;
+		Global.ImprovedExplosions = True;
+		Global.RandomExplosionSounds = True;
+		Global.CooldownDashingEnabled = True;
 	}
 }
 
@@ -611,7 +573,7 @@ rule("Create ball countdown HUD")
 	{
 		Create In-World Text(All Players(All Teams), Custom String("Ball Spawning In: {0}", Round To Integer(Global.BallSpawnCountdown,
 			Up)), Vector(X Component Of(Global.CircleCenter), Y Component Of(Global.CircleCenter) + 2.500, Z Component Of(
-			Global.CircleCenter)), 10, Clip Against Surfaces, Visible To Position and String, Color(Sky Blue), Default Visibility);
+			Global.CircleCenter)), 2.500, Clip Against Surfaces, Visible To Position and String, Color(Sky Blue), Default Visibility);
 		Global.BallSpawnCountdownHUD = Last Text ID;
 	}
 }
@@ -644,8 +606,7 @@ rule("// Not enough players testing")
 	actions
 	{
 		Skip If(!Global.WatermarkEnabled, 1);
-		"Please don't be a child and try to take credit for this game. If you actually have contributed something you are free to add here. But if not, don't touch this. You are free to disable it."
-		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.2.1P"), Null, Left, -1000, Color(
+		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v5.3.1"), Null, Left, -1000, Color(
 			White), Color(Aqua), Color(White), Visible To and String, Visible Always);
 	}
 }
@@ -871,8 +832,8 @@ rule("Put out center")
 
 	actions
 	{
-		Apply Impulse(Event Player, Direction Towards(Global.CircleCenter, Event Player), 10, To World, Cancel Contrary Motion);
-		Apply Impulse(Event Player, Up, 1.500, To World, Incorporate Contrary Motion);
+		Apply Impulse(Event Player, Direction Towards(Global.CircleCenter, Event Player), 10, To World, Cancel Contrary Motion XYZ);
+		Apply Impulse(Event Player, Up, 1.500, To World, Cancel Contrary Motion XYZ);
 		Wait(0.250, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -917,7 +878,7 @@ rule("Player tries to abuse ledge on Workshop Island (push up and to center)")
 
 	conditions
 	{
-		Y Component Of(Position Of(Event Player)) < -0.250;
+		Y Component Of(Position Of(Event Player)) < -0.500;
 		Is Alive(Event Player) == True;
 		"Workshop Island Fix"
 		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
@@ -945,7 +906,7 @@ rule("Player falls off Workshop Island")
 	conditions
 	{
 		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
-		Y Component Of(Position Of(Event Player)) < -0.500;
+		Y Component Of(Position Of(Event Player)) < -0.250;
 	}
 
 	actions
@@ -959,6 +920,157 @@ rule("Player falls off Workshop Island")
 				End;
 			End;
 		End;
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Anti-Bounce Detection Positive X")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) < 0;
+		X Component Of(Position Of(Event Player)) > 20.500;
+		"Workshop Island Fix"
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		Chase Player Variable At Rate(Event Player, antiFloatTimer, 0.010, 1, Destination and Rate);
+		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
+		"Busted!"
+		Event Player.antiFloatProtection = True;
+	}
+}
+
+rule("Anti-Bounce Detection Netgative X")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) < 0;
+		X Component Of(Position Of(Event Player)) < -20.500;
+		"Workshop Island Fix"
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		Chase Player Variable At Rate(Event Player, antiFloatTimer, 0.010, 1, Destination and Rate);
+		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
+		"Busted!"
+		Event Player.antiFloatProtection = True;
+	}
+}
+
+rule("Anti-Bounce Detection Positive Z")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) < 0;
+		Z Component Of(Position Of(Event Player)) > 20.500;
+		"Workshop Island Fix"
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		Chase Player Variable At Rate(Event Player, antiFloatTimer, 0.010, 1, Destination and Rate);
+		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
+		"Busted!"
+		Event Player.antiFloatProtection = True;
+	}
+}
+
+rule("Anti-Bounce Detection Negative Z")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) < 0;
+		Z Component Of(Position Of(Event Player)) < -20.500;
+		"Workshop Island Fix"
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		Chase Player Variable At Rate(Event Player, antiFloatTimer, 0.010, 1, Destination and Rate);
+		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
+		"Busted!"
+		Event Player.antiFloatProtection = True;
+	}
+}
+
+rule("Disable Anti-Bounce")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) >= 0;
+		Event Player.antiFloatProtection == True;
+		"Workshop Island Fix"
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		Stop Forcing Throttle(Event Player);
+		Event Player.antiFloatProtection = False;
+	}
+}
+
+rule("Anti-Stuck Activation")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) < -4;
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Up, 5, To World, Cancel Contrary Motion XYZ);
 		Wait(0.500, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -1267,10 +1379,14 @@ rule("Ball reaches player")
 	actions
 	{
 		Skip If(Is Using Ability 2(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)) || Is Using Ability 1(Players In Slot(
-			Global.SlotOfTargetedPlayer, All Teams)), 9);
+			Global.SlotOfTargetedPlayer, All Teams)), 13);
 		Set Status(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer,
 			All Teams), Stunned, 1);
-		Call Subroutine(CoolDeathEffects);
+		If(Global.ImprovedExplosions == True);
+			Call Subroutine(UpdatedDeathEffects);
+		Else;
+			Call Subroutine(CoolDeathEffects);
+		End;
 		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).BouncePadCooldown = 0;
 		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).CurrentUltPercent += 15;
 		Kill(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams));
@@ -1330,6 +1446,50 @@ rule("CoolDeathEffects sub")
 		disabled Play Effect(All Players(All Teams), Ring Explosion, Color(Red), Global.deathSpherePos, Global.SphereSize * 1.500);
 		disabled Play Effect(All Players(All Teams), Explosion Sound, Color(White), Global.deathSpherePos, 40);
 		Destroy Effect(Global.deathBeam);
+	}
+}
+
+rule("Updated Death Effects Sub")
+{
+	event
+	{
+		Subroutine;
+		UpdatedDeathEffects;
+	}
+
+	actions
+	{
+		Global.deathSpherePos = Position Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams));
+		If(Y Component Of(Global.deathSpherePos) <= 10);
+			Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Effect, Color(White), Vector(X Component Of(
+				Global.deathSpherePos), 0, Z Component Of(Global.deathSpherePos)), 0);
+		End;
+		Play Effect(All Players(All Teams), Bastion Tank Cannon Explosion Effect, Color(White), Global.deathSpherePos, 1);
+		If(Global.RandomExplosionSounds);
+			"Pick a random explosion sound"
+			Global.RandomExplosionPicker = Random Integer(0, 4);
+			If(Global.RandomExplosionPicker == 0);
+				Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			Else If(Global.RandomExplosionPicker == 1);
+				Play Effect(All Players(All Teams), Bastion Tank Cannon Explosion Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			Else If(Global.RandomExplosionPicker == 2);
+				Play Effect(All Players(All Teams), Ashe Dynamite Explosion Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			Else If(Global.RandomExplosionPicker == 3);
+				Play Effect(All Players(All Teams), Pharah Barrage Explosion Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			Else If(Global.RandomExplosionPicker == 4);
+				Play Effect(All Players(All Teams), Junkrat Frag Launcher Explosion Sound, Color(White), Global.deathSpherePos,
+					Global.ExplosionSoundVolume);
+			End;
+		Else;
+			disabled Play Effect(All Players(All Teams), Doomfist Meteor Strike Impact Sound, Color(White), Global.deathSpherePos,
+				Global.ExplosionSoundVolume);
+			Play Effect(All Players(All Teams), Junkrat Frag Launcher Explosion Sound, Color(White), Global.deathSpherePos,
+				Global.ExplosionSoundVolume);
+		End;
 	}
 }
 
