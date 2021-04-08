@@ -130,6 +130,7 @@ variables
 		10: moveSpeed
 		11: maxBallSpeed
 		12: antiFloatProtection
+		14: antiStuckProtection
 }
 
 subroutines
@@ -311,6 +312,8 @@ rule("Init player variables")
 		Disable Built-In Game Mode Respawning(Event Player);
 		Enable Death Spectate All Players(Event Player);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
+		Event Player.antiFloatProtection = False;
+		Event Player.antiStuckProtection = False;
 	}
 }
 
@@ -461,8 +464,6 @@ rule("Create player HUD elements")
 		disabled Create HUD Text(Event Player, Round To Integer(Event Player.BouncePadCooldown, Up), Custom String("Bouncepad"), Custom String(
 			"Cooldown"), Right, -1, Color(Green), Color(White), Color(White), Visible To and String, Default Visibility);
 		disabled Event Player.PlayerUI[5] = Last Created Entity;
-		Create HUD Text(All Players(All Teams), Custom String("{0}", Y Component Of(Position Of(Event Player))), Null, Null, Left, 0,
-			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
 	}
 }
 
@@ -920,6 +921,77 @@ rule("Player falls off Workshop Island")
 				End;
 			End;
 		End;
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Activate Anti-Bounce")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) < -0.010;
+		"Workshop Island Fix"
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
+		"Busted!"
+		Event Player.antiFloatProtection = True;
+	}
+}
+
+rule("Disable Anti-Bounce")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) >= -0.010;
+		Event Player.antiFloatProtection == True;
+		"Workshop Island Fix"
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		Stop Forcing Throttle(Event Player);
+		Event Player.antiFloatProtection = False;
+	}
+}
+
+rule("Anti-Stuck Activation")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Position Of(Event Player)) < -4;
+		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Up, 5, To World, Cancel Contrary Motion XYZ);
 		Wait(0.500, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -1788,79 +1860,5 @@ rule("No Undermaps")
 	{
 		Global.BallDirection *= Vector(1, 0, 1);
 		Play Effect(All Players(All Teams), Ring Explosion, Color(White), Global.BallPosition, 2);
-	}
-}
-
-rule("Activate Anti-Bounce")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Y Component Of(Position Of(Event Player)) < 0;
-		"Workshop Island Fix"
-		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
-	}
-
-	actions
-	{
-		disabled Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Vector(0, 1, 0)), 1, To World,
-			Replace existing throttle, Direction and Magnitude);
-		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
-		"Busted!"
-		Event Player.antiFloatProtection = True;
-	}
-}
-
-rule("Disable Anti-Bounce")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Y Component Of(Position Of(Event Player)) >= 0;
-		Event Player.antiFloatProtection == True;
-		"Workshop Island Fix"
-		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
-	}
-
-	actions
-	{
-		disabled Stop Throttle In Direction(Event Player);
-		Stop Forcing Throttle(Event Player);
-		Event Player.antiFloatProtection = False;
-	}
-}
-
-rule("Anti-Stuck Activation")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Y Component Of(Position Of(Event Player)) < -4;
-		(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night)) == True;
-	}
-
-	actions
-	{
-		Apply Impulse(Event Player, Up, 5, To World, Cancel Contrary Motion XYZ);
-		Wait(0.500, Ignore Condition);
-		Loop If Condition Is True;
 	}
 }
