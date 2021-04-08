@@ -8,7 +8,6 @@ settings
 	lobby
 	{
 		Allow Players Who Are In Queue: Yes
-		Data Center Preference: USA - Central
 		Map Rotation: After A Game
 		Match Voice Chat: Enabled
 		Max Spectators: 6
