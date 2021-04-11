@@ -227,6 +227,25 @@ rule("Set Workshop Expanse Center")
 	}
 }
 
+rule("Set Workshop Green Screen")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		(Current Map == Map(Workshop Green Screen)) == True;
+	}
+
+	actions
+	{
+		Global.CircleCenter = Vector(0, 1.199, 0);
+		Global.SphereSize = 60;
+	}
+}
+
 rule("Set Oasis University Center")
 {
 	event
@@ -360,6 +379,7 @@ rule("Create game sphere")
 	{
 		Create Effect(All Players(All Teams), Sphere, Color(Black), Vector(X Component Of(Global.CircleCenter), Y Component Of(
 			Global.CircleCenter) - 0, Z Component Of(Global.CircleCenter)), Global.CenterOffLimitsSize, Visible To Position and Radius);
+		Abort If(Current Map == Map(Workshop Green Screen));
 		"Workshop Island doesn't need a circle."
 		If(Current Map != Map(Workshop Island) && Current Map != Map(Workshop Island Night));
 			Create Effect(All Players(All Teams), Light Shaft, Color(Orange), Vector(X Component Of(Global.CircleCenter), Y Component Of(
@@ -806,6 +826,7 @@ rule("Push to circle")
 		"Workshop Island Fix"
 		Current Map != Map(Workshop Island);
 		Current Map != Map(Workshop Island Night);
+		Current Map != Map(Workshop Green Screen);
 	}
 
 	actions
@@ -856,6 +877,7 @@ rule("Player dashes too far out of bounds")
 			Z Component Of(Global.CircleCenter))) > Global.SphereSize + 1;
 		"Workshop Island Fix"
 		disabled (Current Map != Map(Workshop Island) && Current Map != Map(Workshop Island Night)) == True;
+		Current Map != Map(Workshop Green Screen);
 	}
 
 	actions
