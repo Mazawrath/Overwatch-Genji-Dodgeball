@@ -18,17 +18,20 @@ settings
 	{
 		Deathmatch
 		{
+			enabled maps
+			{
+				Workshop Island Night
+			}
+		}
+
+		General
+		{
 			Allow Hero Switching: Off
 			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Respawn As Random Hero: On
 			Self Initiated Respawn: Off
-
-			enabled maps
-			{
-				Workshop Island Night
-			}
 		}
 	}
 
@@ -1090,6 +1093,7 @@ rule("Bounce when near pad 1")
 		Event Player.BouncePadCooldown == 0;
 		Is Alive(Event Player) == True;
 		Is Button Held(Event Player, Button(Jump)) == True;
+		Has Status(Event Player, Knocked Down) == False;
 	}
 
 	actions
@@ -1119,6 +1123,7 @@ rule("Bounce when near pad 2")
 		Event Player.BouncePadCooldown == 0;
 		Is Alive(Event Player) == True;
 		Is Button Held(Event Player, Button(Jump)) == True;
+		Has Status(Event Player, Knocked Down) == False;
 	}
 
 	actions
@@ -1148,6 +1153,7 @@ rule("Bounce when near pad 3")
 		Event Player.BouncePadCooldown == 0;
 		Is Alive(Event Player) == True;
 		Is Button Held(Event Player, Button(Jump)) == True;
+		Has Status(Event Player, Knocked Down) == False;
 	}
 
 	actions
@@ -1177,6 +1183,7 @@ rule("Bounce when near pad 4")
 		Event Player.BouncePadCooldown == 0;
 		Is Alive(Event Player) == True;
 		Is Button Held(Event Player, Button(Jump)) == True;
+		Has Status(Event Player, Knocked Down) == False;
 	}
 
 	actions
