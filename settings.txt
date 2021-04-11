@@ -116,6 +116,7 @@ variables
 		45: ImprovedExplosions
 		46: RandomExplosionSounds
 		47: FinalDuelNuke
+		48: UltimateEnabled
 
 	player:
 		0: hasMoved
@@ -150,6 +151,7 @@ rule("// SETTINGS")
 
 	actions
 	{
+		Global.UltimateEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Enable Ultimate"), True, 0);
 		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Enable Watermark"), True, 0);
 		Global.CooldownDashingEnabled = True;
 		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String(
@@ -332,6 +334,7 @@ rule("Init player variables")
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Event Player.antiFloatProtection = False;
 		Event Player.antiStuckProtection = False;
+		Disallow Button(Event Player, Button(Primary Fire));
 	}
 }
 
@@ -733,7 +736,6 @@ rule("Shorten Deflect Length")
 	conditions
 	{
 		Is Using Ability 2(Event Player) == True;
-		Is Using Ultimate(Event Player) == False;
 	}
 
 	actions
@@ -1272,6 +1274,28 @@ rule("Only end game when there isn't a round in progress")
 	}
 }
 
+rule("Player is ulting")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Move Speed(Event Player, 150);
+		Wait Until(!Is Using Ultimate(Event Player), 20);
+		Set Move Speed(Event Player, 100);
+	}
+}
+
 rule("primary = dash")
 {
 	event
@@ -1415,7 +1439,6 @@ rule("Ball reaches player")
 			Set Status(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Null, Knocked Down, 1);
 			Teleport(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Global.BallPosition);
 		End;
-		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).CurrentUltPercent += 5;
 		Play Effect(All Players(All Teams), Explosion Sound, Color(White), Position Of(Players In Slot(Global.SlotOfTargetedPlayer,
 			All Teams)), 200);
 		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).PlayerDeflects += 1;
@@ -1455,6 +1478,10 @@ rule("Player didn't deflect - Kill")
 			Call Subroutine(CoolDeathEffects);
 		End;
 		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).BouncePadCooldown = 0;
+		If(Global.UltimateEnabled);
+			Set Ultimate Charge(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Ultimate Charge Percent(Players In Slot(
+				Global.SlotOfPreviousTargetedPlayer, All Teams)) + 100);
+		End;
 		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).CurrentUltPercent += 15;
 		Kill(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams));
 		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).PlayerDeaths += 1;
