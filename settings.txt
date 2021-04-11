@@ -138,6 +138,7 @@ subroutines
 {
 	0: CoolDeathEffects
 	1: UpdatedDeathEffects
+	2: NoDeflectKill
 }
 
 rule("// SETTINGS")
@@ -1407,20 +1408,8 @@ rule("Ball reaches player")
 	actions
 	{
 		Skip If(Is Using Ability 2(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)) || Is Using Ability 1(Players In Slot(
-			Global.SlotOfTargetedPlayer, All Teams)), 13);
-		Set Status(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer,
-			All Teams), Stunned, 1);
-		If(Global.ImprovedExplosions == True);
-			Call Subroutine(UpdatedDeathEffects);
-		Else;
-			Call Subroutine(CoolDeathEffects);
-		End;
-		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).BouncePadCooldown = 0;
-		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).CurrentUltPercent += 15;
-		Kill(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams));
-		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).PlayerDeaths += 1;
-		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).PlayerKills += 1;
-		Global.BallDeleteRequested = True;
+			Global.SlotOfTargetedPlayer, All Teams)), 2);
+		Call Subroutine(NoDeflectKill);
 		Abort;
 		If(Is Using Ability 1(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)));
 			Set Status(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Null, Knocked Down, 1);
@@ -1445,6 +1434,32 @@ rule("Ball reaches player")
 		Chase Global Variable At Rate(BallDirection, Direction Towards(Global.BallPosition, Eye Position(Players In Slot(
 			Global.SlotOfTargetedPlayer, All Teams))), 6, Destination and Rate);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Player didn't deflect - Kill")
+{
+	event
+	{
+		Subroutine;
+		NoDeflectKill;
+	}
+
+	actions
+	{
+		Set Status(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer,
+			All Teams), Stunned, 1);
+		If(Global.ImprovedExplosions == True);
+			Call Subroutine(UpdatedDeathEffects);
+		Else;
+			Call Subroutine(CoolDeathEffects);
+		End;
+		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).BouncePadCooldown = 0;
+		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).CurrentUltPercent += 15;
+		Kill(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams));
+		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).PlayerDeaths += 1;
+		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).PlayerKills += 1;
+		Global.BallDeleteRequested = True;
 	}
 }
 
