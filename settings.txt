@@ -1320,6 +1320,8 @@ rule("Anti-Bounce Detection Positive X")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -1346,6 +1348,8 @@ rule("Anti-Bounce Detection Netgative X")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -1372,6 +1376,8 @@ rule("Anti-Bounce Detection Positive Z")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -1398,6 +1404,8 @@ rule("Anti-Bounce Detection Negative Z")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
