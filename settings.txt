@@ -18,17 +18,20 @@ settings
 	{
 		Deathmatch
 		{
+			enabled maps
+			{
+				Workshop Island Night
+			}
+		}
+
+		General
+		{
 			Allow Hero Switching: Off
 			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Respawn As Random Hero: On
 			Self Initiated Respawn: Off
-
-			enabled maps
-			{
-				Workshop Island Night
-			}
 		}
 	}
 
@@ -1023,6 +1026,8 @@ rule("Anti-Bounce Detection Positive X")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -1049,6 +1054,8 @@ rule("Anti-Bounce Detection Netgative X")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -1075,6 +1082,8 @@ rule("Anti-Bounce Detection Positive Z")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -1101,6 +1110,8 @@ rule("Anti-Bounce Detection Negative Z")
 		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 		"Busted!"
 		Event Player.antiFloatProtection = True;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
