@@ -152,7 +152,6 @@ rule("// SETTINGS")
 
 	actions
 	{
-		Global.UltimateEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Enable Ultimate"), True, 0);
 		Global.WatermarkEnabled = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String("Enable Watermark"), True, 0);
 		Global.CooldownDashingEnabled = True;
 		Global.RedGreenColorblindMode = Workshop Setting Toggle(Custom String("Visual Settings"), Custom String(
@@ -374,6 +373,8 @@ rule("Init global variables")
 		Global.ImprovedExplosions = True;
 		Global.RandomExplosionSounds = True;
 		Global.CooldownDashingEnabled = True;
+		disabled Global.UltimateEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Enable Ultimate"), True, 0);
+		Global.UltimateEnabled = False;
 	}
 }
 
