@@ -365,7 +365,7 @@ rule("Init global variables")
 		Global.MaxBallSpeed = 1000;
 		Global.CenterOffLimitsSize = 3.500;
 		Global.IsInFinalDuel = False;
-		Global.BouncePadCooldownLength = 5;
+		Global.BouncePadCooldownLength = 6;
 		Global.BallPosition = Vector(0, -1, 0);
 		"Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a \"winner\" at the end VS crashing in the middle of Final Duel."
 		Global.GameEndEnabled = True;
