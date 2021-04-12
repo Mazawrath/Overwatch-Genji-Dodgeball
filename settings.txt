@@ -156,6 +156,7 @@ variables
 		12: antiFloatProtection
 		13: antiFloatTimer
 		14: antiStuckProtection
+		15: ToggleHUD
 }
 
 subroutines
@@ -343,6 +344,10 @@ rule("Init player variables")
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Event Player.antiFloatProtection = False;
 		Event Player.antiStuckProtection = False;
+		Event Player.ToggleHUD = True;
+		Wait Until(Is Alive(Event Player) && Is Game In Progress, 90);
+		Wait(3, Ignore Condition);
+		Small Message(Event Player, Custom String("Press interact to enable/disable the scoreboard"));
 	}
 }
 
@@ -703,6 +708,52 @@ rule("Delete ball countdown HUD")
 	actions
 	{
 		Destroy In-World Text(Global.BallSpawnCountdownHUD);
+	}
+}
+
+rule("Enable Scoreboard")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Event Player.ToggleHUD == True;
+	}
+
+	actions
+	{
+		Disable Game Mode HUD(Event Player);
+		Wait(1, Ignore Condition);
+		Event Player.ToggleHUD = False;
+	}
+}
+
+rule("Disable Scoreboard")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Event Player.ToggleHUD == False;
+	}
+
+	actions
+	{
+		Enable Game Mode HUD(Event Player);
+		Wait(1, Ignore Condition);
+		Event Player.ToggleHUD = True;
 	}
 }
 
