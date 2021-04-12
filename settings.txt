@@ -490,8 +490,6 @@ rule("Create player HUD elements")
 		disabled Create HUD Text(Event Player, Round To Integer(Event Player.BouncePadCooldown, Up), Custom String("Bouncepad"), Custom String(
 			"Cooldown"), Right, -1, Color(Green), Color(White), Color(White), Visible To and String, Default Visibility);
 		disabled Event Player.PlayerUI[5] = Last Created Entity;
-		Create HUD Text(All Players(All Teams), Position Of(Event Player), Null, Null, Left, 0, Color(White), Color(White), Color(White),
-			Visible To and String, Default Visibility);
 	}
 }
 
