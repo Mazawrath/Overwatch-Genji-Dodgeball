@@ -1551,7 +1551,7 @@ rule("Player didn't deflect - Kill")
 		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).BouncePadCooldown = 0;
 		If(Global.UltimateEnabled);
 			Set Ultimate Charge(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Ultimate Charge Percent(Players In Slot(
-				Global.SlotOfPreviousTargetedPlayer, All Teams)) + 100);
+				Global.SlotOfPreviousTargetedPlayer, All Teams)) + 15);
 		End;
 		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).CurrentUltPercent += 15;
 		Kill(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams));
