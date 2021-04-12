@@ -334,7 +334,8 @@ rule("Init player variables")
 		Event Player.antiStuckProtection = False;
 		Disallow Button(Event Player, Button(Primary Fire));
 		Wait Until(Is Alive(Event Player) && Is Game In Progress, 90);
-		Wait(5, Ignore Condition);
+		Event Player.ToggleHUD = True;
+		Wait(3, Ignore Condition);
 		Small Message(Event Player, Custom String("Press interact to enable/disable the scoreboard"));
 	}
 }
