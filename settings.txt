@@ -18,20 +18,16 @@ settings
 	{
 		Deathmatch
 		{
-			enabled maps
-			{
-				Workshop Island Night
-			}
-		}
-
-		General
-		{
 			Allow Hero Switching: Off
-			Game Length In Minutes: 15
 			Game Mode Start: Immediately
 			Hero Limit: Off
 			Respawn As Random Hero: On
 			Self Initiated Respawn: Off
+
+			enabled maps
+			{
+				Workshop Island Night
+			}
 		}
 	}
 
@@ -133,6 +129,7 @@ variables
 		12: antiFloatProtection
 		13: antiFloatTimer
 		14: antiStuckProtection
+		15: ToggleHUD
 }
 
 subroutines
@@ -335,6 +332,9 @@ rule("Init player variables")
 		Event Player.antiFloatProtection = False;
 		Event Player.antiStuckProtection = False;
 		Disallow Button(Event Player, Button(Primary Fire));
+		Wait Until(Is Alive(Event Player) && Is Game In Progress, 90);
+		Wait(5, Ignore Condition);
+		Small Message(All Players(All Teams), Custom String("Press interact to enable/disable the scoreboard"));
 	}
 }
 
@@ -619,6 +619,52 @@ rule("Delete ball countdown HUD")
 	actions
 	{
 		Destroy In-World Text(Global.BallSpawnCountdownHUD);
+	}
+}
+
+rule("Enable Scoreboard")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Event Player.ToggleHUD == True;
+	}
+
+	actions
+	{
+		Disable Game Mode HUD(Event Player);
+		Wait(1, Ignore Condition);
+		Event Player.ToggleHUD = False;
+	}
+}
+
+rule("Disable Scoreboard")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Event Player.ToggleHUD == False;
+	}
+
+	actions
+	{
+		Enable Game Mode HUD(Event Player);
+		Wait(1, Ignore Condition);
+		Event Player.ToggleHUD = True;
 	}
 }
 
