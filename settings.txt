@@ -471,9 +471,11 @@ rule("Create global HUD elements")
 			Color(White), Color(White), Visible To and String, Default Visibility);
 		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Discord.gg/GenjiDodgeball"), Left, 0, Color(White), Color(
 			White), Color(White), Visible To and String, Default Visibility);
-		Create HUD Text(All Players(All Teams), Null, Null, Custom String(
-			"Hold secondary fire while deflecting to pass the ball to another teammate!"), Right, 0, Color(White), Color(White), Color(
-			White), Visible To and String, Default Visibility);
+		If(Current Game Mode == Game Mode(Team Deathmatch));
+			Create HUD Text(All Players(All Teams), Null, Null, Custom String(
+				"Hold secondary fire while deflecting to pass the ball to another teammate!"), Right, 0, Color(White), Color(White), Color(
+				White), Visible To and String, Default Visibility);
+		End;
 	}
 }
 
@@ -552,7 +554,7 @@ rule("Create bounce pads")
 	}
 }
 
-rule("Create ball & targeted effect")
+rule("Create ball & targeted effect - TEAMS")
 {
 	event
 	{
@@ -562,6 +564,7 @@ rule("Create ball & targeted effect")
 	conditions
 	{
 		Is Game In Progress == True;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -673,7 +676,7 @@ rule("// Not enough players testing")
 	}
 }
 
-rule("Check for <2 players")
+rule("Check for <2 players - TEAMS")
 {
 	event
 	{
@@ -685,6 +688,7 @@ rule("Check for <2 players")
 		Is Game In Progress == True;
 		disabled Number Of Players(All Teams) == 1;
 		(Number Of Players(Team 1) && Number Of Players(Team 2)) == False;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -713,6 +717,7 @@ rule("Wait for more players")
 	{
 		(Number Of Players(Team 1) && Number Of Players(Team 2)) == True;
 		Global.IsEnoughPlayersToStart == False;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -738,6 +743,7 @@ rule("Check for players in unauthorized slots - Team 1")
 	conditions
 	{
 		Is Game In Progress == True;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -764,6 +770,7 @@ rule("Players in unauthorized slots - Team 1")
 	{
 		Global.IncorrectTeam1ConfigCheck == True;
 		Global.RoundInProgress == False;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -798,6 +805,11 @@ rule("Create unauthorized slots HUD - Team 1")
 		Ongoing - Global;
 	}
 
+	conditions
+	{
+		Current Game Mode == Game Mode(Team Deathmatch);
+	}
+
 	actions
 	{
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.IncorrectTeam1ConfigCheck && !Global.RoundInProgress), Custom String(
@@ -820,6 +832,7 @@ rule("Check for players in unauthorized slots - Team 2")
 	conditions
 	{
 		Is Game In Progress == True;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -846,6 +859,7 @@ rule("Players in unauthorized slots - Team 2")
 	{
 		Global.IncorrectTeam2ConfigCheck == True;
 		Global.RoundInProgress == False;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -880,6 +894,11 @@ rule("Create unauthorized slots HUD - Team 2")
 		Ongoing - Global;
 	}
 
+	conditions
+	{
+		Current Game Mode == Game Mode(Team Deathmatch);
+	}
+
 	actions
 	{
 		Create HUD Text(Filtered Array(All Players(All Teams), Global.IncorrectTeam2ConfigCheck && !Global.RoundInProgress), Custom String(
@@ -902,6 +921,7 @@ rule("Pulse HUD color")
 	conditions
 	{
 		(Global.IncorrectTeam1ConfigCheck || Global.IncorrectTeam2ConfigCheck) == True;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -1515,7 +1535,7 @@ rule("primary = dash")
 	}
 }
 
-disabled rule("secondary = deflect")
+rule("secondary = deflect")
 {
 	event
 	{
@@ -1528,6 +1548,7 @@ disabled rule("secondary = deflect")
 	{
 		Is Button Held(Event Player, Button(Secondary Fire)) == True;
 		Custom String("{0}", Event Player) != Custom String("bytestats");
+		Current Game Mode == Game Mode(Deathmatch);
 	}
 
 	actions
@@ -1544,7 +1565,7 @@ rule("// ACTIVE GAME")
 	}
 }
 
-rule("Start round")
+rule("Start round - TEAMS")
 {
 	event
 	{
@@ -1557,6 +1578,7 @@ rule("Start round")
 		Global.IncorrectTeam1ConfigCheck == False;
 		Global.IncorrectTeam2ConfigCheck == False;
 		Is Game In Progress == True;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -1616,7 +1638,7 @@ rule("ball motion (has to be done weird due to chase vector variable bugs)")
 	}
 }
 
-rule("Ball reaches player")
+rule("Ball reaches player -TEAMS")
 {
 	event
 	{
@@ -1627,6 +1649,7 @@ rule("Ball reaches player")
 	{
 		Distance Between(Global.BallPosition, Eye Position(Players In Slot(Global.SlotOfTargetedPlayer, All Teams))) <= 1.900;
 		Global.BallIsOut == True;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -1701,7 +1724,7 @@ rule("Ball reaches player")
 	}
 }
 
-rule("Player Didn't Deflect - Kill")
+rule("Player Didn't Deflect - Kill - TEAMS")
 {
 	event
 	{
@@ -1822,6 +1845,7 @@ rule("Final duel")
 			All Living Players(Team 2), Current Array Element.hasMoved)) == 1) == True;
 		Global.IsEnoughPlayersToStart == True;
 		Global.IsInFinalDuel == False;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -1867,6 +1891,7 @@ rule("Team 1 Last Surviving")
 		Is Game In Progress == True;
 		Number Of Living Players(Team 2) == 0;
 		Global.IsEnoughPlayersToStart == True;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -1933,6 +1958,7 @@ rule("Team 2 Last Surviving")
 		Is Game In Progress == True;
 		Number Of Living Players(Team 1) == 0;
 		Global.IsEnoughPlayersToStart == True;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -2338,6 +2364,7 @@ rule("Team 1 Win")
 	{
 		Global.AllowMatchEnd == True;
 		Team Score(Team 1) == Global.ScoreToWin;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
@@ -2357,6 +2384,7 @@ rule("Team 2 Win")
 	{
 		Global.AllowMatchEnd == True;
 		Team Score(Team 2) == Global.ScoreToWin;
+		Current Game Mode == Game Mode(Team Deathmatch);
 	}
 
 	actions
