@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v1.1.0T. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "Genji Dodgeball v6.0.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
 	}
 
 	lobby
@@ -11,30 +11,29 @@ settings
 		Map Rotation: After A Game
 		Match Voice Chat: Enabled
 		Max Spectators: 6
-		Max Team 1 Players: 3
 		Return To Lobby: Never
 		Swap Teams After Match: No
 	}
 
 	modes
 	{
-		disabled Deathmatch
+		Deathmatch
 		{
 			Game Length In Minutes: 15
 			Self Initiated Respawn: Off
-		}
-
-		Team Deathmatch
-		{
-			Game Length In Minutes: 15
-			Imbalanced Team Score To Win: On
-			Team 1 Score To Win: 10
-			Team 2 Score To Win: 10
 
 			enabled maps
 			{
 				Workshop Island Night
 			}
+		}
+
+		disabled Team Deathmatch
+		{
+			Game Length In Minutes: 15
+			Imbalanced Team Score To Win: On
+			Team 1 Score To Win: 10
+			Team 2 Score To Win: 10
 		}
 
 		General
@@ -717,7 +716,7 @@ rule("// Not enough players testing")
 	actions
 	{
 		Skip If(!Global.WatermarkEnabled, 1);
-		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v1.1.0T"), Null, Left, -1000, Color(
+		Create HUD Text(All Players(All Teams), Null, Custom String("Original by u/Mazawrath. Version v6.0.0"), Null, Left, -1000, Color(
 			White), Color(Aqua), Color(White), Visible To and String, Visible Always);
 	}
 }
