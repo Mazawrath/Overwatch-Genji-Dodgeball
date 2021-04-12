@@ -1667,6 +1667,29 @@ rule("// ACTIVE GAME")
 	}
 }
 
+rule("Start round")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.IsEnoughPlayersToStart == True;
+		Is Game In Progress == True;
+		Current Game Mode == Game Mode(Deathmatch);
+	}
+
+	actions
+	{
+		Chase Global Variable At Rate(BallSpawnCountdown, 0, 1, Destination and Rate);
+		Global.RoundInProgress = True;
+		Chase Player Variable At Rate(All Players(All Teams), BouncePadCooldown, 0, 1, Destination and Rate);
+		Global.BallSpawnCountdown = 5;
+	}
+}
+
 rule("Start round - TEAMS")
 {
 	event
@@ -1736,6 +1759,64 @@ rule("ball motion (has to be done weird due to chase vector variable bugs)")
 			Global.SlotOfTargetedPlayer, All Teams))), 1.750, Destination and Rate);
 		Chase Global Variable At Rate(BallSpeed, Global.MaxBallSpeed, 0.250, Destination and Rate);
 		Wait(0.050, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Ball reaches player")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Distance Between(Global.BallPosition, Eye Position(Players In Slot(Global.SlotOfTargetedPlayer, All Teams))) <= 1.900;
+		Global.BallIsOut == True;
+		Current Game Mode == Game Mode(Deathmatch);
+	}
+
+	actions
+	{
+		Skip If(Is Using Ability 2(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)) || Is Using Ability 1(Players In Slot(
+			Global.SlotOfTargetedPlayer, All Teams)), 13);
+		Set Status(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer,
+			All Teams), Stunned, 1);
+		If(Global.ImprovedExplosions == True);
+			Call Subroutine(UpdatedDeathEffects);
+		Else;
+			Call Subroutine(CoolDeathEffects);
+		End;
+		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).BouncePadCooldown = 0;
+		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).CurrentUltPercent += 15;
+		Kill(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams));
+		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).PlayerDeaths += 1;
+		Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams).PlayerKills += 1;
+		Global.BallDeleteRequested = True;
+		Abort;
+		If(Is Using Ability 1(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)));
+			Set Status(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Null, Knocked Down, 1);
+			Teleport(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Global.BallPosition);
+		End;
+		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).CurrentUltPercent += 5;
+		Play Effect(All Players(All Teams), Explosion Sound, Color(White), Position Of(Players In Slot(Global.SlotOfTargetedPlayer,
+			All Teams)), 200);
+		Players In Slot(Global.SlotOfTargetedPlayer, All Teams).PlayerDeflects += 1;
+		Global.SlotOfPreviousTargetedPlayer = Global.SlotOfTargetedPlayer;
+		Global.BallSpeed = Min(500, Global.BallSpeed * 1.050);
+		If(Global.BallSpeed > Players In Slot(Global.SlotOfTargetedPlayer, All Teams).maxBallSpeed);
+			Players In Slot(Global.SlotOfTargetedPlayer, All Teams).maxBallSpeed = Global.BallSpeed;
+		End;
+		Stop Chasing Global Variable(BallDirection);
+		Global.BallDirection = Facing Direction Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams));
+		Wait(0.001, Ignore Condition);
+		Global.SlotOfTargetedPlayer = Slot Of(First Of(Sorted Array(Filtered Array(All Living Players(All Teams), Slot Of(
+			Current Array Element) != Global.SlotOfPreviousTargetedPlayer), Angle Between Vectors(Facing Direction Of(Players In Slot(
+			Global.SlotOfTargetedPlayer, All Teams)), Direction Towards(Players In Slot(Global.SlotOfTargetedPlayer, All Teams),
+			Position Of(Current Array Element))))));
+		Chase Global Variable At Rate(BallDirection, Direction Towards(Global.BallPosition, Eye Position(Players In Slot(
+			Global.SlotOfTargetedPlayer, All Teams))), 6, Destination and Rate);
 		Loop If Condition Is True;
 	}
 }
@@ -1942,6 +2023,53 @@ rule("Final duel")
 	conditions
 	{
 		Is Game In Progress == True;
+		Count Of(Filtered Array(All Living Players(All Teams), Current Array Element.hasMoved)) == 2;
+		Global.IsEnoughPlayersToStart == True;
+		Global.IsInFinalDuel == False;
+		Current Game Mode == Game Mode(Deathmatch);
+	}
+
+	actions
+	{
+		All Living Players(All Teams).IsDashEnabled = False;
+		Skip If(Global.BallIsOut == False, 1);
+		Global.BallDeleteRequested = True;
+		Global.IsInFinalDuel = True;
+		All Living Players(All Teams).BouncePadCooldown = Global.BouncePadCooldownLength;
+		Skip If(Number Of Players(All Teams) <= 2, 1);
+		Big Message(All Players(All Teams), Custom String("Final Duel!"));
+		Apply Impulse(All Living Players(All Teams), Down, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Up, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Backward, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Forward, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Right, 0.001, To World, Cancel Contrary Motion);
+		Apply Impulse(All Living Players(All Teams), Left, 0.001, To World, Cancel Contrary Motion);
+		If(Current Map == Map(Workshop Island) || Current Map == Map(Workshop Island Night));
+			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 4));
+			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 4));
+		Else;
+			Teleport(All Living Players(All Teams)[0], Global.CircleCenter + Vector(-1, 0, 0) * (Global.SphereSize / 1.500));
+			Teleport(All Living Players(All Teams)[1], Global.CircleCenter + Vector(1, 0, 0) * (Global.SphereSize / 1.500));
+		End;
+		Set Status(All Living Players(All Teams), Null, Rooted, 2);
+		Wait(0.001, Ignore Condition);
+		Set Facing(All Living Players(All Teams)[0], Direction Towards(Position Of(All Living Players(All Teams)[0]), Global.CircleCenter),
+			To World);
+		Set Facing(All Living Players(All Teams)[1], Direction Towards(Position Of(All Living Players(All Teams)[1]), Global.CircleCenter),
+			To World);
+	}
+}
+
+rule("Final duel - TEAMS")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
 		disabled Count Of(Filtered Array(All Living Players(All Teams), Current Array Element.hasMoved)) == 2;
 		(Count Of(Filtered Array(All Living Players(Team 1), Current Array Element.hasMoved)) == 1 && Count Of(Filtered Array(
 			All Living Players(Team 2), Current Array Element.hasMoved)) == 1) == True;
@@ -1978,6 +2106,70 @@ rule("Final duel")
 			To World);
 		Set Facing(All Living Players(All Teams)[1], Direction Towards(Position Of(All Living Players(All Teams)[1]), Global.CircleCenter),
 			To World);
+	}
+}
+
+rule("Check for last player surviving")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Number Of Living Players(All Teams) == 1;
+		Global.IsEnoughPlayersToStart == True;
+		Current Game Mode == Game Mode(Deathmatch);
+	}
+
+	actions
+	{
+		Global.IsInFinalDuel = False;
+		Modify Player Score(All Living Players(All Teams), 1);
+		Wait(0.250, Ignore Condition);
+		If((Match Time == 0 || Global.TieBreakerActive) && Global.GameEndEnabled);
+			"If there is alredy a tiebreaker, then the tiebreaker has ended."
+			disabled If(Global.TieBreakerActive);
+			disabled Break;
+			disabled End;
+			Global.HighestScore = Score Of(Last Of(Sorted Array(All Players(All Teams), Score Of(Current Array Element))));
+			"Check if there is more then 1 person with the highest score"
+			If(Count Of(Filtered Array(All Players(All Teams), Score Of(Current Array Element) == Global.HighestScore)) > 1);
+				"There is more then 1, activate tie breaker"
+				Global.TieBreakerActive = True;
+			Else;
+				Global.TieBreakerActive = False;
+			End;
+		End;
+		Stop Chasing Global Variable(BallSpawnCountdown);
+		Stop Chasing Player Variable(All Players(All Teams), BouncePadCooldown);
+		Big Message(All Players(All Teams), Custom String("{0} has won the round!", First Of(All Living Players(All Teams))));
+		Wait(2, Ignore Condition);
+		If(!Global.TieBreakerActive);
+			Resurrect(All Dead Players(All Teams));
+		Else;
+			"Kill anyone alive who doesn't have the highest score."
+			Kill(Filtered Array(All Living Players(All Teams), Score Of(Current Array Element) != Global.HighestScore), Null);
+			"During tiebreaker, only revive the people who have the same score as the highest score."
+			Resurrect(Filtered Array(All Dead Players(All Teams), Score Of(Current Array Element) == Global.HighestScore));
+			Wait(0.250, Ignore Condition);
+			Global.SlotOfTargetedPlayer = -1;
+			Big Message(All Players(All Teams), Custom String("Tiebreaker!"));
+		End;
+		Abort If(!Global.IsEnoughPlayersToStart);
+		Global.RoundInProgress = False;
+		All Players(All Teams).BouncePadCooldown = Global.BouncePadCooldownLength;
+		Global.SlotOfTargetedPlayer = -1;
+		Global.BallSpawnCountdown = 5;
+		Wait(1, Ignore Condition);
+		Global.RoundInProgress = True;
+		Skip If(!Global.BouncepadDashingEnabled, 2);
+		All Players(All Teams).IsDashEnabled = False;
+		Set Ability 1 Enabled(All Players(All Teams), False);
+		Chase Global Variable At Rate(BallSpawnCountdown, 0, 1, Destination and Rate);
+		Chase Player Variable At Rate(All Players(All Teams), BouncePadCooldown, 0, 1, Destination and Rate);
 	}
 }
 
