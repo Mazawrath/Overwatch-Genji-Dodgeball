@@ -554,6 +554,52 @@ rule("Create bounce pads")
 	}
 }
 
+rule("Create ball & targeted effect")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Current Game Mode == Game Mode(Deathmatch);
+	}
+
+	actions
+	{
+		Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Orb, Color(
+			White), Global.BallPosition, 0.400, Visible To Position and Radius);
+		If(!Global.RedGreenColorblindMode);
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Color(Red), Global.BallPosition, 0.400,
+				Visible To Position and Radius);
+			Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Good Aura,
+				Color(Red), Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1, Visible To Position and Radius);
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Red), Players In Slot(
+				Global.SlotOfTargetedPlayer, All Teams), 1, Visible To Position and Radius);
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Red), Global.BallPosition, 1,
+				Visible To Position and Radius);
+		Else;
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Color(Yellow), Global.BallPosition, 0.400,
+				Visible To Position and Radius);
+			Create Effect(All Players(All Teams), Good Aura, Color(Yellow), Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1,
+				Visible To Position and Radius);
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Yellow), Eye Position(Players In Slot(
+				Global.SlotOfTargetedPlayer, All Teams)), 1, Visible To Position and Radius);
+		End;
+		"ball trail change color with speed"
+		disabled Create Effect(All Players(All Teams), Bad Aura, Color(Blue), Global.BallPosition, 1, Visible To Position and Radius);
+		disabled Global.BallSmoke = Last Created Entity;
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.BallPosition, Color(Blue),
+			Visible To Position and Radius);
+		disabled Global.BallTail1 = Last Created Entity;
+		disabled Create Beam Effect(All Players(All Teams), Bad Beam, Global.PrevBallPos, Global.PrevBallPos2, Color(Blue),
+			Visible To Position and Radius);
+		disabled Global.BallTail2 = Last Created Entity;
+	}
+}
+
 rule("Create ball & targeted effect - TEAMS")
 {
 	event
@@ -676,6 +722,35 @@ rule("// Not enough players testing")
 	}
 }
 
+rule("Check for <2 players")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Number Of Players(All Teams) == 1;
+		Current Game Mode == Game Mode(Deathmatch);
+	}
+
+	actions
+	{
+		Global.IsInFinalDuel = False;
+		Create HUD Text(All Players(All Teams), Custom String("Waiting for more players"), Null, Null, Top, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Global.WaitingForPlayersHUD = Last Text ID;
+		Global.IsEnoughPlayersToStart = False;
+		Stop Chasing Global Variable(BallSpawnCountdown);
+		Skip If(Global.RoundInProgress == False, 1);
+		Global.BallDeleteRequested = True;
+		Global.RoundInProgress = False;
+		Pause Match Time;
+	}
+}
+
 rule("Check for <2 players - TEAMS")
 {
 	event
@@ -707,6 +782,33 @@ rule("Check for <2 players - TEAMS")
 }
 
 rule("Wait for more players")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number Of Players(All Teams) > 1;
+		Global.IsEnoughPlayersToStart == False;
+		Current Game Mode == Game Mode(Deathmatch);
+	}
+
+	actions
+	{
+		Destroy HUD Text(Global.WaitingForPlayersHUD);
+		Big Message(All Players(All Teams), Custom String("Starting game in 5 seconds!"));
+		Wait(5.500, Ignore Condition);
+		Abort If(Number Of Players(All Teams) < 2);
+		Unpause Match Time;
+		Global.IsEnoughPlayersToStart = True;
+		Global.SlotOfTargetedPlayer = -1;
+		Global.SlotOfPreviousTargetedPlayer = -1;
+	}
+}
+
+rule("Wait for more players - TEAMS")
 {
 	event
 	{
