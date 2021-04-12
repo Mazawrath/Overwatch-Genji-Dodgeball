@@ -1,6 +1,6 @@
 # Overwatch-Genji-Dodgeball
-**Current Version: v5.4.0**  
-**Game Settings Code: 7ES1R**
+**Current Version: v5.5.0**  
+**Game Settings Code: GZNP5**
 
 Genji Dodgeball is a minigame inspired by the TF2 game pyro dodgeball.
 When the ball is red it is targeting you! Use your deflect to target someone else. Look at the person you want to target next while deflecting. Use bouncepads to get extra air and style points.
