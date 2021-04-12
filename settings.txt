@@ -373,7 +373,6 @@ rule("Init global variables")
 		Global.ImprovedExplosions = True;
 		Global.RandomExplosionSounds = True;
 		Global.CooldownDashingEnabled = True;
-		disabled Global.UltimateEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Enable Ultimate"), True, 0);
 		Global.UltimateEnabled = False;
 	}
 }
