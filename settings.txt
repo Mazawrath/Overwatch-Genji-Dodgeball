@@ -369,7 +369,7 @@ rule("Init global variables")
 		Global.MaxBallSpeed = 1000;
 		Global.CenterOffLimitsSize = 3.500;
 		Global.IsInFinalDuel = False;
-		Global.BouncePadCooldownLength = 3;
+		Global.BouncePadCooldownLength = 6;
 		Global.BallPosition = Vector(0, -1, 0);
 		Global.ExplosionSoundVolume = 30;
 		Global.ImprovedExplosions = True;
