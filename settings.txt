@@ -2,7 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Genji Dodgeball v6.0.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+		Description: "bot"
 	}
 
 	lobby
@@ -1775,8 +1775,6 @@ rule("// ACTIVE GAME")
 	actions
 	{
 		Kill(All Players(All Teams), Null);
-		Small Message(All Players(All Teams), Custom String("This wasn't supposed to be a public mode..."));
-		Wait(0.250, Ignore Condition);
 		Loop;
 	}
 }
