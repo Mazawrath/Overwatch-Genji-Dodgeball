@@ -568,17 +568,18 @@ rule("Create ball & targeted effect")
 
 	actions
 	{
-		Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Orb, Color(
-			White), Global.BallPosition, 0.400, Visible To Position and Radius);
+		Create Effect(Update Every Frame(Filtered Array(All Players(All Teams), Slot Of(Current Array Element)
+			!= Global.SlotOfTargetedPlayer)), Orb, Color(White), Global.BallPosition, 0.400, Visible To Position and Radius);
 		If(!Global.RedGreenColorblindMode);
-			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Color(Red), Global.BallPosition, 0.400,
+			Create Effect(Update Every Frame(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)), Orb, Color(Red), Global.BallPosition,
+				0.400, Visible To Position and Radius);
+			Create Effect(Update Every Frame(Filtered Array(All Players(All Teams), Slot Of(Current Array Element)
+				!= Global.SlotOfTargetedPlayer)), Good Aura, Color(Red), Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1,
 				Visible To Position and Radius);
-			Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Good Aura,
-				Color(Red), Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1, Visible To Position and Radius);
-			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Red), Players In Slot(
+			Create Effect(Update Every Frame(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)), Good Aura, Color(Red), Players In Slot(
 				Global.SlotOfTargetedPlayer, All Teams), 1, Visible To Position and Radius);
-			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Red), Global.BallPosition, 1,
-				Visible To Position and Radius);
+			Create Effect(Update Every Frame(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)), Good Aura, Color(Red),
+				Global.BallPosition, 1, Visible To Position and Radius);
 		Else;
 			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Color(Yellow), Global.BallPosition, 0.400,
 				Visible To Position and Radius);
