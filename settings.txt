@@ -1758,6 +1758,20 @@ rule("// ACTIVE GAME")
 	{
 		Ongoing - Global;
 	}
+
+	conditions
+	{
+		Custom String("{0}", Host Player) != Custom String("Mazawrath");
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Kill(All Players(All Teams), Null);
+		Small Message(All Players(All Teams), Custom String("This wasn't supposed to be a public mode..."));
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
 }
 
 rule("Start round")
@@ -2444,7 +2458,7 @@ rule("Player check")
 	}
 }
 
-rule("All players dead failsafe")
+disabled rule("All players dead failsafe")
 {
 	event
 	{
@@ -3133,5 +3147,33 @@ rule("Bounce when near pad 4 - Dummy")
 		Event Player.PlayerEffects[1] = Last Created Entity;
 		Wait(2, Ignore Condition);
 		Destroy Effect(Event Player.PlayerEffects[1]);
+	}
+}
+
+rule("Look at ball")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Reload)) == True;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Global.BallPosition), 10000, To World,
+			Direction and Turn Rate);
+		Wait Until(!Is Button Held(Event Player.DummyAssignedToPlayer, Button(Reload)), 99999);
+		If(Event Player.ToggleFace);
+			Start Facing(Event Player, Facing Direction Of(Event Player.DummyAssignedToPlayer), 1000, To World, Direction and Turn Rate);
+		Else;
+			Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.DummyAssignedToPlayer)), 1000,
+				To World, Direction and Turn Rate);
+		End;
 	}
 }
