@@ -2869,6 +2869,8 @@ rule("Assign Dummy")
 			Event Player.DummyAssignedToPlayer))), 0, Z Component Of(Update Every Frame(Throttle Of(Event Player.DummyAssignedToPlayer)))),
 			X Component Of(Update Every Frame(Throttle Of(Event Player.DummyAssignedToPlayer))) != 0 || Z Component Of(Update Every Frame(
 			Throttle Of(Event Player.DummyAssignedToPlayer))) != 0, To Player, Replace existing throttle, Direction and Magnitude);
+		Start Forcing Player Outlines(Event Player.DummyAssignedToPlayer, Event Player.DummyAssignedToPlayer.PlayerDummy, True, Color(
+			Sky Blue), Always);
 	}
 }
 
@@ -3023,6 +3025,8 @@ rule("Toggle moving")
 
 	actions
 	{
+		Start Forcing Player Outlines(Event Player, Event Player.DummyAssignedToPlayer, True, Color(Sky Blue), Always);
+		disabled Start Forcing Player Outlines(Event Player.DummyAssignedToPlayer, Event Player, True, Color(Sky Blue), Always);
 		If(Event Player.ToggleMove);
 			Stop Throttle In Direction(Event Player);
 			Event Player.ToggleMove = False;
@@ -3181,5 +3185,13 @@ rule("Look at ball")
 			Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.DummyAssignedToPlayer)), 1000,
 				To World, Direction and Turn Rate);
 		End;
+	}
+}
+
+rule("Rule 101")
+{
+	event
+	{
+		Ongoing - Global;
 	}
 }
