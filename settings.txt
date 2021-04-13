@@ -487,6 +487,13 @@ rule("Create global HUD elements")
 					Right, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
 			End;
 		End;
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String(
+			"Ultimate - Make bot look at you/Look the same direction as you"), Right, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Interact - Make bot start/stop copying your movement"), Right,
+			0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Reload (Hold) - Make bot look at ball"), Right, 0, Color(White),
+			Color(White), Color(White), Visible To and String, Default Visibility);
 	}
 }
 
