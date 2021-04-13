@@ -516,8 +516,6 @@ rule("Create player HUD elements")
 		disabled Create HUD Text(Event Player, Round To Integer(Event Player.BouncePadCooldown, Up), Custom String("Bouncepad"), Custom String(
 			"Cooldown"), Right, -1, Color(Green), Color(White), Color(White), Visible To and String, Default Visibility);
 		disabled Event Player.PlayerUI[5] = Last Created Entity;
-		Create HUD Text(All Players(All Teams), Throttle Of(Event Player), Null, Null, Left, 0, Color(White), Color(White), Color(White),
-			Visible To and String, Default Visibility);
 	}
 }
 
@@ -2845,7 +2843,7 @@ rule("Assign Dummy")
 		Event Player.DummyAssignedToPlayer = First Of(Filtered Array(All Players(All Teams),
 			Current Array Element.PlayerDummy == Null && !Is Dummy Bot(Current Array Element)));
 		Event Player.DummyAssignedToPlayer.PlayerDummy = Event Player;
-		Start Forcing Dummy Bot Name(Event Player, Custom String("{0} poo poo head", Event Player.DummyAssignedToPlayer));
+		Start Forcing Dummy Bot Name(Event Player, Custom String("{0}", Event Player.DummyAssignedToPlayer));
 		Start Facing(Event Player, Facing Direction Of(Event Player.DummyAssignedToPlayer), 1000, To World, Direction and Turn Rate);
 		Start Throttle In Direction(Event Player, Vector(X Component Of(Update Every Frame(Throttle Of(
 			Event Player.DummyAssignedToPlayer))), 0, Z Component Of(Update Every Frame(Throttle Of(Event Player.DummyAssignedToPlayer)))),
