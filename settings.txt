@@ -1083,6 +1083,30 @@ rule("Pulse HUD color")
 	}
 }
 
+rule("Superjump Nerf")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Y Component Of(Velocity Of(Event Player)) > 0;
+		Y Component Of(Position Of(Event Player)) > 30;
+	}
+
+	actions
+	{
+		disabled Set Gravity(Event Player, 200);
+		Apply Impulse(Event Player, Down, 1, To World, Incorporate Contrary Motion);
+		Wait(0.005, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
 rule("// GAME RULES")
 {
 	event
