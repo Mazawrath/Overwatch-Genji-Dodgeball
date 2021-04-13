@@ -135,6 +135,7 @@ variables
 		53: IsPassingTeam1
 		54: IsPassingTeam2
 		55: ScoreToWin
+		56: PassingEnabled
 
 	player:
 		0: hasMoved
@@ -170,6 +171,7 @@ rule("// SETTINGS")
 
 	actions
 	{
+		Global.PassingEnabled = Workshop Setting Toggle(Custom String("Dodgeball Settings"), Custom String("Passing Enabled"), False, 0);
 		Global.AllowMatchEnd = Workshop Setting Toggle(Custom String("Teams Settings"), Custom String("Allow Match to End At Score"), True,
 			0);
 		Global.ScoreToWin = Workshop Setting Integer(Custom String("Teams Settings"), Custom String("Score to Win"), 10, 1, 30, 1);
@@ -470,10 +472,15 @@ rule("Create global HUD elements")
 			Color(White), Color(White), Visible To and String, Default Visibility);
 		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Discord.gg/GenjiDodgeball"), Left, 0, Color(White), Color(
 			White), Color(White), Visible To and String, Default Visibility);
-		If(Current Game Mode == Game Mode(Team Deathmatch));
-			Create HUD Text(All Players(All Teams), Null, Null, Custom String(
-				"Hold secondary fire while deflecting to pass the ball to another teammate!"), Right, 0, Color(White), Color(White), Color(
-				White), Visible To and String, Default Visibility);
+		If(Global.PassingEnabled);
+			If(Current Game Mode == Game Mode(Team Deathmatch));
+				Create HUD Text(All Players(All Teams), Null, Null, Custom String(
+					"Hold secondary fire while deflecting to pass the ball to another teammate!"), Right, 0, Color(White), Color(White), Color(
+					White), Visible To and String, Default Visibility);
+			Else If(Current Game Mode == Game Mode(Deathmatch));
+				Create HUD Text(All Players(All Teams), Null, Null, Custom String("Hold secondary fire while deflecting to self pass the ball!"),
+					Right, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+			End;
 		End;
 	}
 }
@@ -568,18 +575,17 @@ rule("Create ball & targeted effect")
 
 	actions
 	{
-		Create Effect(Update Every Frame(Filtered Array(All Players(All Teams), Slot Of(Current Array Element)
-			!= Global.SlotOfTargetedPlayer)), Orb, Color(White), Global.BallPosition, 0.400, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Orb, Color(
+			White), Global.BallPosition, 0.400, Visible To Position and Radius);
 		If(!Global.RedGreenColorblindMode);
-			Create Effect(Update Every Frame(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)), Orb, Color(Red), Global.BallPosition,
-				0.400, Visible To Position and Radius);
-			Create Effect(Update Every Frame(Filtered Array(All Players(All Teams), Slot Of(Current Array Element)
-				!= Global.SlotOfTargetedPlayer)), Good Aura, Color(Red), Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1,
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Color(Red), Global.BallPosition, 0.400,
 				Visible To Position and Radius);
-			Create Effect(Update Every Frame(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)), Good Aura, Color(Red), Players In Slot(
+			Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Good Aura,
+				Color(Red), Players In Slot(Global.SlotOfTargetedPlayer, All Teams), 1, Visible To Position and Radius);
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Red), Players In Slot(
 				Global.SlotOfTargetedPlayer, All Teams), 1, Visible To Position and Radius);
-			Create Effect(Update Every Frame(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)), Good Aura, Color(Red),
-				Global.BallPosition, 1, Visible To Position and Radius);
+			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Good Aura, Color(Red), Global.BallPosition, 1,
+				Visible To Position and Radius);
 		Else;
 			Create Effect(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Orb, Color(Yellow), Global.BallPosition, 0.400,
 				Visible To Position and Radius);
@@ -1732,7 +1738,7 @@ rule("secondary = deflect")
 	{
 		Is Button Held(Event Player, Button(Secondary Fire)) == True;
 		Custom String("{0}", Event Player) != Custom String("bytestats");
-		Current Game Mode == Game Mode(Deathmatch);
+		Global.PassingEnabled == False;
 	}
 
 	actions
@@ -1861,6 +1867,13 @@ rule("Ball reaches player")
 
 	actions
 	{
+		If(Is Button Held(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Button(Secondary Fire)));
+			"If they don't have enough health, kill em"
+			If(Health(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)) <= 100);
+				Call Subroutine(DeflectFailed);
+				Abort;
+			End;
+		End;
 		Skip If(Is Using Ability 2(Players In Slot(Global.SlotOfTargetedPlayer, All Teams)) || Is Using Ability 1(Players In Slot(
 			Global.SlotOfTargetedPlayer, All Teams)), 13);
 		Set Status(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Players In Slot(Global.SlotOfPreviousTargetedPlayer,
@@ -1893,13 +1906,24 @@ rule("Ball reaches player")
 		Stop Chasing Global Variable(BallDirection);
 		Global.BallDirection = Facing Direction Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams));
 		Wait(0.001, Ignore Condition);
-		Global.SlotOfTargetedPlayer = Slot Of(First Of(Sorted Array(Filtered Array(All Living Players(All Teams), Slot Of(
-			Current Array Element) != Global.SlotOfPreviousTargetedPlayer), Angle Between Vectors(Facing Direction Of(Players In Slot(
-			Global.SlotOfTargetedPlayer, All Teams)), Direction Towards(Players In Slot(Global.SlotOfTargetedPlayer, All Teams),
-			Position Of(Current Array Element))))));
+		If(Is Button Held(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Button(Secondary Fire))
+			&& Global.PassingEnabled);
+			Play Effect(All Players(All Teams), Ring Explosion, Color(Sky Blue), Position Of(Players In Slot(
+				Global.SlotOfPreviousTargetedPlayer, All Teams)), 10);
+			Play Effect(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Moira Fade Disappear Sound, Color(White), Position Of(
+				Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams)), 100);
+			Set Player Health(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Global.PassingDamage);
+			Global.SlotOfTargetedPlayer = Global.SlotOfPreviousTargetedPlayer;
+		Else;
+			Heal(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Null, Global.PassingDamage);
+			Global.SlotOfTargetedPlayer = Slot Of(First Of(Sorted Array(Filtered Array(All Living Players(All Teams), Slot Of(
+				Current Array Element) != Global.SlotOfPreviousTargetedPlayer), Angle Between Vectors(Facing Direction Of(Players In Slot(
+				Global.SlotOfTargetedPlayer, All Teams)), Direction Towards(Players In Slot(Global.SlotOfTargetedPlayer, All Teams),
+				Position Of(Current Array Element))))));
+		End;
 		Chase Global Variable At Rate(BallDirection, Direction Towards(Global.BallPosition, Eye Position(Players In Slot(
 			Global.SlotOfTargetedPlayer, All Teams))), 6, Destination and Rate);
-		Loop If Condition Is True;
+		disabled Loop If Condition Is True;
 	}
 }
 
@@ -1948,7 +1972,9 @@ rule("Ball reaches player -TEAMS")
 		Stop Chasing Global Variable(BallDirection);
 		Global.BallDirection = Facing Direction Of(Players In Slot(Global.SlotOfTargetedPlayer, All Teams));
 		Wait(0.001, Ignore Condition);
-		If(Is Button Held(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Button(Secondary Fire)));
+		If(Is Button Held(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Button(Secondary Fire))
+			&& Global.PassingEnabled);
+			disabled If(Is Button Held(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Button(Secondary Fire)));
 			Play Effect(All Players(All Teams), Ring Explosion, Color(Sky Blue), Position Of(Players In Slot(
 				Global.SlotOfPreviousTargetedPlayer, All Teams)), 10);
 			Play Effect(Players In Slot(Global.SlotOfPreviousTargetedPlayer, All Teams), Moira Fade Disappear Sound, Color(White), Position Of(
