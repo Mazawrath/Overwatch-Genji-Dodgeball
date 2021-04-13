@@ -153,6 +153,10 @@ variables
 		13: antiFloatTimer
 		14: antiStuckProtection
 		15: ToggleHUD
+		16: PlayerDummy
+		17: DummyAssignedToPlayer
+		18: ToggleFace
+		19: ToggleMove
 }
 
 subroutines
@@ -342,9 +346,10 @@ rule("Init player variables")
 		Event Player.antiFloatProtection = False;
 		Event Player.antiStuckProtection = False;
 		Event Player.ToggleHUD = True;
-		Wait Until(Is Alive(Event Player) && Is Game In Progress, 90);
-		Wait(3, Ignore Condition);
-		Small Message(Event Player, Custom String("Press interact to enable/disable the scoreboard"));
+		Event Player.PlayerDummy = Null;
+		disabled Wait Until(Is Alive(Event Player) && Is Game In Progress, 90);
+		disabled Wait(3, Ignore Condition);
+		disabled Small Message(Event Player, Custom String("Press interact to enable/disable the scoreboard"));
 	}
 }
 
@@ -511,6 +516,8 @@ rule("Create player HUD elements")
 		disabled Create HUD Text(Event Player, Round To Integer(Event Player.BouncePadCooldown, Up), Custom String("Bouncepad"), Custom String(
 			"Cooldown"), Right, -1, Color(Green), Color(White), Color(White), Visible To and String, Default Visibility);
 		disabled Event Player.PlayerUI[5] = Last Created Entity;
+		Create HUD Text(All Players(All Teams), Throttle Of(Event Player), Null, Null, Left, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
 	}
 }
 
@@ -713,7 +720,7 @@ rule("Delete ball countdown HUD")
 	}
 }
 
-rule("Enable Scoreboard")
+disabled rule("Enable Scoreboard")
 {
 	event
 	{
@@ -736,7 +743,7 @@ rule("Enable Scoreboard")
 	}
 }
 
-rule("Disable Scoreboard")
+disabled rule("Disable Scoreboard")
 {
 	event
 	{
@@ -1704,7 +1711,7 @@ rule("Only end game when there isn't a round in progress")
 	}
 }
 
-rule("primary = dash")
+disabled rule("primary = dash")
 {
 	event
 	{
@@ -1725,7 +1732,7 @@ rule("primary = dash")
 	}
 }
 
-rule("secondary = deflect")
+disabled rule("secondary = deflect")
 {
 	event
 	{
@@ -1771,6 +1778,7 @@ rule("Start round")
 
 	actions
 	{
+		Wait(5, Ignore Condition);
 		Chase Global Variable At Rate(BallSpawnCountdown, 0, 1, Destination and Rate);
 		Global.RoundInProgress = True;
 		Chase Player Variable At Rate(All Players(All Teams), BouncePadCooldown, 0, 1, Destination and Rate);
@@ -2794,5 +2802,338 @@ rule("Team 2 Win")
 	{
 		Enable Built-In Game Mode Announcer;
 		Declare Team Victory(Team 2);
+	}
+}
+
+rule("Create dummy for each player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		!Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Genji), All Teams, -1, Vector(0, 0, 0), Vector(0, 0, 0));
+	}
+}
+
+rule("Assign Dummy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.DummyAssignedToPlayer = First Of(Filtered Array(All Players(All Teams),
+			Current Array Element.PlayerDummy == Null && !Is Dummy Bot(Current Array Element)));
+		Event Player.DummyAssignedToPlayer.PlayerDummy = Event Player;
+		Start Forcing Dummy Bot Name(Event Player, Custom String("{0} poo poo head", Event Player.DummyAssignedToPlayer));
+		Start Facing(Event Player, Facing Direction Of(Event Player.DummyAssignedToPlayer), 1000, To World, Direction and Turn Rate);
+		Start Throttle In Direction(Event Player, Vector(X Component Of(Update Every Frame(Throttle Of(
+			Event Player.DummyAssignedToPlayer))), 0, Z Component Of(Update Every Frame(Throttle Of(Event Player.DummyAssignedToPlayer)))),
+			X Component Of(Update Every Frame(Throttle Of(Event Player.DummyAssignedToPlayer))) != 0 || Z Component Of(Update Every Frame(
+			Throttle Of(Event Player.DummyAssignedToPlayer))) != 0, To Player, Replace existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("primary = dash")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Primary Fire)) == True;
+		Custom String("{0}", Event Player) != Custom String("bytestats");
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 1));
+	}
+}
+
+rule("secondary = deflect")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Secondary Fire)) == True;
+		disabled Is Button Held(Event Player, Button(Secondary Fire)) == True;
+		Custom String("{0}", Event Player) != Custom String("bytestats");
+		Global.PassingEnabled == False;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 2));
+	}
+}
+
+rule("jump = jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Jump)) == True;
+		Custom String("{0}", Event Player) != Custom String("bytestats");
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Jump));
+	}
+}
+
+rule("crouch held")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Crouch)) == True;
+		Custom String("{0}", Event Player) != Custom String("bytestats");
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Button(Crouch));
+	}
+}
+
+rule("crouch let go")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Crouch)) == False;
+		Custom String("{0}", Event Player) != Custom String("bytestats");
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Button(Crouch));
+	}
+}
+
+rule("ToggleFacing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Ultimate)) == True;
+	}
+
+	actions
+	{
+		If(Event Player.ToggleFace);
+			Start Facing(Event Player, Facing Direction Of(Event Player.DummyAssignedToPlayer), 1000, To World, Direction and Turn Rate);
+			Event Player.ToggleFace = False;
+		Else;
+			Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.DummyAssignedToPlayer)), 1000,
+				To World, Direction and Turn Rate);
+			Event Player.ToggleFace = True;
+		End;
+	}
+}
+
+rule("Toggle moving")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		If(Event Player.ToggleMove);
+			Stop Throttle In Direction(Event Player);
+			Event Player.ToggleMove = False;
+		Else;
+			Start Throttle In Direction(Event Player, Vector(X Component Of(Update Every Frame(Throttle Of(
+				Event Player.DummyAssignedToPlayer))), 0, Z Component Of(Update Every Frame(Throttle Of(Event Player.DummyAssignedToPlayer)))),
+				X Component Of(Update Every Frame(Throttle Of(Event Player.DummyAssignedToPlayer))) != 0 || Z Component Of(Update Every Frame(
+				Throttle Of(Event Player.DummyAssignedToPlayer))) != 0, To Player, Replace existing throttle, Direction and Magnitude);
+			Event Player.ToggleMove = True;
+		End;
+	}
+}
+
+rule("Bounce when near pad 1- Dummy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global.BouncePad1) <= 2.750;
+		Event Player.BouncePadCooldown == 0;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Jump)) == True;
+		Has Status(Event Player, Knocked Down) == False;
+	}
+
+	actions
+	{
+		Event Player.IsDashEnabled = True;
+		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
+		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
+		Event Player.PlayerEffects[1] = Last Created Entity;
+		Wait(2, Ignore Condition);
+		Destroy Effect(Event Player.PlayerEffects[1]);
+	}
+}
+
+rule("Bounce when near pad 2 - Dummy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global.BouncePad2) <= 2.750;
+		Event Player.BouncePadCooldown == 0;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Jump)) == True;
+		Has Status(Event Player, Knocked Down) == False;
+	}
+
+	actions
+	{
+		Event Player.IsDashEnabled = True;
+		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
+		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
+		Event Player.PlayerEffects[1] = Last Created Entity;
+		Wait(2, Ignore Condition);
+		Destroy Effect(Event Player.PlayerEffects[1]);
+	}
+}
+
+rule("Bounce when near pad 3 - Dummy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global.BouncePad3) <= 2.750;
+		Event Player.BouncePadCooldown == 0;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Jump)) == True;
+		Has Status(Event Player, Knocked Down) == False;
+	}
+
+	actions
+	{
+		Event Player.IsDashEnabled = True;
+		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
+		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
+		Event Player.PlayerEffects[1] = Last Created Entity;
+		Wait(2, Ignore Condition);
+		Destroy Effect(Event Player.PlayerEffects[1]);
+	}
+}
+
+rule("Bounce when near pad 4 - Dummy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global.BouncePad4) <= 2.750;
+		Event Player.BouncePadCooldown == 0;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player.DummyAssignedToPlayer, Button(Jump)) == True;
+		Has Status(Event Player, Knocked Down) == False;
+	}
+
+	actions
+	{
+		Event Player.IsDashEnabled = True;
+		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
+		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
+		Event Player.PlayerEffects[1] = Last Created Entity;
+		Wait(2, Ignore Condition);
+		Destroy Effect(Event Player.PlayerEffects[1]);
 	}
 }
