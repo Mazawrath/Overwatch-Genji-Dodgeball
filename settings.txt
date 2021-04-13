@@ -73,6 +73,7 @@ settings
 		Buff and Debuff Sounds
 		Kinetic Explosion Effects
 		Explosion Sounds
+		Spawn More Dummy Bots
 	}
 }
 
