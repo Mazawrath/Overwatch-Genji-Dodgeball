@@ -1094,7 +1094,7 @@ rule("Superjump Nerf")
 
 	conditions
 	{
-		Y Component Of(Velocity Of(Event Player)) > 0;
+		Y Component Of(Velocity Of(Event Player)) >= 8;
 		Y Component Of(Position Of(Event Player)) > 30;
 	}
 
