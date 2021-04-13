@@ -68,11 +68,6 @@ settings
 		}
 	}
 
-	workshop
-	{
-		Allow Match to End At Time: On
-	}
-
 	extensions
 	{
 		Buff and Debuff Sounds
@@ -2097,7 +2092,7 @@ rule("Final duel")
 		Skip If(Global.BallIsOut == False, 1);
 		Global.BallDeleteRequested = True;
 		Global.IsInFinalDuel = True;
-		All Living Players(All Teams).BouncePadCooldown = 3;
+		All Living Players(All Teams).BouncePadCooldown = 2;
 		Skip If(Number Of Players(All Teams) <= 2, 1);
 		Big Message(All Players(All Teams), Custom String("Final Duel!"));
 		Apply Impulse(All Living Players(All Teams), Down, 0.001, To World, Cancel Contrary Motion);
@@ -2146,7 +2141,7 @@ rule("Final duel - TEAMS")
 		Skip If(Global.BallIsOut == False, 1);
 		Global.BallDeleteRequested = True;
 		Global.IsInFinalDuel = True;
-		All Living Players(All Teams).BouncePadCooldown = 3;
+		All Living Players(All Teams).BouncePadCooldown = 2;
 		Skip If(Number Of Players(All Teams) <= 2, 1);
 		Big Message(All Players(All Teams), Custom String("Final Duel!"));
 		Apply Impulse(All Living Players(All Teams), Down, 0.001, To World, Cancel Contrary Motion);
