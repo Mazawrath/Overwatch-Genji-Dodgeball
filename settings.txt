@@ -153,6 +153,7 @@ variables
 		13: antiFloatTimer
 		14: antiStuckProtection
 		15: ToggleHUD
+		16: DashNerf
 }
 
 subroutines
@@ -342,6 +343,7 @@ rule("Init player variables")
 		Event Player.antiFloatProtection = False;
 		Event Player.antiStuckProtection = False;
 		Event Player.ToggleHUD = True;
+		Event Player.DashNerf = False;
 		Wait Until(Is Alive(Event Player) && Is Game In Progress, 90);
 		Wait(3, Ignore Condition);
 		Small Message(Event Player, Custom String("Press interact to enable/disable the scoreboard"));
@@ -1093,30 +1095,6 @@ rule("Pulse HUD color")
 	}
 }
 
-rule("Superjump Nerf")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Y Component Of(Velocity Of(Event Player)) >= 8;
-		Y Component Of(Position Of(Event Player)) > 30;
-	}
-
-	actions
-	{
-		disabled Set Gravity(Event Player, 200);
-		Apply Impulse(Event Player, Down, 1, To World, Incorporate Contrary Motion);
-		Wait(0.005, Ignore Condition);
-		Loop If Condition Is True;
-	}
-}
-
 rule("// GAME RULES")
 {
 	event
@@ -1557,7 +1535,11 @@ rule("Bounce when near pad 1")
 	actions
 	{
 		Event Player.IsDashEnabled = True;
-		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		If(Event Player.DashNerf);
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength - 7.500, To World, Cancel Contrary Motion);
+		Else;
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		End;
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
 		Event Player.PlayerEffects[1] = Last Created Entity;
@@ -1587,7 +1569,11 @@ rule("Bounce when near pad 2")
 	actions
 	{
 		Event Player.IsDashEnabled = True;
-		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		If(Event Player.DashNerf);
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength - 7.500, To World, Cancel Contrary Motion);
+		Else;
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		End;
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
 		Event Player.PlayerEffects[1] = Last Created Entity;
@@ -1617,7 +1603,11 @@ rule("Bounce when near pad 3")
 	actions
 	{
 		Event Player.IsDashEnabled = True;
-		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		If(Event Player.DashNerf);
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength - 7.500, To World, Cancel Contrary Motion);
+		Else;
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		End;
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
 		Event Player.PlayerEffects[1] = Last Created Entity;
@@ -1647,7 +1637,11 @@ rule("Bounce when near pad 4")
 	actions
 	{
 		Event Player.IsDashEnabled = True;
-		Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		If(Event Player.DashNerf);
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength - 7.500, To World, Cancel Contrary Motion);
+		Else;
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
+		End;
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Play Effect(All Players(All Teams), Ring Explosion Sound, Color(White), Global.BouncePad1, 25);
 		Event Player.PlayerEffects[1] = Last Created Entity;
@@ -2494,6 +2488,7 @@ rule("dash slow")
 
 	actions
 	{
+		Event Player.DashNerf = True;
 		Event Player.moveSpeed = 0;
 		Chase Player Variable At Rate(Event Player, moveSpeed, 100, Max(Event Player.moveSpeed, 16) ^ 1.250, Destination and Rate);
 		While(Event Player.moveSpeed != 100);
@@ -2503,6 +2498,7 @@ rule("dash slow")
 		End;
 		Set Move Speed(Event Player, 100);
 		Set Gravity(Event Player, 100);
+		Event Player.DashNerf = False;
 	}
 }
 
