@@ -382,6 +382,9 @@ rule("Init global variables")
 		Global.PassingDamage = 100;
 		Global.IsPassingTeam1 = False;
 		Global.IsPassingTeam2 = False;
+		If(Current Game Mode == Game Mode(Deathmatch));
+			Global.GameEndEnabled = True;
+		End;
 	}
 }
 
