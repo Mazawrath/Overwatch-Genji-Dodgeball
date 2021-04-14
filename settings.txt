@@ -136,6 +136,7 @@ variables
 		54: IsPassingTeam2
 		55: ScoreToWin
 		56: PassingEnabled
+		57: BouncePadSuperjumpNerf
 
 	player:
 		0: hasMoved
@@ -374,6 +375,7 @@ rule("Init global variables")
 		Global.CenterOffLimitsSize = 3.500;
 		Global.IsInFinalDuel = False;
 		Global.BouncePadCooldownLength = 6;
+		Global.BouncePadSuperjumpNerf = 6;
 		Global.BallPosition = Vector(0, -1, 0);
 		Global.ExplosionSoundVolume = 30;
 		Global.ImprovedExplosions = True;
@@ -1536,7 +1538,7 @@ rule("Bounce when near pad 1")
 	{
 		Event Player.IsDashEnabled = True;
 		If(Event Player.DashNerf);
-			Apply Impulse(Event Player, Up, Global.BouncePadStrength - 7.500, To World, Cancel Contrary Motion);
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength - Global.BouncePadSuperjumpNerf, To World, Cancel Contrary Motion);
 		Else;
 			Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		End;
@@ -1570,7 +1572,7 @@ rule("Bounce when near pad 2")
 	{
 		Event Player.IsDashEnabled = True;
 		If(Event Player.DashNerf);
-			Apply Impulse(Event Player, Up, Global.BouncePadStrength - 7.500, To World, Cancel Contrary Motion);
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength - Global.BouncePadSuperjumpNerf, To World, Cancel Contrary Motion);
 		Else;
 			Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		End;
@@ -1604,7 +1606,7 @@ rule("Bounce when near pad 3")
 	{
 		Event Player.IsDashEnabled = True;
 		If(Event Player.DashNerf);
-			Apply Impulse(Event Player, Up, Global.BouncePadStrength - 7.500, To World, Cancel Contrary Motion);
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength - Global.BouncePadSuperjumpNerf, To World, Cancel Contrary Motion);
 		Else;
 			Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		End;
@@ -1638,7 +1640,7 @@ rule("Bounce when near pad 4")
 	{
 		Event Player.IsDashEnabled = True;
 		If(Event Player.DashNerf);
-			Apply Impulse(Event Player, Up, Global.BouncePadStrength - 7.500, To World, Cancel Contrary Motion);
+			Apply Impulse(Event Player, Up, Global.BouncePadStrength - Global.BouncePadSuperjumpNerf, To World, Cancel Contrary Motion);
 		Else;
 			Apply Impulse(Event Player, Up, Global.BouncePadStrength, To World, Cancel Contrary Motion);
 		End;
