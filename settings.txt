@@ -56,7 +56,7 @@ settings
 				Primary Fire: Off
 				Quick Melee: Off
 				Secondary Fire: Off
-				Swift Strike Cooldown Time: 30%
+				Swift Strike Cooldown Time: 38%
 				Ultimate Generation - Combat Dragonblade: 0%
 				Ultimate Generation - Passive Dragonblade: 0%
 			}
