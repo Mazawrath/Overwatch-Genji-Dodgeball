@@ -41,7 +41,9 @@ settings
 			Allow Hero Switching: Off
 			Game Mode Start: Immediately
 			Hero Limit: Off
+			Kill Cam: Off
 			Respawn As Random Hero: On
+			Skins: Off
 		}
 	}
 
@@ -342,7 +344,7 @@ rule("Init player variables")
 		Skip If(Global.CooldownDashingEnabled, 1);
 		Set Ability 1 Enabled(Event Player, False);
 		Disable Built-In Game Mode Respawning(Event Player);
-		Enable Death Spectate All Players(Event Player);
+		disabled Enable Death Spectate All Players(Event Player);
 		Event Player.BouncePadCooldown = Global.BouncePadCooldownLength;
 		Event Player.antiFloatProtection = False;
 		Event Player.antiStuckProtection = False;
@@ -2871,6 +2873,10 @@ rule("Assign Dummy")
 			Throttle Of(Event Player.DummyAssignedToPlayer))) != 0, To Player, Replace existing throttle, Direction and Magnitude);
 		Start Forcing Player Outlines(Event Player.DummyAssignedToPlayer, Event Player.DummyAssignedToPlayer.PlayerDummy, True, Color(
 			Sky Blue), Always);
+		Create Icon(Filtered Array(Event Player.DummyAssignedToPlayer, Is Alive(Event Player)), Update Every Frame(Eye Position(
+			Event Player)), Diamond, Visible To and Position, Color(Lime Green), True);
+		Wait(5, Ignore Condition);
+		Start Forcing Player Outlines(Event Player, Event Player.DummyAssignedToPlayer, True, Color(Sky Blue), Always);
 	}
 }
 
