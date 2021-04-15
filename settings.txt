@@ -738,7 +738,7 @@ rule("Enable Scoreboard")
 	actions
 	{
 		Disable Game Mode HUD(Event Player);
-		Wait(1, Ignore Condition);
+		Wait Until(!Is Button Held(Event Player, Button(Interact)), 10);
 		Event Player.ToggleHUD = False;
 	}
 }
@@ -761,7 +761,7 @@ rule("Disable Scoreboard")
 	actions
 	{
 		Enable Game Mode HUD(Event Player);
-		Wait(1, Ignore Condition);
+		Wait Until(!Is Button Held(Event Player, Button(Interact)), 10);
 		Event Player.ToggleHUD = True;
 	}
 }
