@@ -14,5 +14,10 @@ A maximum of 3 players on team 1, in slots 1-3.
 A maximum of 3 players on team 2, in slots 4-6.  
 There are protections that stop the match from starting if there is a incorrect configuration, please do not disable this, as the game will not function properly with a incorrect team layout.
 
+## A personal note
+I am the so called founder of this game, although many names have influenced this game, and I am very proud of that.
+I have done 100% of the development of this game for free and I will always do it for free. Please do not be pressured to donate, this is only for if you want to go above and beyond. But if you appreciate what I create, and have funds to spare, I will greatly appreciate any amount that you give as thanks, from the bottom of my heart.  
+My donation link: https://streamlabs.com/mazawrath/tip
+
 ## YouTube Video
 [![YouTube video](http://img.youtube.com/vi/mQmDIZGKKR8/0.jpg)](http://www.youtube.com/watch?v=mQmDIZGKKR8)
