@@ -16,7 +16,7 @@ There are protections that stop the match from starting if there is a incorrect 
 
 ## A personal note
 I am the so called founder of this game, although many names have influenced this game, and I am very proud of that.
-I have done 100% of the development of this game for free and I will always do it for free. Please do not be pressured to donate, this is only for if you want to go above and beyond. But if you appreciate what I create, and have funds to spare, I will greatly appreciate any amount that you give as thanks, from the bottom of my heart.  
+I have done 100% of the development of this game for free and I will always do it for free. Please do not be pressured to donate, this is only for if you want to go above and beyond. But if you appreciate what I create, and have funds to spare, I will greatly appreciate any amount that you give, and I will be truly thankful, from the bottom of my heart.  
 My donation link: https://streamlabs.com/mazawrath/tip
 
 ## YouTube Video
