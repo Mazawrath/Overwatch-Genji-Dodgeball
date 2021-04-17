@@ -1,7 +1,6 @@
 # Overwatch-Genji-Dodgeball
 **Current Version: v6.0.0**  
 **Deathmatch Code: 5H1MQ**  
-**Team Deathmatch Code: CH4VG**
 
 Genji Dodgeball is a minigame inspired by the TF2 game pyro dodgeball.
 When the ball is red it is targeting you! Use your deflect to target someone else. Look at the person you want to target next while deflecting. Use bouncepads to get extra air and style points.
@@ -12,7 +11,8 @@ Due to limitations of the game, teams must be laid out like this:
 ![Correct layout](https://cdn.discordapp.com/attachments/720371417509789728/830655043903684688/Untitled.png)  
 A maximum of 3 players on team 1, in slots 1-3.  
 A maximum of 3 players on team 2, in slots 4-6.  
-There are protections that stop the match from starting if there is a incorrect configuration, please do not disable this, as the game will not function properly with a incorrect team layout.
+There are protections that stop the match from starting if there is a incorrect configuration, please do not disable this, as the game will not function properly with a incorrect team layout.  
+**Team Deathmatch Code: CH4VG**  
 
 ## A personal note
 I am the so called founder of this game, although many names have influenced this game, and I am very proud of that.
