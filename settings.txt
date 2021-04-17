@@ -583,12 +583,11 @@ rule("Create ball & targeted effect")
 	actions
 	{
 		"Orb for when ball is not getting passed"
-		Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element)
-			!= Global.SlotOfTargetedPlayer && !Global.IsPassingTeam1), Orb, Color(White), Global.BallPosition, 0.400,
-			Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Slot Of(Current Array Element) != Global.SlotOfTargetedPlayer), Orb, Color(
+			White), Global.BallPosition, 0.400, Visible To Position and Radius);
 		"Orb for when ball is getting passed"
-		Create Effect(Filtered Array(All Players(All Teams), Global.IsPassingTeam1), Orb, Color(Sky Blue), Global.BallPosition, 0.400,
-			Visible To Position and Radius);
+		Create Effect(Filtered Array(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), Global.IsPassingTeam1), Orb, Color(Sky Blue),
+			Global.BallPosition, 0.400, Visible To Position and Radius);
 		If(!Global.RedGreenColorblindMode);
 			Create Effect(Filtered Array(Players In Slot(Global.SlotOfTargetedPlayer, All Teams), !Global.IsPassingTeam1), Orb, Color(Red),
 				Global.BallPosition, 0.400, Visible To Position and Radius);
