@@ -377,13 +377,13 @@ rule "Create ball & targeted effect - TEAMS":
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     #Team 1 standard ball
-    createEffect([player for player in getPlayers(Color.TEAM_1) if player != SlotOfTargetedPlayer and not IsPassingTeam1], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.1) if player != SlotOfTargetedPlayer and not IsPassingTeam1], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #Team 1 passing ball
-    createEffect([player for player in getPlayers(Color.TEAM_1) if IsPassingTeam1], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.1) if IsPassingTeam1], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #Team 2 standard ball
-    createEffect([player for player in getPlayers(Color.TEAM_2) if player != SlotOfTargetedPlayer and not IsPassingTeam2], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.2) if player != SlotOfTargetedPlayer and not IsPassingTeam2], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #Team 2 passing ball
-    createEffect([player for player in getPlayers(Color.TEAM_2) if IsPassingTeam2], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.2) if IsPassingTeam2], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     if not RedGreenColorblindMode:
         #Team 1 Targeted Ball
         createEffect([i for i in SlotOfTargetedPlayer if not IsPassingTeam1], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
@@ -470,7 +470,7 @@ rule "Check for <2 players":
 rule "Check for <2 players - TEAMS":
     @Condition isGameInProgress() == true
     #@Condition getNumberOfPlayers(Team.ALL) == 1
-    @Condition (getNumberOfPlayers(Color.TEAM_1) and getNumberOfPlayers(Color.TEAM_2)) == false
+    @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == false
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     IsInFinalDuel = false
@@ -503,7 +503,7 @@ rule "Wait for more players":
 
 
 rule "Wait for more players - TEAMS":
-    @Condition (getNumberOfPlayers(Color.TEAM_1) and getNumberOfPlayers(Color.TEAM_2)) == true
+    @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == true
     @Condition IsEnoughPlayersToStart == false
     @Condition getCurrentGamemode() == Gamemode.TDM
     
@@ -1002,7 +1002,7 @@ rule "Ball reaches player -TEAMS":
         playEffect(SlotOfPreviousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, SlotOfPreviousTargetedPlayer.getPosition(), 100)
         SlotOfPreviousTargetedPlayer.setHealth(PassingDamage)
         #Check which team is passing
-        if SlotOfPreviousTargetedPlayer.getTeam() == Color.TEAM_1:
+        if SlotOfPreviousTargetedPlayer.getTeam() == Team.1:
             IsPassingTeam1 = true
         else:
             IsPassingTeam2 = true
@@ -1129,7 +1129,7 @@ rule "Final duel":
 rule "Final duel - TEAMS":
     @Condition isGameInProgress() == true
     #@Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved]) == 2
-    @Condition (len([player for player in getLivingPlayers(Color.TEAM_1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Color.TEAM_2) if player.hasMoved]) == 1) == true
+    @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
     @Condition IsEnoughPlayersToStart == true
     @Condition IsInFinalDuel == false
     @Condition getCurrentGamemode() == Gamemode.TDM
@@ -1217,12 +1217,12 @@ rule "Check for last player surviving":
 
 rule "Team 1 Last Surviving":
     @Condition isGameInProgress() == true
-    @Condition getNumberOfLivingPlayers(Color.TEAM_2) == 0
+    @Condition getNumberOfLivingPlayers(Team.2) == 0
     @Condition IsEnoughPlayersToStart == true
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     IsInFinalDuel = false
-    addToTeamScore(Color.TEAM_1, 1)
+    addToTeamScore(Team.1, 1)
     wait(0.25)
     if (getMatchTime() == 0 or TieBreakerActive) and GameEndEnabled:
         #If there is alredy a tiebreaker, then the tiebreaker has ended.
@@ -1231,14 +1231,14 @@ rule "Team 1 Last Surviving":
         #__end__()
         HighestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
         #Check if there is more then 1 person with the highest score
-        if teamScore(Color.TEAM_1) == teamScore(Color.TEAM_2):
+        if teamScore(Team.1) == teamScore(Team.2):
             #There is more then 1, activate tie breaker
             TieBreakerActive = true
         else:
             TieBreakerActive = false
     stopChasingVariable(BallSpawnCountdown)
     stopChasingVariable(getAllPlayers().BouncePadCooldown)
-    bigMessage(getAllPlayers(), "{0} has won the round!".format(Color.TEAM_1))
+    bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.1))
     wait(2)
     if not TieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
@@ -1270,12 +1270,12 @@ rule "Team 1 Last Surviving":
 
 rule "Team 2 Last Surviving":
     @Condition isGameInProgress() == true
-    @Condition getNumberOfLivingPlayers(Color.TEAM_1) == 0
+    @Condition getNumberOfLivingPlayers(Team.1) == 0
     @Condition IsEnoughPlayersToStart == true
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     IsInFinalDuel = false
-    addToTeamScore(Color.TEAM_2, 1)
+    addToTeamScore(Team.2, 1)
     wait(0.25)
     if (getMatchTime() == 0 or TieBreakerActive) and GameEndEnabled:
         #If there is alredy a tiebreaker, then the tiebreaker has ended.
@@ -1284,14 +1284,14 @@ rule "Team 2 Last Surviving":
         #__end__()
         HighestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
         #Check if there is more then 1 person with the highest score
-        if teamScore(Color.TEAM_1) == teamScore(Color.TEAM_2):
+        if teamScore(Team.1) == teamScore(Team.2):
             #There is more then 1, activate tie breaker
             TieBreakerActive = true
         else:
             TieBreakerActive = false
     stopChasingVariable(BallSpawnCountdown)
     stopChasingVariable(getAllPlayers().BouncePadCooldown)
-    bigMessage(getAllPlayers(), "{0} has won the round!".format(Color.TEAM_2))
+    bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.2))
     wait(2)
     if not TieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
@@ -1533,17 +1533,17 @@ rule "No Undermaps":
 
 rule "Team 1 Win":
     @Condition AllowMatchEnd == true
-    @Condition teamScore(Color.TEAM_1) == ScoreToWin
+    @Condition teamScore(Team.1) == ScoreToWin
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     enableAnnouncer()
-    declareTeamVictory(Color.TEAM_1)
+    declareTeamVictory(Team.1)
 
 
 rule "Team 2 Win":
     @Condition AllowMatchEnd == true
-    @Condition teamScore(Color.TEAM_2) == ScoreToWin
+    @Condition teamScore(Team.2) == ScoreToWin
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     enableAnnouncer()
-    declareTeamVictory(Color.TEAM_2)
+    declareTeamVictory(Team.2)
