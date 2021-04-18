@@ -101,9 +101,6 @@ globalvar ExplosionSoundVolume 44
 globalvar ImprovedExplosions 45
 globalvar RandomExplosionSounds 46
 globalvar FinalDuelNuke 47
-globalvar IncorrectTeam2ConfigCheck 48
-globalvar IncorrectTeam1ConfigCheck 49
-globalvar IncorrectTeam2ConfigHUDColor 50
 globalvar AllowMatchEnd 51
 globalvar PassingDamage 52
 globalvar IsPassingTeam1 53
@@ -252,8 +249,6 @@ rule "Init global variables":
     ImprovedExplosions = true
     RandomExplosionSounds = true
     CooldownDashingEnabled = true
-    IncorrectTeam2ConfigCheck = false
-    IncorrectTeam2ConfigHUDColor = Color.RED
     PassingDamage = 100
     IsPassingTeam1 = false
     IsPassingTeam2 = false
@@ -272,9 +267,9 @@ rule "Create game sphere":
 
 rule "Create global HUD elements":
     #white normal
-    hudSubtext([player for player in getAllPlayers() if player != getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL)], "Current Player Targeted: {0}".format(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL)), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudSubtext([player for player in getAllPlayers() if player != SlotOfTargetedPlayer], "Current Player Targeted: {0}".format(SlotOfTargetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #red when you're targeted
-    hudSubtext(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), "Current Player Targeted: {0}".format(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL)), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudSubtext(SlotOfTargetedPlayer, "Current Player Targeted: {0}".format(SlotOfTargetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudText(getDeadPlayers(Team.ALL), "Waiting for next round", "You have been eliminated or joined during a round", "You will spawn once the next round starts", HudPosition.TOP, 2, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     if BouncepadDashingEnabled or CooldownDashingEnabled:
         goto lbl_0
@@ -354,18 +349,18 @@ rule "Create ball & targeted effect":
     @Condition getCurrentGamemode() == Gamemode.FFA
     
     #Orb for when ball is not getting passed
-    createEffect([player for player in getAllPlayers() if player.getSlot() != SlotOfTargetedPlayer], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getAllPlayers() if player != SlotOfTargetedPlayer], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #Orb for when ball is getting passed
-    createEffect([i for i in getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL) if IsPassingTeam1], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([i for i in SlotOfTargetedPlayer if IsPassingTeam1], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     if not RedGreenColorblindMode:
-        createEffect([i for i in getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL) if not IsPassingTeam1], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect([player for player in getAllPlayers() if player.getSlot() != SlotOfTargetedPlayer], Effect.GOOD_AURA, Color.RED, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), Effect.GOOD_AURA, Color.RED, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), Effect.GOOD_AURA, Color.RED, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect([i for i in SlotOfTargetedPlayer if not IsPassingTeam1], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect([player for player in getAllPlayers() if player != SlotOfTargetedPlayer], Effect.GOOD_AURA, Color.RED, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(SlotOfTargetedPlayer, Effect.GOOD_AURA, Color.RED, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(SlotOfTargetedPlayer, Effect.GOOD_AURA, Color.RED, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     else:
-        createEffect(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), Effect.ORB, Color.YELLOW, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), Effect.GOOD_AURA, Color.YELLOW, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getEyePosition(), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(SlotOfTargetedPlayer, Effect.ORB, Color.YELLOW, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(SlotOfTargetedPlayer, Effect.GOOD_AURA, Color.YELLOW, SlotOfTargetedPlayer.getEyePosition(), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #ball trail change color with speed
     #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.BLUE, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #BallSmoke = getLastCreatedEntity()
@@ -373,8 +368,8 @@ rule "Create ball & targeted effect":
     #BallTail1 = getLastCreatedEntity()
     #createBeam(getAllPlayers(), Beam.BAD, PrevBallPos, PrevBallPos2, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #BallTail2 = getLastCreatedEntity()
-    createEffect([i for i in [player for player in getAllPlayers() if player.getSlot() != SlotOfTargetedPlayer] if IsPassingTeam1 or IsPassingTeam2], Effect.GOOD_AURA, Color.SKY_BLUE, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.getSlot() != SlotOfTargetedPlayer and (IsPassingTeam1 or IsPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([i for i in [player for player in getAllPlayers() if player != SlotOfTargetedPlayer] if IsPassingTeam1 or IsPassingTeam2], Effect.GOOD_AURA, Color.SKY_BLUE, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getAllPlayers() if player != SlotOfTargetedPlayer and (IsPassingTeam1 or IsPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
 
 
 rule "Create ball & targeted effect - TEAMS":
@@ -382,25 +377,25 @@ rule "Create ball & targeted effect - TEAMS":
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     #Team 1 standard ball
-    createEffect([player for player in getPlayers(Color.TEAM_1) if player.getSlot() != SlotOfTargetedPlayer and not IsPassingTeam1], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.1) if player != SlotOfTargetedPlayer and not IsPassingTeam1], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #Team 1 passing ball
-    createEffect([player for player in getPlayers(Color.TEAM_1) if IsPassingTeam1], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.1) if IsPassingTeam1], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #Team 2 standard ball
-    createEffect([player for player in getPlayers(Color.TEAM_2) if player.getSlot() != SlotOfTargetedPlayer and not IsPassingTeam2], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.2) if player != SlotOfTargetedPlayer and not IsPassingTeam2], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #Team 2 passing ball
-    createEffect([player for player in getPlayers(Color.TEAM_2) if IsPassingTeam2], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.2) if IsPassingTeam2], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     if not RedGreenColorblindMode:
         #Team 1 Targeted Ball
-        createEffect([i for i in getPlayersInSlot(SlotOfTargetedPlayer, Color.TEAM_1) if not IsPassingTeam1], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect([i for i in SlotOfTargetedPlayer if not IsPassingTeam1 and not IsPassingTeam2], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         #Team 2 Targeted Ball
-        createEffect([i for i in getPlayersInSlot(SlotOfTargetedPlayer, Color.TEAM_2) if not IsPassingTeam2], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect([player for player in getAllPlayers() if player.getSlot() != SlotOfTargetedPlayer], Effect.GOOD_AURA, Color.RED, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), Effect.GOOD_AURA, Color.RED, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), Effect.GOOD_AURA, Color.RED, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        #createEffect([i for i in SlotOfTargetedPlayer if not IsPassingTeam2], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect([player for player in getAllPlayers() if player != SlotOfTargetedPlayer], Effect.GOOD_AURA, Color.RED, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(SlotOfTargetedPlayer, Effect.GOOD_AURA, Color.RED, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(SlotOfTargetedPlayer, Effect.GOOD_AURA, Color.RED, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     else:
-        createEffect(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), Effect.ORB, Color.YELLOW, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), Effect.GOOD_AURA, Color.YELLOW, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getEyePosition(), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(SlotOfTargetedPlayer, Effect.ORB, Color.YELLOW, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(SlotOfTargetedPlayer, Effect.GOOD_AURA, Color.YELLOW, SlotOfTargetedPlayer.getEyePosition(), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #ball trail change color with speed
     #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.BLUE, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #BallSmoke = getLastCreatedEntity()
@@ -408,8 +403,8 @@ rule "Create ball & targeted effect - TEAMS":
     #BallTail1 = getLastCreatedEntity()
     #createBeam(getAllPlayers(), Beam.BAD, PrevBallPos, PrevBallPos2, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #BallTail2 = getLastCreatedEntity()
-    createEffect([i for i in [player for player in getAllPlayers() if player.getSlot() != SlotOfTargetedPlayer] if IsPassingTeam1 or IsPassingTeam2], Effect.GOOD_AURA, Color.SKY_BLUE, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.getSlot() != SlotOfTargetedPlayer and (IsPassingTeam1 or IsPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([i for i in [player for player in getAllPlayers() if player != SlotOfTargetedPlayer] if IsPassingTeam1 or IsPassingTeam2], Effect.GOOD_AURA, Color.SKY_BLUE, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getAllPlayers() if player != SlotOfTargetedPlayer and (IsPassingTeam1 or IsPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
 
 
 rule "Create ball countdown HUD":
@@ -475,7 +470,7 @@ rule "Check for <2 players":
 rule "Check for <2 players - TEAMS":
     @Condition isGameInProgress() == true
     #@Condition getNumberOfPlayers(Team.ALL) == 1
-    @Condition (getNumberOfPlayers(Color.TEAM_1) and getNumberOfPlayers(Color.TEAM_2)) == false
+    @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == false
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     IsInFinalDuel = false
@@ -508,7 +503,7 @@ rule "Wait for more players":
 
 
 rule "Wait for more players - TEAMS":
-    @Condition (getNumberOfPlayers(Color.TEAM_1) and getNumberOfPlayers(Color.TEAM_2)) == true
+    @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == true
     @Condition IsEnoughPlayersToStart == false
     @Condition getCurrentGamemode() == Gamemode.TDM
     
@@ -521,97 +516,6 @@ rule "Wait for more players - TEAMS":
     IsEnoughPlayersToStart = true
     SlotOfTargetedPlayer = -1
     SlotOfPreviousTargetedPlayer = -1
-
-
-rule "Check for players in unauthorized slots - Team 1":
-    @Condition isGameInProgress() == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    #DO NOT DISABLE THIS. Don't say I didn't warn you.
-    if getPlayersInSlot(3, Color.TEAM_1) == true or getPlayersInSlot(4, Color.TEAM_1) == true or getPlayersInSlot(5, Color.TEAM_1) == true:
-        IncorrectTeam1ConfigCheck = true
-    else:
-        IncorrectTeam1ConfigCheck = false
-    wait(1)
-    goto RULE_START
-
-
-rule "Players in unauthorized slots - Team 1":
-    @Condition IncorrectTeam1ConfigCheck == true
-    @Condition RoundInProgress == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    if getPlayersInSlot(3, Color.TEAM_1) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 4 on team 1!".format(getPlayersInSlot(3, Color.TEAM_1)))
-        wait(1)
-    if getPlayersInSlot(4, Color.TEAM_1) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 5 on team 1!".format(getPlayersInSlot(4, Color.TEAM_1)))
-        wait(1)
-    if getPlayersInSlot(5, Color.TEAM_1) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 6 on team 1!".format(getPlayersInSlot(5, Color.TEAM_1)))
-        wait(1)
-    wait(5)
-    if RULE_CONDITION:
-        goto RULE_START
-
-
-rule "Create unauthorized slots HUD - Team 1":
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    hudHeader([player for player in getAllPlayers() if IncorrectTeam1ConfigCheck and not RoundInProgress], "Players are detected in slot(s) 4-6 on team 1! Game will not function in this state!", HudPosition.TOP, 0, IncorrectTeam2ConfigHUDColor, HudReeval.VISIBILITY_AND_COLOR, SpecVisibility.DEFAULT)
-    createInWorldText([player for player in getAllPlayers() if IncorrectTeam1ConfigCheck and not RoundInProgress], "The players in slot(s) 4-6 on team 1 must be moved to slots 4-6 or removed from the team!", vect(CircleCenter.x, CircleCenter.y + 1, CircleCenter.z), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_COLOR, IncorrectTeam2ConfigHUDColor, SpecVisibility.DEFAULT)
-
-
-rule "Check for players in unauthorized slots - Team 2":
-    @Condition isGameInProgress() == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    #DO NOT DISABLE THIS. Don't say I didn't warn you.
-    if getPlayersInSlot(0, Color.TEAM_2) == true or getPlayersInSlot(1, Color.TEAM_2) == true or getPlayersInSlot(2, Color.TEAM_2) == true:
-        IncorrectTeam2ConfigCheck = true
-    else:
-        IncorrectTeam2ConfigCheck = false
-    wait(1)
-    goto RULE_START
-
-
-rule "Players in unauthorized slots - Team 2":
-    @Condition IncorrectTeam2ConfigCheck == true
-    @Condition RoundInProgress == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    if getPlayersInSlot(0, Color.TEAM_2) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 1 on team 2!".format(getPlayersInSlot(0, Color.TEAM_2)))
-        wait(1)
-    if getPlayersInSlot(1, Color.TEAM_2) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 2 on team 2!".format(getPlayersInSlot(1, Color.TEAM_2)))
-        wait(1)
-    if getPlayersInSlot(2, Color.TEAM_2) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 3 on team 2!".format(getPlayersInSlot(2, Color.TEAM_2)))
-        wait(1)
-    wait(5)
-    if RULE_CONDITION:
-        goto RULE_START
-
-
-rule "Create unauthorized slots HUD - Team 2":
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    hudHeader([player for player in getAllPlayers() if IncorrectTeam2ConfigCheck and not RoundInProgress], "Players are detected in slot(s) 1-3 on team 2! Game will not function in this state!", HudPosition.TOP, 0, IncorrectTeam2ConfigHUDColor, HudReeval.VISIBILITY_AND_COLOR, SpecVisibility.DEFAULT)
-    createInWorldText([player for player in getAllPlayers() if IncorrectTeam2ConfigCheck and not RoundInProgress], "The players in slot(s) 1-3 on team 2 must be moved to slots 4-6 or removed from the team!", vect(CircleCenter.x, CircleCenter.y + 0, CircleCenter.z), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_COLOR, IncorrectTeam2ConfigHUDColor, SpecVisibility.DEFAULT)
-
-
-rule "Pulse HUD color":
-    @Condition (IncorrectTeam1ConfigCheck or IncorrectTeam2ConfigCheck) == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    if IncorrectTeam2ConfigHUDColor == Color.WHITE:
-        IncorrectTeam2ConfigHUDColor = Color.RED
-    else:
-        IncorrectTeam2ConfigHUDColor = Color.WHITE
-    wait(1.5)
-    if RULE_CONDITION:
-        goto RULE_START
 
 
 rule "// GAME RULES":
@@ -669,7 +573,7 @@ rule "Target random player":
     @Condition isGameInProgress() == true
     @Condition SlotOfTargetedPlayer == -1
     
-    SlotOfTargetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and SlotOfPreviousTargetedPlayer != getPlayersInSlot(player, Team.ALL).getSlot()])).getSlot()
+    SlotOfTargetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and SlotOfPreviousTargetedPlayer != getPlayersInSlot(player, Team.ALL)]))
 
 
 rule "Push to circle":
@@ -738,7 +642,7 @@ rule "Player falls off Workshop Island":
     #A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!
     if not eventPlayer.isAlive():
         eventPlayer.teleport(CircleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
-        if eventPlayer.getSlot() == SlotOfTargetedPlayer:
+        if eventPlayer == SlotOfTargetedPlayer:
             if BallIsOut:
                 BallDeleteRequested = true
     wait(0.5)
@@ -984,8 +888,6 @@ rule "Start round":
 
 rule "Start round - TEAMS":
     @Condition IsEnoughPlayersToStart == true
-    @Condition IncorrectTeam1ConfigCheck == false
-    @Condition IncorrectTeam2ConfigCheck == false
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.TDM
     
@@ -999,7 +901,7 @@ rule "Spawn ball":
     @Condition BallSpawnCountdown == 0
     
     BallPosition = CircleCenter
-    BallDirection = directionTowards(BallPosition, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getEyePosition())
+    BallDirection = directionTowards(BallPosition, SlotOfTargetedPlayer.getEyePosition())
     BallSpeed = min(30, BallSpeed)
     BallIsOut = true
 
@@ -1010,7 +912,7 @@ rule "ball motion (has to be done weird due to chase vector variable bugs)":
     PrevBallPos2 = PrevBallPos
     PrevBallPos = BallPosition
     chase(BallPosition, BallPosition + BallDirection * BallSpeed * 1, rate=BallSpeed, ChaseReeval.DESTINATION_AND_RATE)
-    chase(BallDirection, directionTowards(BallPosition, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
+    chase(BallDirection, directionTowards(BallPosition, SlotOfTargetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
     chase(BallSpeed, MaxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
     wait(0.05)
     if RULE_CONDITION:
@@ -1018,105 +920,105 @@ rule "ball motion (has to be done weird due to chase vector variable bugs)":
 
 
 rule "Ball reaches player":
-    @Condition distance(BallPosition, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getEyePosition()) <= 1.9
+    @Condition distance(BallPosition, SlotOfTargetedPlayer.getEyePosition()) <= 1.9
     @Condition BallIsOut == true
     @Condition getCurrentGamemode() == Gamemode.FFA
     
-    if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isHoldingButton(Button.SECONDARY_FIRE):
+    if SlotOfTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
         #If they don't have enough health, kill em
-        if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getHealth() <= 100:
+        if SlotOfTargetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility2() or getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility1():
+    if SlotOfTargetedPlayer.isUsingAbility2() or SlotOfTargetedPlayer.isUsingAbility1():
         goto lbl_0
     DeflectFailed()
     return
     lbl_0:
-    #if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility2() or getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility1():
+    #if SlotOfTargetedPlayer.isUsingAbility2() or SlotOfTargetedPlayer.isUsingAbility1():
     #        goto lbl_1
-    if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility1():
-        getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).setStatusEffect(null, Status.KNOCKED_DOWN, 1)
-        getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).teleport(BallPosition)
-    getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).CurrentUltPercent += 5
-    playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getPosition(), 200)
-    getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).PlayerDeflects += 1
+    if SlotOfTargetedPlayer.isUsingAbility1():
+        SlotOfTargetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+        SlotOfTargetedPlayer.teleport(BallPosition)
+    SlotOfTargetedPlayer.CurrentUltPercent += 5
+    playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, SlotOfTargetedPlayer.getPosition(), 200)
+    SlotOfTargetedPlayer.PlayerDeflects += 1
     SlotOfPreviousTargetedPlayer = SlotOfTargetedPlayer
     BallSpeed = min(500, BallSpeed * 1.05)
-    if BallSpeed > getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).maxBallSpeed:
-        getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).maxBallSpeed = BallSpeed
+    if BallSpeed > SlotOfTargetedPlayer.maxBallSpeed:
+        SlotOfTargetedPlayer.maxBallSpeed = BallSpeed
     stopChasingVariable(BallDirection)
     lbl_1:
-    BallDirection = getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getFacingDirection()
+    BallDirection = SlotOfTargetedPlayer.getFacingDirection()
     wait(0.001)
-    if getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).isHoldingButton(Button.SECONDARY_FIRE) and PassingEnabled:
+    if SlotOfPreviousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and PassingEnabled:
         IsPassingTeam1 = true
-        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).getPosition(), 10)
-        playEffect(getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL), DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).getPosition(), 100)
-        getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).setHealth(PassingDamage)
+        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, SlotOfPreviousTargetedPlayer.getPosition(), 10)
+        playEffect(SlotOfPreviousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, SlotOfPreviousTargetedPlayer.getPosition(), 100)
+        SlotOfPreviousTargetedPlayer.setHealth(PassingDamage)
         SlotOfTargetedPlayer = SlotOfPreviousTargetedPlayer
     else:
         IsPassingTeam1 = false
-        heal(getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL), null, PassingDamage)
-        SlotOfTargetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player.getSlot() != SlotOfPreviousTargetedPlayer], lambda i: angleBetweenVectors(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getFacingDirection(), directionTowards(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), i.getPosition()))))[0]).getSlot()
-    chase(BallDirection, directionTowards(BallPosition, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+        heal(SlotOfPreviousTargetedPlayer, null, PassingDamage)
+        SlotOfTargetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != SlotOfPreviousTargetedPlayer], lambda i: angleBetweenVectors(SlotOfTargetedPlayer.getFacingDirection(), directionTowards(SlotOfTargetedPlayer, i.getPosition()))))[0])
+    chase(BallDirection, directionTowards(BallPosition, SlotOfTargetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
     #if RULE_CONDITION:
     #        goto RULE_START
 
 
 rule "Ball reaches player -TEAMS":
-    @Condition distance(BallPosition, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getEyePosition()) <= 1.9
+    @Condition distance(BallPosition, SlotOfTargetedPlayer.getEyePosition()) <= 1.9
     @Condition BallIsOut == true
     @Condition getCurrentGamemode() == Gamemode.TDM
     
-    if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isHoldingButton(Button.SECONDARY_FIRE):
+    if SlotOfTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
         #If they don't have enough health, kill em
-        if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getHealth() <= 100:
+        if SlotOfTargetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility2() or getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility1():
+    if SlotOfTargetedPlayer.isUsingAbility2() or SlotOfTargetedPlayer.isUsingAbility1():
         goto lbl_0
     DeflectFailed()
     return
     lbl_0:
-    #if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility2() or getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility1():
+    #if SlotOfTargetedPlayer.isUsingAbility2() or SlotOfTargetedPlayer.isUsingAbility1():
     #        goto lbl_1
-    if getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).isUsingAbility1():
-        getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).setStatusEffect(null, Status.KNOCKED_DOWN, 1)
-        getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).teleport(BallPosition)
-    getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).CurrentUltPercent += 5
-    playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getPosition(), 200)
-    getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).PlayerDeflects += 1
+    if SlotOfTargetedPlayer.isUsingAbility1():
+        SlotOfTargetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+        SlotOfTargetedPlayer.teleport(BallPosition)
+    SlotOfTargetedPlayer.CurrentUltPercent += 5
+    playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, SlotOfTargetedPlayer.getPosition(), 200)
+    SlotOfTargetedPlayer.PlayerDeflects += 1
     SlotOfPreviousTargetedPlayer = SlotOfTargetedPlayer
     BallSpeed = min(500, BallSpeed * 1.05)
-    if BallSpeed > getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).maxBallSpeed:
-        getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).maxBallSpeed = BallSpeed
+    if BallSpeed > SlotOfTargetedPlayer.maxBallSpeed:
+        SlotOfTargetedPlayer.maxBallSpeed = BallSpeed
     stopChasingVariable(BallDirection)
     lbl_1:
-    BallDirection = getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getFacingDirection()
+    BallDirection = SlotOfTargetedPlayer.getFacingDirection()
     wait(0.001)
-    if getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).isHoldingButton(Button.SECONDARY_FIRE) and PassingEnabled:
-        #if getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).isHoldingButton(Button.SECONDARY_FIRE):
-        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).getPosition(), 10)
-        playEffect(getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL), DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).getPosition(), 100)
-        getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).setHealth(PassingDamage)
+    if SlotOfPreviousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and PassingEnabled:
+        #if SlotOfPreviousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
+        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, SlotOfPreviousTargetedPlayer.getPosition(), 10)
+        playEffect(SlotOfPreviousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, SlotOfPreviousTargetedPlayer.getPosition(), 100)
+        SlotOfPreviousTargetedPlayer.setHealth(PassingDamage)
         #Check which team is passing
-        if getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).getTeam() == Color.TEAM_1:
+        if SlotOfPreviousTargetedPlayer.getTeam() == Team.1:
             IsPassingTeam1 = true
         else:
             IsPassingTeam2 = true
         #If the member is the only one left on their team, self pass
-        if len([player for player in getLivingPlayers(getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).getTeam()) if true]) == 1:
+        if len([player for player in getLivingPlayers(SlotOfPreviousTargetedPlayer.getTeam()) if true]) == 1:
             SlotOfTargetedPlayer = SlotOfPreviousTargetedPlayer
             #Pass to another teammate
         else:
-            SlotOfTargetedPlayer = ((sorted([player for player in getLivingPlayers(getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).getTeam()) if player.getSlot() != SlotOfPreviousTargetedPlayer], lambda i: angleBetweenVectors(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getFacingDirection(), directionTowards(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), i.getPosition()))))[0]).getSlot()
+            SlotOfTargetedPlayer = ((sorted([player for player in getLivingPlayers(SlotOfPreviousTargetedPlayer.getTeam()) if player != SlotOfPreviousTargetedPlayer], lambda i: angleBetweenVectors(SlotOfTargetedPlayer.getFacingDirection(), directionTowards(SlotOfTargetedPlayer, i.getPosition()))))[0])
         #Not passing, heal the person deflecting and target someone on the other team
     else:
-        heal(getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL), null, PassingDamage)
+        heal(SlotOfPreviousTargetedPlayer, null, PassingDamage)
         IsPassingTeam1 = false
         IsPassingTeam2 = false
-        SlotOfTargetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).getTeam())) if player.getSlot() != SlotOfPreviousTargetedPlayer], lambda i: angleBetweenVectors(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getFacingDirection(), directionTowards(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), i.getPosition()))))[0]).getSlot()
-    chase(BallDirection, directionTowards(BallPosition, getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+        SlotOfTargetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(SlotOfPreviousTargetedPlayer.getTeam())) if player != SlotOfPreviousTargetedPlayer], lambda i: angleBetweenVectors(SlotOfTargetedPlayer.getFacingDirection(), directionTowards(SlotOfTargetedPlayer, i.getPosition()))))[0])
+    chase(BallDirection, directionTowards(BallPosition, SlotOfTargetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
     #If deflecting and stuff breaks...disabling this is why.
     #if RULE_CONDITION:
     #        goto RULE_START
@@ -1128,16 +1030,16 @@ def DeflectFailed():
     heal(getLivingPlayers(Team.ALL), null, 200)
     IsPassingTeam1 = false
     IsPassingTeam2 = false
-    getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).setStatusEffect(getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL), Status.STUNNED, 1)
+    SlotOfTargetedPlayer.setStatusEffect(SlotOfPreviousTargetedPlayer, Status.STUNNED, 1)
     if ImprovedExplosions == true:
         UpdatedDeathEffects()
     else:
         CoolDeathEffects()
-    getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).BouncePadCooldown = 0
-    getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).CurrentUltPercent += 15
-    kill(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL))
-    getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).PlayerDeaths += 1
-    getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).PlayerKills += 1
+    SlotOfTargetedPlayer.BouncePadCooldown = 0
+    SlotOfPreviousTargetedPlayer.CurrentUltPercent += 15
+    kill(SlotOfTargetedPlayer, SlotOfPreviousTargetedPlayer)
+    SlotOfTargetedPlayer.PlayerDeaths += 1
+    SlotOfPreviousTargetedPlayer.PlayerKills += 1
     BallDeleteRequested = true
     return
 
@@ -1145,9 +1047,9 @@ def DeflectFailed():
 def CoolDeathEffects():
     @Name "CoolDeathEffects sub"
     
-    createBeam(getAllPlayers(), Beam.BAD, getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL), getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createBeam(getAllPlayers(), Beam.BAD, SlotOfPreviousTargetedPlayer, SlotOfTargetedPlayer, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     deathBeam = getLastCreatedEntity()
-    deathSpherePos = getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getPosition()
+    deathSpherePos = SlotOfTargetedPlayer.getPosition()
     deathSphereRad = 30
     chase(deathSphereRad, 0, duration=0.25, ChaseReeval.DESTINATION_AND_DURATION)
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.SKY_BLUE, deathSpherePos, 40)
@@ -1164,7 +1066,7 @@ def CoolDeathEffects():
 def UpdatedDeathEffects():
     @Name "Updated Death Effects Sub"
     
-    deathSpherePos = getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).getPosition()
+    deathSpherePos = SlotOfTargetedPlayer.getPosition()
     #Make sure it is final duel AND there are at least 3 or more players
     if getNumberOfLivingPlayers(Team.ALL) == 2 and getNumberOfPlayers(Team.ALL) != 2:
         if FinalDuelNuke:
@@ -1227,7 +1129,7 @@ rule "Final duel":
 rule "Final duel - TEAMS":
     @Condition isGameInProgress() == true
     #@Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved]) == 2
-    @Condition (len([player for player in getLivingPlayers(Color.TEAM_1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Color.TEAM_2) if player.hasMoved]) == 1) == true
+    @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
     @Condition IsEnoughPlayersToStart == true
     @Condition IsInFinalDuel == false
     @Condition getCurrentGamemode() == Gamemode.TDM
@@ -1315,12 +1217,12 @@ rule "Check for last player surviving":
 
 rule "Team 1 Last Surviving":
     @Condition isGameInProgress() == true
-    @Condition getNumberOfLivingPlayers(Color.TEAM_2) == 0
+    @Condition getNumberOfLivingPlayers(Team.2) == 0
     @Condition IsEnoughPlayersToStart == true
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     IsInFinalDuel = false
-    addToTeamScore(Color.TEAM_1, 1)
+    addToTeamScore(Team.1, 1)
     wait(0.25)
     if (getMatchTime() == 0 or TieBreakerActive) and GameEndEnabled:
         #If there is alredy a tiebreaker, then the tiebreaker has ended.
@@ -1329,14 +1231,14 @@ rule "Team 1 Last Surviving":
         #__end__()
         HighestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
         #Check if there is more then 1 person with the highest score
-        if teamScore(Color.TEAM_1) == teamScore(Color.TEAM_2):
+        if teamScore(Team.1) == teamScore(Team.2):
             #There is more then 1, activate tie breaker
             TieBreakerActive = true
         else:
             TieBreakerActive = false
     stopChasingVariable(BallSpawnCountdown)
     stopChasingVariable(getAllPlayers().BouncePadCooldown)
-    bigMessage(getAllPlayers(), "{0} has won the round!".format(Color.TEAM_1))
+    bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.1))
     wait(2)
     if not TieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
@@ -1352,10 +1254,6 @@ rule "Team 1 Last Surviving":
     if not IsEnoughPlayersToStart:
         return
     RoundInProgress = false
-    if IncorrectTeam1ConfigCheck:
-        return
-    if IncorrectTeam2ConfigCheck:
-        return
     getAllPlayers().BouncePadCooldown = BouncePadCooldownLength
     SlotOfTargetedPlayer = -1
     BallSpawnCountdown = 5
@@ -1372,12 +1270,12 @@ rule "Team 1 Last Surviving":
 
 rule "Team 2 Last Surviving":
     @Condition isGameInProgress() == true
-    @Condition getNumberOfLivingPlayers(Color.TEAM_1) == 0
+    @Condition getNumberOfLivingPlayers(Team.1) == 0
     @Condition IsEnoughPlayersToStart == true
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     IsInFinalDuel = false
-    addToTeamScore(Color.TEAM_2, 1)
+    addToTeamScore(Team.2, 1)
     wait(0.25)
     if (getMatchTime() == 0 or TieBreakerActive) and GameEndEnabled:
         #If there is alredy a tiebreaker, then the tiebreaker has ended.
@@ -1386,14 +1284,14 @@ rule "Team 2 Last Surviving":
         #__end__()
         HighestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
         #Check if there is more then 1 person with the highest score
-        if teamScore(Color.TEAM_1) == teamScore(Color.TEAM_2):
+        if teamScore(Team.1) == teamScore(Team.2):
             #There is more then 1, activate tie breaker
             TieBreakerActive = true
         else:
             TieBreakerActive = false
     stopChasingVariable(BallSpawnCountdown)
     stopChasingVariable(getAllPlayers().BouncePadCooldown)
-    bigMessage(getAllPlayers(), "{0} has won the round!".format(Color.TEAM_2))
+    bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.2))
     wait(2)
     if not TieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
@@ -1409,10 +1307,6 @@ rule "Team 2 Last Surviving":
     if not IsEnoughPlayersToStart:
         return
     RoundInProgress = false
-    if IncorrectTeam1ConfigCheck:
-        return
-    if IncorrectTeam2ConfigCheck:
-        return
     getAllPlayers().BouncePadCooldown = BouncePadCooldownLength
     SlotOfTargetedPlayer = -1
     BallSpawnCountdown = 5
@@ -1639,17 +1533,17 @@ rule "No Undermaps":
 
 rule "Team 1 Win":
     @Condition AllowMatchEnd == true
-    @Condition teamScore(Color.TEAM_1) == ScoreToWin
+    @Condition teamScore(Team.1) == ScoreToWin
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     enableAnnouncer()
-    declareTeamVictory(Color.TEAM_1)
+    declareTeamVictory(Team.1)
 
 
 rule "Team 2 Win":
     @Condition AllowMatchEnd == true
-    @Condition teamScore(Color.TEAM_2) == ScoreToWin
+    @Condition teamScore(Team.2) == ScoreToWin
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     enableAnnouncer()
-    declareTeamVictory(Color.TEAM_2)
+    declareTeamVictory(Team.2)
