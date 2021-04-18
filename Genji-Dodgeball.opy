@@ -101,9 +101,6 @@ globalvar ExplosionSoundVolume 44
 globalvar ImprovedExplosions 45
 globalvar RandomExplosionSounds 46
 globalvar FinalDuelNuke 47
-globalvar IncorrectTeam2ConfigCheck 48
-globalvar IncorrectTeam1ConfigCheck 49
-globalvar IncorrectTeam2ConfigHUDColor 50
 globalvar AllowMatchEnd 51
 globalvar PassingDamage 52
 globalvar IsPassingTeam1 53
@@ -252,8 +249,6 @@ rule "Init global variables":
     ImprovedExplosions = true
     RandomExplosionSounds = true
     CooldownDashingEnabled = true
-    IncorrectTeam2ConfigCheck = false
-    IncorrectTeam2ConfigHUDColor = Color.RED
     PassingDamage = 100
     IsPassingTeam1 = false
     IsPassingTeam2 = false
@@ -521,97 +516,6 @@ rule "Wait for more players - TEAMS":
     IsEnoughPlayersToStart = true
     SlotOfTargetedPlayer = -1
     SlotOfPreviousTargetedPlayer = -1
-
-
-rule "Check for players in unauthorized slots - Team 1":
-    @Condition isGameInProgress() == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    #DO NOT DISABLE THIS. Don't say I didn't warn you.
-    if getPlayersInSlot(3, Color.TEAM_1) == true or getPlayersInSlot(4, Color.TEAM_1) == true or getPlayersInSlot(5, Color.TEAM_1) == true:
-        IncorrectTeam1ConfigCheck = true
-    else:
-        IncorrectTeam1ConfigCheck = false
-    wait(1)
-    goto RULE_START
-
-
-rule "Players in unauthorized slots - Team 1":
-    @Condition IncorrectTeam1ConfigCheck == true
-    @Condition RoundInProgress == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    if getPlayersInSlot(3, Color.TEAM_1) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 4 on team 1!".format(getPlayersInSlot(3, Color.TEAM_1)))
-        wait(1)
-    if getPlayersInSlot(4, Color.TEAM_1) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 5 on team 1!".format(getPlayersInSlot(4, Color.TEAM_1)))
-        wait(1)
-    if getPlayersInSlot(5, Color.TEAM_1) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 6 on team 1!".format(getPlayersInSlot(5, Color.TEAM_1)))
-        wait(1)
-    wait(5)
-    if RULE_CONDITION:
-        goto RULE_START
-
-
-rule "Create unauthorized slots HUD - Team 1":
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    hudHeader([player for player in getAllPlayers() if IncorrectTeam1ConfigCheck and not RoundInProgress], "Players are detected in slot(s) 4-6 on team 1! Game will not function in this state!", HudPosition.TOP, 0, IncorrectTeam2ConfigHUDColor, HudReeval.VISIBILITY_AND_COLOR, SpecVisibility.DEFAULT)
-    createInWorldText([player for player in getAllPlayers() if IncorrectTeam1ConfigCheck and not RoundInProgress], "The players in slot(s) 4-6 on team 1 must be moved to slots 4-6 or removed from the team!", vect(CircleCenter.x, CircleCenter.y + 1, CircleCenter.z), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_COLOR, IncorrectTeam2ConfigHUDColor, SpecVisibility.DEFAULT)
-
-
-rule "Check for players in unauthorized slots - Team 2":
-    @Condition isGameInProgress() == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    #DO NOT DISABLE THIS. Don't say I didn't warn you.
-    if getPlayersInSlot(0, Color.TEAM_2) == true or getPlayersInSlot(1, Color.TEAM_2) == true or getPlayersInSlot(2, Color.TEAM_2) == true:
-        IncorrectTeam2ConfigCheck = true
-    else:
-        IncorrectTeam2ConfigCheck = false
-    wait(1)
-    goto RULE_START
-
-
-rule "Players in unauthorized slots - Team 2":
-    @Condition IncorrectTeam2ConfigCheck == true
-    @Condition RoundInProgress == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    if getPlayersInSlot(0, Color.TEAM_2) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 1 on team 2!".format(getPlayersInSlot(0, Color.TEAM_2)))
-        wait(1)
-    if getPlayersInSlot(1, Color.TEAM_2) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 2 on team 2!".format(getPlayersInSlot(1, Color.TEAM_2)))
-        wait(1)
-    if getPlayersInSlot(2, Color.TEAM_2) == true:
-        smallMessage(getAllPlayers(), "{0} is not allowed in this slot! The game will not function properly with a player in slot 3 on team 2!".format(getPlayersInSlot(2, Color.TEAM_2)))
-        wait(1)
-    wait(5)
-    if RULE_CONDITION:
-        goto RULE_START
-
-
-rule "Create unauthorized slots HUD - Team 2":
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    hudHeader([player for player in getAllPlayers() if IncorrectTeam2ConfigCheck and not RoundInProgress], "Players are detected in slot(s) 1-3 on team 2! Game will not function in this state!", HudPosition.TOP, 0, IncorrectTeam2ConfigHUDColor, HudReeval.VISIBILITY_AND_COLOR, SpecVisibility.DEFAULT)
-    createInWorldText([player for player in getAllPlayers() if IncorrectTeam2ConfigCheck and not RoundInProgress], "The players in slot(s) 1-3 on team 2 must be moved to slots 4-6 or removed from the team!", vect(CircleCenter.x, CircleCenter.y + 0, CircleCenter.z), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_COLOR, IncorrectTeam2ConfigHUDColor, SpecVisibility.DEFAULT)
-
-
-rule "Pulse HUD color":
-    @Condition (IncorrectTeam1ConfigCheck or IncorrectTeam2ConfigCheck) == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
-    
-    if IncorrectTeam2ConfigHUDColor == Color.WHITE:
-        IncorrectTeam2ConfigHUDColor = Color.RED
-    else:
-        IncorrectTeam2ConfigHUDColor = Color.WHITE
-    wait(1.5)
-    if RULE_CONDITION:
-        goto RULE_START
 
 
 rule "// GAME RULES":
@@ -984,8 +888,6 @@ rule "Start round":
 
 rule "Start round - TEAMS":
     @Condition IsEnoughPlayersToStart == true
-    @Condition IncorrectTeam1ConfigCheck == false
-    @Condition IncorrectTeam2ConfigCheck == false
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.TDM
     
@@ -1352,10 +1254,6 @@ rule "Team 1 Last Surviving":
     if not IsEnoughPlayersToStart:
         return
     RoundInProgress = false
-    if IncorrectTeam1ConfigCheck:
-        return
-    if IncorrectTeam2ConfigCheck:
-        return
     getAllPlayers().BouncePadCooldown = BouncePadCooldownLength
     SlotOfTargetedPlayer = -1
     BallSpawnCountdown = 5
@@ -1409,10 +1307,6 @@ rule "Team 2 Last Surviving":
     if not IsEnoughPlayersToStart:
         return
     RoundInProgress = false
-    if IncorrectTeam1ConfigCheck:
-        return
-    if IncorrectTeam2ConfigCheck:
-        return
     getAllPlayers().BouncePadCooldown = BouncePadCooldownLength
     SlotOfTargetedPlayer = -1
     BallSpawnCountdown = 5
