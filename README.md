@@ -7,7 +7,7 @@ When the ball is red it is targeting you! Use your deflect to target someone els
 
 ## Team Deathmatch  
 The Team Deathmatch version is a version where passing is enabled by default. To pass, hold the Secondary Fire button and it will either pass to a teammate, or if none are alive, it will pass the ball back to yourself. Each pass will cost 100 health, you can get healed by deflecting the ball to a enemy or someone on either team dies.  
-**Team Deathmatch Code: CH4VG**  
+**Team Deathmatch Code: AWKWWM**  
 
 ## A personal note
 I am the so called founder of this game, although many names have influenced this game, and I am very proud of that.
