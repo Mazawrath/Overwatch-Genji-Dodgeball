@@ -1472,6 +1472,7 @@ rule "dash slow":
     @Event eachPlayer
     @Hero all
     @Condition eventPlayer.isUsingAbility1() == true
+    @Condition eventPlayer.isUsingUltimate() == false
     
     eventPlayer.DashNerf = true
     eventPlayer.moveSpeed = 0
@@ -1653,3 +1654,22 @@ rule "Team 2 Win":
     
     enableAnnouncer()
     declareTeamVictory(Color.TEAM_2)
+
+rule "No gravity while ulting":
+    @Event eachPlayer
+    @Condition eventPlayer.isUsingUltimate() == true
+
+    eventPlayer.setGravity(0)
+    waitUntil(eventPlayer.isUsingUltimate() == false, 60)
+    eventPlayer.setGravity(100)
+
+rule "Move in direciton of player":
+    @Event eachPlayer
+    @Condition eventPlayer.isUsingUltimate() == true
+    @Condition eventPlayer.getThrottle().x == 1
+
+    eventPlayer.applyImpulse(eventPlayer.getFacingDirection(), 5, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    wait(0.025)
+    if RULE_CONDITION:
+        goto RULE_START
+    
