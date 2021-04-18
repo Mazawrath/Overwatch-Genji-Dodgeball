@@ -637,7 +637,7 @@ rule "Shorten Deflect Length":
     @Event eachPlayer
     @Hero all
     @Condition eventPlayer.isUsingAbility2() == true
-    @Condition eventPlayer.isUsingUltimate() == false
+    #@Condition eventPlayer.isUsingUltimate() == false
     
     wait(0.3)
     eventPlayer.setAbility2Enabled(false)
