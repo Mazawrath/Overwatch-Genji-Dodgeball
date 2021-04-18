@@ -386,9 +386,9 @@ rule "Create ball & targeted effect - TEAMS":
     createEffect([player for player in getPlayers(Team.2) if IsPassingTeam2], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     if not RedGreenColorblindMode:
         #Team 1 Targeted Ball
-        createEffect([i for i in SlotOfTargetedPlayer if not IsPassingTeam1], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect([i for i in SlotOfTargetedPlayer if not IsPassingTeam1 and not IsPassingTeam2], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         #Team 2 Targeted Ball
-        createEffect([i for i in SlotOfTargetedPlayer if not IsPassingTeam2], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        #createEffect([i for i in SlotOfTargetedPlayer if not IsPassingTeam2], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect([player for player in getAllPlayers() if player != SlotOfTargetedPlayer], Effect.GOOD_AURA, Color.RED, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(SlotOfTargetedPlayer, Effect.GOOD_AURA, Color.RED, SlotOfTargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(SlotOfTargetedPlayer, Effect.GOOD_AURA, Color.RED, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
