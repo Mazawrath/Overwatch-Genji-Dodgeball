@@ -324,6 +324,7 @@ rule "Create player HUD elements":
     #eventPlayer.PlayerUI[4] = getLastCreatedEntity()
     #hudText(eventPlayer, ceil(eventPlayer.BouncePadCooldown), "Bouncepad", "Cooldown", HudPosition.RIGHT, -1, Color.GREEN, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #eventPlayer.PlayerUI[5] = getLastCreatedEntity()
+    hudText(eventPlayer, eventPlayer.getSpeed(), null, null, HudPosition.RIGHT, 0, Color.LIME_GREEN, Color.LIME_GREEN, Color.LIME_GREEN, HudReeval.STRING, SpecVisibility.NEVER)
 
 
 rule "Create bounce pads":
@@ -1136,6 +1137,8 @@ def DeflectFailed():
     getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).BouncePadCooldown = 0
     getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).CurrentUltPercent += 15
     kill(getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL), getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL))
+    # Give the player who got the kill ultimate
+    getPlayersInSlot(SlotOfPreviousTargetedPlayer,Team.ALL).setUltCharge(getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).getUltCharge() + 15)
     getPlayersInSlot(SlotOfTargetedPlayer, Team.ALL).PlayerDeaths += 1
     getPlayersInSlot(SlotOfPreviousTargetedPlayer, Team.ALL).PlayerKills += 1
     BallDeleteRequested = true
@@ -1666,10 +1669,43 @@ rule "No gravity while ulting":
 rule "Move in direciton of player":
     @Event eachPlayer
     @Condition eventPlayer.isUsingUltimate() == true
-    @Condition eventPlayer.getThrottle().x == 1
+    @Condition eventPlayer.getThrottle().z == 1
+    @Condition eventPlayer.getSpeed() < 30
 
-    eventPlayer.applyImpulse(eventPlayer.getFacingDirection(), 5, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.applyImpulse(eventPlayer.getFacingDirection(), 1, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
     wait(0.025)
     if RULE_CONDITION:
         goto RULE_START
-    
+
+rule "Move in opposite direciton of player":
+    @Event eachPlayer
+    @Condition eventPlayer.isUsingUltimate() == true
+    @Condition eventPlayer.getThrottle().z == -1
+    @Condition eventPlayer.getSpeed() < 30
+
+    eventPlayer.applyImpulse(eventPlayer.getFacingDirection() * -1, 1, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+    wait(0.025)
+    if RULE_CONDITION:
+        goto RULE_START
+
+rule "Move up when ulting and holding space":
+    @Event eachPlayer
+    @Condition eventPlayer.isUsingUltimate() == true
+    @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
+    @Condition eventPlayer.getSpeed() < 30
+
+    eventPlayer.applyImpulse(Vector.UP, 5, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    wait(0.025)
+    if RULE_CONDITION:
+        goto RULE_START
+
+rule "Move down when ulting and holding crouch":
+    @Event eachPlayer
+    @Condition eventPlayer.isUsingUltimate() == true
+    @Condition eventPlayer.isHoldingButton(Button.CROUCH) == true
+    @Condition eventPlayer.getSpeed() < 30
+
+    eventPlayer.applyImpulse(Vector.DOWN, 5, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    wait(0.025)
+    if RULE_CONDITION:
+        goto RULE_START
