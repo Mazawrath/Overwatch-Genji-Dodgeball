@@ -11,7 +11,7 @@ The Team Deathmatch version is a version where passing is enabled by default. To
 
 ## How to compile  
 `Genji-Dodgeball.opy` is a file format compatable with OverPy, a high-level language for the Overwatch Workshop with support for compilation and decompilation.  
-[Follow this tutorial for directions on how to compile this game.](https://github.com/Zezombye/overpy/wiki/General-usage)
+[Follow this tutorial for instructions on how to compile this game.](https://github.com/Zezombye/overpy/wiki/General-usage)
 
 ## A personal note
 I am the so called founder of this game, although many names have influenced this game, and I am very proud of that.
