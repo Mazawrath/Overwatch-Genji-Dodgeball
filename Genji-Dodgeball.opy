@@ -1670,7 +1670,7 @@ rule "Move in direciton of player":
     @Event eachPlayer
     @Condition eventPlayer.isUsingUltimate() == true
     @Condition eventPlayer.getThrottle().z == 1
-    @Condition eventPlayer.getSpeed() < 30
+    @Condition eventPlayer.getSpeed() < 15
 
     eventPlayer.applyImpulse(eventPlayer.getFacingDirection(), 1, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
     wait(0.025)
@@ -1681,7 +1681,7 @@ rule "Move in opposite direciton of player":
     @Event eachPlayer
     @Condition eventPlayer.isUsingUltimate() == true
     @Condition eventPlayer.getThrottle().z == -1
-    @Condition eventPlayer.getSpeed() < 30
+    @Condition eventPlayer.getSpeed() < 15
 
     eventPlayer.applyImpulse(eventPlayer.getFacingDirection() * -1, 1, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
     wait(0.025)
@@ -1692,7 +1692,7 @@ rule "Move up when ulting and holding space":
     @Event eachPlayer
     @Condition eventPlayer.isUsingUltimate() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
-    @Condition eventPlayer.getSpeed() < 30
+    # @Condition eventPlayer.getSpeed() < 30
 
     eventPlayer.applyImpulse(Vector.UP, 5, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     wait(0.025)
@@ -1703,7 +1703,7 @@ rule "Move down when ulting and holding crouch":
     @Event eachPlayer
     @Condition eventPlayer.isUsingUltimate() == true
     @Condition eventPlayer.isHoldingButton(Button.CROUCH) == true
-    @Condition eventPlayer.getSpeed() < 30
+    # @Condition eventPlayer.getSpeed() < 30
 
     eventPlayer.applyImpulse(Vector.DOWN, 5, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     wait(0.025)
