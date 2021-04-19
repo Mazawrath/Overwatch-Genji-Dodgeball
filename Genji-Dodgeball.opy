@@ -257,12 +257,12 @@ rule "Init global variables":
 
 
 rule "Create game sphere":
-    createEffect(getAllPlayers(), Effect.SPHERE, Color.BLACK, vect(CircleCenter.x, CircleCenter.y - 0, CircleCenter.z), CenterOffLimitsSize, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(getAllPlayers(), Effect.SPHERE, Color.BLACK, vect(CircleCenter.x, CircleCenter.y - 0, CircleCenter.z), CenterOffLimitsSize, EffectReeval.VISIBILITY)
     #Workshop Island doesn't need a circle.
     if getCurrentMap() != Map.WORKSHOP_ISLAND and getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT:
-        createEffect(getAllPlayers(), Effect.LIGHT_SHAFT, Color.ORANGE, vect(CircleCenter.x, CircleCenter.y - 15, CircleCenter.z), SphereSize, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(getAllPlayers(), Effect.LIGHT_SHAFT, Color.ORANGE, vect(CircleCenter.x, CircleCenter.y - 15, CircleCenter.z), SphereSize, EffectReeval.VISIBILITY)
     else:
-        createEffect([player for player in getAllPlayers() if distance(player.getPosition(), CircleCenter) >= SphereSize - 10], Effect.LIGHT_SHAFT, Color.BLUE, vect(CircleCenter.x, CircleCenter.y - 15, CircleCenter.z), SphereSize, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect([player for player in getAllPlayers() if distance(player.getPosition(), CircleCenter) >= SphereSize - 10], Effect.LIGHT_SHAFT, Color.BLUE, vect(CircleCenter.x, CircleCenter.y - 15, CircleCenter.z), SphereSize, EffectReeval.VISIBILITY)
 
 
 rule "Create global HUD elements":
@@ -270,7 +270,7 @@ rule "Create global HUD elements":
     hudSubtext([player for player in getAllPlayers() if player != SlotOfTargetedPlayer], "Current Player Targeted: {0}".format(SlotOfTargetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #red when you're targeted
     hudSubtext(SlotOfTargetedPlayer, "Current Player Targeted: {0}".format(SlotOfTargetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudText(getDeadPlayers(Team.ALL), "Waiting for next round", "You have been eliminated or joined during a round", "You will spawn once the next round starts", HudPosition.TOP, 2, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getDeadPlayers(Team.ALL), "Waiting for next round", "You have been eliminated or joined during a round", "You will spawn once the next round starts", HudPosition.TOP, 2, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     if BouncepadDashingEnabled or CooldownDashingEnabled:
         goto lbl_0
     #hudSubtext(getAllPlayers(), "Current Dashing Mode: None", HudPosition.LEFT, -1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
@@ -297,12 +297,12 @@ rule "Create global HUD elements":
     hudSubtext([player for player in getAllPlayers() if BallSpeed >= 35 and BallSpeed < 55], "Current Ball Speed: {0}".format(BallSpeed), HudPosition.LEFT, -3, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudSubtext([player for player in getAllPlayers() if BallSpeed > 55], "Current Ball Speed: {0}".format(BallSpeed), HudPosition.LEFT, -3, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudSubtext(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     if PassingEnabled:
         if getCurrentGamemode() == Gamemode.TDM:
-            hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to pass the ball to another teammate!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+            hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to pass the ball to another teammate!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
         elif getCurrentGamemode() == Gamemode.FFA:
-            hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to self pass the ball!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+            hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to self pass the ball!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
 
 
 rule "Create player HUD elements":
@@ -326,22 +326,22 @@ rule "Create bounce pads":
     BouncePad2 = vect(CircleCenter.x + BouncePadDistance * -1, CircleCenter.y, CircleCenter.z)
     BouncePad3 = vect(CircleCenter.x, CircleCenter.y, CircleCenter.z + BouncePadDistance * 1)
     BouncePad4 = vect(CircleCenter.x, CircleCenter.y, CircleCenter.z + BouncePadDistance * -1)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad1, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad2, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad3, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad4, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad1, 2, EffectReeval.VISIBILITY)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad2, 2, EffectReeval.VISIBILITY)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad3, 2, EffectReeval.VISIBILITY)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad4, 2, EffectReeval.VISIBILITY)
     if RedGreenColorblindMode:
         goto lbl_0
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad1, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad2, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad3, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad4, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad1, 2, EffectReeval.VISIBILITY)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad2, 2, EffectReeval.VISIBILITY)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad3, 2, EffectReeval.VISIBILITY)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad4, 2, EffectReeval.VISIBILITY)
     return
     lbl_0:
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad1, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad2, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad3, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad4, 2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad1, 2, EffectReeval.VISIBILITY)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad2, 2, EffectReeval.VISIBILITY)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad3, 2, EffectReeval.VISIBILITY)
+    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad4, 2, EffectReeval.VISIBILITY)
 
 
 rule "Create ball & targeted effect":
