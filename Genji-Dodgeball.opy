@@ -1059,7 +1059,7 @@ def UpdatedDeathEffects():
     #Make sure it is final duel AND there are at least 3 or more players
     if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 2 and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
-    if getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 1 or getNumberOfLivingPlayers(Team.2) == 1) and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
+    elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 1 or getNumberOfLivingPlayers(Team.2) == 1) and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
     playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION, Color.WHITE, deathSpherePos, 1)
     if RandomExplosionSounds:
