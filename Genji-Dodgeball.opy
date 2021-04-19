@@ -326,22 +326,18 @@ rule "Create bounce pads":
     BouncePad2 = vect(CircleCenter.x + BouncePadDistance * -1, CircleCenter.y, CircleCenter.z)
     BouncePad3 = vect(CircleCenter.x, CircleCenter.y, CircleCenter.z + BouncePadDistance * 1)
     BouncePad4 = vect(CircleCenter.x, CircleCenter.y, CircleCenter.z + BouncePadDistance * -1)
+    
+    # Bouncepad ready
     createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad1, 2, EffectReeval.VISIBILITY)
     createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad2, 2, EffectReeval.VISIBILITY)
     createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad3, 2, EffectReeval.VISIBILITY)
     createEffect([player for player in getAllPlayers() if player.BouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, BouncePad4, 2, EffectReeval.VISIBILITY)
-    if RedGreenColorblindMode:
-        goto lbl_0
+
+    # Bouncepad not ready
     createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad1, 2, EffectReeval.VISIBILITY)
     createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad2, 2, EffectReeval.VISIBILITY)
     createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad3, 2, EffectReeval.VISIBILITY)
     createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.WHITE, BouncePad4, 2, EffectReeval.VISIBILITY)
-    return
-    lbl_0:
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad1, 2, EffectReeval.VISIBILITY)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad2, 2, EffectReeval.VISIBILITY)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad3, 2, EffectReeval.VISIBILITY)
-    createEffect([player for player in getAllPlayers() if player.BouncePadCooldown > 0], Effect.RING, Color.YELLOW, BouncePad4, 2, EffectReeval.VISIBILITY)
 
 
 rule "Create ball & targeted effect":
