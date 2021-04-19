@@ -406,14 +406,7 @@ rule "Create ball & targeted effect - TEAMS":
 rule "Create ball countdown HUD":
     @Condition BallSpawnCountdown > 0
     
-    createInWorldText(getAllPlayers(), "Ball Spawning In: {0}".format(ceil(BallSpawnCountdown)), vect(CircleCenter.x, CircleCenter.y + 2.5, CircleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
-    BallSpawnCountdownHUD = getLastCreatedText()
-
-
-rule "Delete ball countdown HUD":
-    @Condition BallSpawnCountdown == 0
-    
-    destroyInWorldText(BallSpawnCountdownHUD)
+    createInWorldText([player for player in getAllPlayers() if BallSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(BallSpawnCountdown)), vect(CircleCenter.x, CircleCenter.y + 2.5, CircleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
 
 
 rule "Enable Scoreboard":
