@@ -228,8 +228,8 @@ rule "Init player variables":
 
 
 rule "Init global variables":
-    TargetedPlayer = -1
-    PreviousTargetedPlayer = -1
+    TargetedPlayer = null
+    PreviousTargetedPlayer = null
     BallSpawnCountdown = 3
     disableScoring()
     disableGamemodeCompletion()
@@ -487,8 +487,8 @@ rule "Wait for more players":
         return
     unpauseMatchTime()
     IsEnoughPlayersToStart = true
-    TargetedPlayer = -1
-    PreviousTargetedPlayer = -1
+    TargetedPlayer = null
+    PreviousTargetedPlayer = null
 
 
 rule "Wait for more players - TEAMS":
@@ -503,8 +503,8 @@ rule "Wait for more players - TEAMS":
         return
     unpauseMatchTime()
     IsEnoughPlayersToStart = true
-    TargetedPlayer = -1
-    PreviousTargetedPlayer = -1
+    TargetedPlayer = null
+    PreviousTargetedPlayer = null
 
 
 rule "// GAME RULES":
@@ -560,7 +560,7 @@ rule "Disable dash after using":
 
 rule "Target random player":
     @Condition isGameInProgress() == true
-    @Condition TargetedPlayer == -1
+    @Condition TargetedPlayer == null
     
     TargetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and PreviousTargetedPlayer != getPlayersInSlot(player, Team.ALL)]))
 
@@ -819,14 +819,14 @@ rule "Ball delete requested":
     @Condition BallDeleteRequested == true
     
     BallDeleteRequested = false
-    TargetedPlayer = -1
+    TargetedPlayer = null
     stopChasingVariable(BallDirection)
     stopChasingVariable(BallPosition)
     stopChasingVariable(BallSpeed)
     BallPosition = vect(0, -1, 0)
     BallDirection = vect(0, 0, 0)
     BallIsOut = false
-    PreviousTargetedPlayer = -1
+    PreviousTargetedPlayer = null
     BallSpawnCountdown = 2
     PrevBallPos = vect(0, 0, 0)
     PrevBallPos2 = vect(0, 0, 0)
@@ -1186,13 +1186,13 @@ rule "Check for last player surviving":
         #During tiebreaker, only revive the people who have the same score as the highest score.
         ([player for player in getDeadPlayers(Team.ALL) if player.getScore() == HighestScore]).resurrect()
         wait(0.25)
-        TargetedPlayer = -1
+        TargetedPlayer = null
         bigMessage(getAllPlayers(), "Tiebreaker!")
     if not IsEnoughPlayersToStart:
         return
     RoundInProgress = false
     getAllPlayers().BouncePadCooldown = BouncePadCooldownLength
-    TargetedPlayer = -1
+    TargetedPlayer = null
     BallSpawnCountdown = 5
     wait(1)
     RoundInProgress = true
@@ -1238,14 +1238,14 @@ rule "Team 1 Last Surviving":
         #During tiebreaker, only revive the people who have the same score as the highest score.
         ([player for player in getDeadPlayers(Team.ALL) if player.getScore() == HighestScore]).resurrect()
         wait(0.25)
-        TargetedPlayer = -1
+        TargetedPlayer = null
         bigMessage(getAllPlayers(), "Tiebreaker!")
     heal(getAllPlayers(), null, 200)
     if not IsEnoughPlayersToStart:
         return
     RoundInProgress = false
     getAllPlayers().BouncePadCooldown = BouncePadCooldownLength
-    TargetedPlayer = -1
+    TargetedPlayer = null
     BallSpawnCountdown = 5
     wait(1)
     RoundInProgress = true
@@ -1291,14 +1291,14 @@ rule "Team 2 Last Surviving":
         #During tiebreaker, only revive the people who have the same score as the highest score.
         ([player for player in getDeadPlayers(Team.ALL) if player.getScore() == HighestScore]).resurrect()
         wait(0.25)
-        TargetedPlayer = -1
+        TargetedPlayer = null
         bigMessage(getAllPlayers(), "Tiebreaker!")
     heal(getAllPlayers(), null, 200)
     if not IsEnoughPlayersToStart:
         return
     RoundInProgress = false
     getAllPlayers().BouncePadCooldown = BouncePadCooldownLength
-    TargetedPlayer = -1
+    TargetedPlayer = null
     BallSpawnCountdown = 5
     wait(1)
     RoundInProgress = true
