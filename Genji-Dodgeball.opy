@@ -434,7 +434,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not WatermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by u/Mazawrath. Version v7.0.0", HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by u/Mazawrath. Version v7.0.0", HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -444,7 +444,7 @@ rule "Check for <2 players":
     @Condition getCurrentGamemode() == Gamemode.FFA
     
     IsInFinalDuel = false
-    hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     WaitingForPlayersHUD = getLastCreatedText()
     IsEnoughPlayersToStart = false
     stopChasingVariable(BallSpawnCountdown)
@@ -463,7 +463,7 @@ rule "Check for <2 players - TEAMS":
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     IsInFinalDuel = false
-    hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     WaitingForPlayersHUD = getLastCreatedText()
     IsEnoughPlayersToStart = false
     stopChasingVariable(BallSpawnCountdown)
