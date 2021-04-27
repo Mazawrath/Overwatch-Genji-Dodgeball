@@ -939,6 +939,7 @@ rule "Ball reaches player":
     lbl_1:
     BallDirection = TargetedPlayer.getFacingDirection()
     wait(0.001)
+    # Check if player is passing and if passing is enabled
     if PreviousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and PassingEnabled:
         IsPassingTeam1 = true
         playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, PreviousTargetedPlayer.getPosition(), 10)
@@ -985,6 +986,7 @@ rule "Ball reaches player -TEAMS":
     lbl_1:
     BallDirection = TargetedPlayer.getFacingDirection()
     wait(0.001)
+    # Check if player is passing and if passing is enabled
     if PreviousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and PassingEnabled:
         #if PreviousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
         playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, PreviousTargetedPlayer.getPosition(), 10)
