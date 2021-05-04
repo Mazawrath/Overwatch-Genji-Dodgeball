@@ -743,7 +743,6 @@ rule "Bounce when near pad 1":
     @Condition eventPlayer.BouncePadCooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
-    @Condition eventPlayer.hasStatusEffect(Status.KNOCKED_DOWN) == false
     
     eventPlayer.IsDashEnabled = true
     if eventPlayer.DashNerf:
@@ -764,7 +763,6 @@ rule "Bounce when near pad 2":
     @Condition eventPlayer.BouncePadCooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
-    @Condition eventPlayer.hasStatusEffect(Status.KNOCKED_DOWN) == false
     
     eventPlayer.IsDashEnabled = true
     if eventPlayer.DashNerf:
@@ -785,7 +783,6 @@ rule "Bounce when near pad 3":
     @Condition eventPlayer.BouncePadCooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
-    @Condition eventPlayer.hasStatusEffect(Status.KNOCKED_DOWN) == false
     
     eventPlayer.IsDashEnabled = true
     if eventPlayer.DashNerf:
@@ -806,7 +803,6 @@ rule "Bounce when near pad 4":
     @Condition eventPlayer.BouncePadCooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
-    @Condition eventPlayer.hasStatusEffect(Status.KNOCKED_DOWN) == false
     
     eventPlayer.IsDashEnabled = true
     if eventPlayer.DashNerf:
