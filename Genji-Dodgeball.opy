@@ -519,10 +519,15 @@ rule "Player joins game":
     
     if not RoundInProgress or not isGameInProgress():
         goto lbl_0
+    eventPlayer.teleport(CircleCenter + vect(0, 500, 0))
+    eventPlayer.setInvisibility(Invis.ALL)
     kill(eventPlayer, null)
+    wait(0.25)
     lbl_0:
     eventPlayer.teleport(CircleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
     eventPlayer.hasMoved = true
+    waitUntil(not RoundInProgress or not isGameInProgress(), 9999)
+    eventPlayer.setInvisibility(Invis.NONE)  
 
 
 rule "Shorten Deflect Length":
