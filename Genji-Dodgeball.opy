@@ -72,8 +72,8 @@ globalvar BouncePad1 15
 globalvar BouncePad2 16
 globalvar BouncePad3 17
 globalvar BouncePad4 18
-globalvar deathSphere 19
-globalvar deathSphereRad 20
+globalvar DeathSphere 19
+globalvar DeathSphereRad 20
 globalvar IsEnoughPlayersToStart 21
 globalvar WaitingForPlayersHUD 22
 globalvar CenterOffLimitsSize 23
@@ -84,8 +84,8 @@ globalvar WatermarkEnabled 27
 globalvar BouncepadDashingEnabled 28
 globalvar GameEndEnabled 29
 globalvar CooldownDashingEnabled 30
-globalvar deathSpherePos 31
-globalvar deathBeam 32
+globalvar DeathSpherePos 31
+globalvar DeathBeam 32
 globalvar BallDirection 33
 globalvar BallCollisionSurfaceNormal 34
 globalvar PrevBallPos 35
@@ -112,7 +112,7 @@ globalvar BouncePadSuperjumpNerf 57
 
 #Player variables
 
-playervar hasMoved 0
+playervar HasMoved 0
 playervar CurrentUltPercent 1
 playervar BouncePadCooldown 2
 playervar PlayerDeflects 4
@@ -121,11 +121,11 @@ playervar PlayerDeaths 6
 playervar PlayerEffects 7
 playervar PlayerUI 8
 playervar IsDashEnabled 9
-playervar moveSpeed 10
-playervar maxBallSpeed 11
-playervar antiFloatProtection 12
-playervar antiFloatTimer 13
-playervar antiStuckProtection 14
+playervar MoveSpeed 10
+playervar MaxBallSpeed 11
+playervar AntiFloatProtection 12
+playervar AntiFloatTimer 13
+playervar AntiStuckProtection 14
 playervar ToggleHUD 15
 playervar DashNerf 16
 
@@ -218,8 +218,8 @@ rule "Init player variables":
     eventPlayer.disableRespawn()
     eventPlayer.enableDeathSpectateAllPlayers()
     eventPlayer.BouncePadCooldown = BouncePadCooldownLength
-    eventPlayer.antiFloatProtection = false
-    eventPlayer.antiStuckProtection = false
+    eventPlayer.AntiFloatProtection = false
+    eventPlayer.AntiStuckProtection = false
     eventPlayer.ToggleHUD = true
     eventPlayer.DashNerf = false
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
@@ -315,7 +315,7 @@ rule "Create player HUD elements":
     #eventPlayer.PlayerUI[2] = getLastCreatedEntity()
     #hudText(eventPlayer, eventPlayer.PlayerDeaths, "Deaths", null, HudPosition.LEFT, 3, Color.SKY_BLUE, Color.WHITE, Color.SKY_BLUE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #eventPlayer.PlayerUI[3] = getLastCreatedEntity()
-    #hudText(eventPlayer, eventPlayer.maxBallSpeed, "Max Deflect Speed", null, HudPosition.LEFT, 4, Color.RED, Color.WHITE, Color.TURQUOISE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    #hudText(eventPlayer, eventPlayer.MaxBallSpeed, "Max Deflect Speed", null, HudPosition.LEFT, 4, Color.RED, Color.WHITE, Color.TURQUOISE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #eventPlayer.PlayerUI[4] = getLastCreatedEntity()
     #hudText(eventPlayer, ceil(eventPlayer.BouncePadCooldown), "Bouncepad", "Cooldown", HudPosition.RIGHT, -1, Color.GREEN, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #eventPlayer.PlayerUI[5] = getLastCreatedEntity()
@@ -513,7 +513,7 @@ rule "// GAME RULES":
 rule "Player joins game":
     @Event eachPlayer
     @Hero all
-    @Condition eventPlayer.hasMoved == false
+    @Condition eventPlayer.HasMoved == false
     #@Condition isGameInProgress() == true
     @Condition eventPlayer.hasSpawned() == true
     
@@ -525,7 +525,7 @@ rule "Player joins game":
     wait(0.25)
     lbl_0:
     eventPlayer.teleport(CircleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
-    eventPlayer.hasMoved = true
+    eventPlayer.HasMoved = true
     waitUntil(not RoundInProgress or not isGameInProgress(), 9999)
     eventPlayer.setInvisibility(Invis.NONE)  
 
@@ -567,7 +567,7 @@ rule "Target random player":
     @Condition isGameInProgress() == true
     @Condition TargetedPlayer == null
     
-    TargetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and PreviousTargetedPlayer != getPlayersInSlot(player, Team.ALL)]))
+    TargetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.HasMoved and PreviousTargetedPlayer != getPlayersInSlot(player, Team.ALL)]))
 
 
 rule "Push to circle":
@@ -652,10 +652,10 @@ rule "Anti-Bounce Detection Positive X":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(eventPlayer.AntiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
-    eventPlayer.antiFloatProtection = true
+    eventPlayer.AntiFloatProtection = true
     wait(0.25)
     if RULE_CONDITION:
         goto RULE_START
@@ -669,10 +669,10 @@ rule "Anti-Bounce Detection Netgative X":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(eventPlayer.AntiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
-    eventPlayer.antiFloatProtection = true
+    eventPlayer.AntiFloatProtection = true
     wait(0.25)
     if RULE_CONDITION:
         goto RULE_START
@@ -686,10 +686,10 @@ rule "Anti-Bounce Detection Positive Z":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(eventPlayer.AntiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
-    eventPlayer.antiFloatProtection = true
+    eventPlayer.AntiFloatProtection = true
     wait(0.25)
     if RULE_CONDITION:
         goto RULE_START
@@ -703,10 +703,10 @@ rule "Anti-Bounce Detection Negative Z":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(eventPlayer.AntiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
-    eventPlayer.antiFloatProtection = true
+    eventPlayer.AntiFloatProtection = true
     wait(0.25)
     if RULE_CONDITION:
         goto RULE_START
@@ -716,12 +716,12 @@ rule "Disable Anti-Bounce":
     @Event eachPlayer
     @Hero all
     @Condition eventPlayer.getPosition().y >= 0
-    @Condition eventPlayer.antiFloatProtection == true
+    @Condition eventPlayer.AntiFloatProtection == true
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
     eventPlayer.stopForcingThrottle()
-    eventPlayer.antiFloatProtection = false
+    eventPlayer.AntiFloatProtection = false
 
 
 rule "Anti-Stuck Activation":
@@ -934,8 +934,8 @@ rule "Ball reaches player":
     TargetedPlayer.PlayerDeflects += 1
     PreviousTargetedPlayer = TargetedPlayer
     BallSpeed = min(500, BallSpeed * 1.05)
-    if BallSpeed > TargetedPlayer.maxBallSpeed:
-        TargetedPlayer.maxBallSpeed = BallSpeed
+    if BallSpeed > TargetedPlayer.MaxBallSpeed:
+        TargetedPlayer.MaxBallSpeed = BallSpeed
     stopChasingVariable(BallDirection)
     lbl_1:
     BallDirection = TargetedPlayer.getFacingDirection()
@@ -981,8 +981,8 @@ rule "Ball reaches player -TEAMS":
     TargetedPlayer.PlayerDeflects += 1
     PreviousTargetedPlayer = TargetedPlayer
     BallSpeed = min(500, BallSpeed * 1.05)
-    if BallSpeed > TargetedPlayer.maxBallSpeed:
-        TargetedPlayer.maxBallSpeed = BallSpeed
+    if BallSpeed > TargetedPlayer.MaxBallSpeed:
+        TargetedPlayer.MaxBallSpeed = BallSpeed
     stopChasingVariable(BallDirection)
     lbl_1:
     BallDirection = TargetedPlayer.getFacingDirection()
@@ -1040,52 +1040,52 @@ def CoolDeathEffects():
     @Name "CoolDeathEffects sub"
     
     createBeam(getAllPlayers(), Beam.BAD, PreviousTargetedPlayer, TargetedPlayer, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    deathBeam = getLastCreatedEntity()
-    deathSpherePos = TargetedPlayer.getPosition()
-    deathSphereRad = 30
-    chase(deathSphereRad, 0, duration=0.25, ChaseReeval.DESTINATION_AND_DURATION)
-    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.SKY_BLUE, deathSpherePos, 40)
-    createEffect(getAllPlayers(), Effect.SPHERE, Color.BLACK, deathSpherePos, deathSphereRad, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    deathSphere = getLastCreatedEntity()
-    playEffect(getAllPlayers(), DynamicEffect.GOOD_EXPLOSION, Color.WHITE, deathSpherePos, 5)
+    DeathBeam = getLastCreatedEntity()
+    DeathSpherePos = TargetedPlayer.getPosition()
+    DeathSphereRad = 30
+    chase(DeathSphereRad, 0, duration=0.25, ChaseReeval.DESTINATION_AND_DURATION)
+    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.SKY_BLUE, DeathSpherePos, 40)
+    createEffect(getAllPlayers(), Effect.SPHERE, Color.BLACK, DeathSpherePos, DeathSphereRad, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    DeathSphere = getLastCreatedEntity()
+    playEffect(getAllPlayers(), DynamicEffect.GOOD_EXPLOSION, Color.WHITE, DeathSpherePos, 5)
     wait(0.25)
-    destroyEffect(deathSphere)
-    #playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.RED, deathSpherePos, SphereSize * 1.5)
-    #playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, deathSpherePos, 40)
-    destroyEffect(deathBeam)
+    destroyEffect(DeathSphere)
+    #playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.RED, DeathSpherePos, SphereSize * 1.5)
+    #playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, DeathSpherePos, 40)
+    destroyEffect(DeathBeam)
 
 
 def UpdatedDeathEffects():
     @Name "Updated Death Effects Sub"
     
-    deathSpherePos = TargetedPlayer.getPosition()
+    DeathSpherePos = TargetedPlayer.getPosition()
     #Make sure it is final duel AND there are at least 3 or more players
     if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 2 and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
-            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
+            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(DeathSpherePos.x, 0, DeathSpherePos.z), 0)
     elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 1 or getNumberOfLivingPlayers(Team.2) == 1) and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
-            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
-    playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION, Color.WHITE, deathSpherePos, 1)
+            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(DeathSpherePos.x, 0, DeathSpherePos.z), 0)
+    playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION, Color.WHITE, DeathSpherePos, 1)
     if RandomExplosionSounds:
         #Pick a random explosion sound
         RandomExplosionPicker = random.randint(0, 4)
         if RandomExplosionPicker == 0:
-            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT_SOUND, Color.WHITE, deathSpherePos, ExplosionSoundVolume)
+            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT_SOUND, Color.WHITE, DeathSpherePos, ExplosionSoundVolume)
         elif RandomExplosionPicker == 1:
-            playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, ExplosionSoundVolume)
+            playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION_SOUND, Color.WHITE, DeathSpherePos, ExplosionSoundVolume)
         elif RandomExplosionPicker == 2:
-            playEffect(getAllPlayers(), DynamicEffect.ASHE_DYNAMITE_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, ExplosionSoundVolume)
+            playEffect(getAllPlayers(), DynamicEffect.ASHE_DYNAMITE_EXPLOSION_SOUND, Color.WHITE, DeathSpherePos, ExplosionSoundVolume)
         elif RandomExplosionPicker == 3:
-            playEffect(getAllPlayers(), DynamicEffect.PHARAH_BARRAGE_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, ExplosionSoundVolume)
+            playEffect(getAllPlayers(), DynamicEffect.PHARAH_BARRAGE_EXPLOSION_SOUND, Color.WHITE, DeathSpherePos, ExplosionSoundVolume)
         elif RandomExplosionPicker == 4:
-            playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_FRAG_LAUNCHER_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, ExplosionSoundVolume)
+            playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_FRAG_LAUNCHER_EXPLOSION_SOUND, Color.WHITE, DeathSpherePos, ExplosionSoundVolume)
     else:
-        #playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT_SOUND, Color.WHITE, deathSpherePos, ExplosionSoundVolume)
-        playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_FRAG_LAUNCHER_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, ExplosionSoundVolume)
+        #playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT_SOUND, Color.WHITE, DeathSpherePos, ExplosionSoundVolume)
+        playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_FRAG_LAUNCHER_EXPLOSION_SOUND, Color.WHITE, DeathSpherePos, ExplosionSoundVolume)
 
 
 rule "Final duel":
     @Condition isGameInProgress() == true
-    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved]) == 2
+    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.HasMoved]) == 2
     @Condition IsEnoughPlayersToStart == true
     @Condition IsInFinalDuel == false
     @Condition getCurrentGamemode() == Gamemode.FFA
@@ -1121,8 +1121,8 @@ rule "Final duel":
 
 rule "Final duel - TEAMS":
     @Condition isGameInProgress() == true
-    #@Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved]) == 2
-    @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
+    #@Condition len([player for player in getLivingPlayers(Team.ALL) if player.HasMoved]) == 2
+    @Condition (len([player for player in getLivingPlayers(Team.1) if player.HasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.HasMoved]) == 1) == true
     @Condition IsEnoughPlayersToStart == true
     @Condition IsInFinalDuel == false
     @Condition getCurrentGamemode() == Gamemode.TDM
@@ -1361,11 +1361,11 @@ rule "dash slow":
     @Condition eventPlayer.isUsingAbility1() == true
     
     eventPlayer.DashNerf = true
-    eventPlayer.moveSpeed = 0
-    chase(eventPlayer.moveSpeed, 100, rate=max(eventPlayer.moveSpeed, 16) ** 1.25, ChaseReeval.DESTINATION_AND_RATE)
-    while eventPlayer.moveSpeed != 100:
-        eventPlayer.setMoveSpeed(eventPlayer.moveSpeed)
-        eventPlayer.setGravity(eventPlayer.moveSpeed)
+    eventPlayer.MoveSpeed = 0
+    chase(eventPlayer.MoveSpeed, 100, rate=max(eventPlayer.MoveSpeed, 16) ** 1.25, ChaseReeval.DESTINATION_AND_RATE)
+    while eventPlayer.MoveSpeed != 100:
+        eventPlayer.setMoveSpeed(eventPlayer.MoveSpeed)
+        eventPlayer.setGravity(eventPlayer.MoveSpeed)
         wait(0.1)
     eventPlayer.setMoveSpeed(100)
     eventPlayer.setGravity(100)
