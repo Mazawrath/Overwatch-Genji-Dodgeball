@@ -1086,7 +1086,7 @@ def UpdatedDeathEffects():
     
     DeathSpherePos = TargetedPlayer.getPosition()
     #Make sure it is final duel AND there are at least 3 or more players
-    if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 2 and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
+    if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 1 and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(DeathSpherePos.x, 0, DeathSpherePos.z), 0)
     elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0) and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(DeathSpherePos.x, 0, DeathSpherePos.z), 0)
