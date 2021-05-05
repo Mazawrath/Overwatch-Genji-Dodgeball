@@ -522,7 +522,7 @@ rule "Player joins game":
     #@Condition isGameInProgress() == true
     @Condition eventPlayer.hasSpawned() == true
     
-    if RoundInProgress or isGameInProgress():
+    if RoundInProgress and isGameInProgress():
         eventPlayer.teleport(CircleCenter + vect(0, 500, 0))
         eventPlayer.setInvisibility(Invis.ALL)
         wait(0.05)
