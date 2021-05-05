@@ -8,7 +8,8 @@ settings {
         "enableMatchVoiceChat": true,
         "spectatorSlots": 6,
         "returnToLobby": "never",
-        "swapTeamsAfterMatch": false
+        "swapTeamsAfterMatch": false,
+        "teamBalancing": "afterGame"
     },
     "gamemodes": {
         "ffa": {
