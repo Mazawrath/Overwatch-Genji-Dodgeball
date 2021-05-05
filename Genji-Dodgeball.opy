@@ -110,6 +110,7 @@ globalvar PassingEnabled 56
 globalvar BouncePadSuperjumpNerf 57
 globalvar PassingPlayer 58
 globalvar PassingAssistId 59
+globalvar PassingPlayerName 60
 
 
 #Player variables
@@ -254,6 +255,7 @@ rule "Init global variables":
     PassingDamage = 100
     IsPassingTeam1 = false
     IsPassingTeam2 = false
+    PassingPlayer = null
     if getCurrentGamemode() == Gamemode.FFA:
         GameEndEnabled = true
 
@@ -967,11 +969,9 @@ rule "Ball reaches player -TEAMS":
         if TargetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if TargetedPlayer.isUsingAbility2() or TargetedPlayer.isUsingAbility1():
-        goto lbl_0
-    DeflectFailed()
-    return
-    lbl_0:
+    if not TargetedPlayer.isUsingAbility2() and not TargetedPlayer.isUsingAbility1():
+        DeflectFailed()
+        return
     #if TargetedPlayer.isUsingAbility2() or TargetedPlayer.isUsingAbility1():
     #        goto lbl_1
     if TargetedPlayer.isUsingAbility1():
@@ -995,7 +995,7 @@ rule "Ball reaches player -TEAMS":
         playEffect(PreviousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, PreviousTargetedPlayer.getPosition(), 100)
         PreviousTargetedPlayer.setHealth(PassingDamage)
         stopAssist(PassingAssistId)
-        PassingPlayer = null
+        #PassingPlayer = null
         #Check which team is passing
         if PreviousTargetedPlayer.getTeam() == Team.1:
             IsPassingTeam1 = true
@@ -1015,7 +1015,7 @@ rule "Ball reaches player -TEAMS":
         # Only clear the passing player if this isn't that passing players ball
         if IsPassingTeam1 == false or IsPassingTeam2 == false:
             stopAssist(PassingAssistId)
-            PassingPlayer = null
+            #PassingPlayer = null
         heal(PreviousTargetedPlayer, null, PassingDamage)
         IsPassingTeam1 = false
         IsPassingTeam2 = false
@@ -1043,13 +1043,17 @@ def DeflectFailed():
     IsPassingTeam1 = false
     IsPassingTeam2 = false
     TargetedPlayer.setStatusEffect(PreviousTargetedPlayer, Status.STUNNED, 1)
+    TargetedPlayer.BouncePadCooldown = 0
+    PreviousTargetedPlayer.CurrentUltPercent += 15
+    kill(TargetedPlayer, PreviousTargetedPlayer)
     if ImprovedExplosions == true:
         UpdatedDeathEffects()
     else:
         CoolDeathEffects()
-    TargetedPlayer.BouncePadCooldown = 0
-    PreviousTargetedPlayer.CurrentUltPercent += 15
-    kill(TargetedPlayer, PreviousTargetedPlayer)
+    if PassingPlayer and TargetedPlayer.:
+        # Please don't ask me why I need to do this. I don't know either.
+        PassingPlayerName = PassingPlayer
+        smallMessage(getAllPlayers(), "Passing assist from {0}!".format(PassingPlayerName))
     stopAssist(PassingAssistId)
     PassingPlayer = null
     TargetedPlayer.PlayerDeaths += 1
@@ -1084,7 +1088,7 @@ def UpdatedDeathEffects():
     #Make sure it is final duel AND there are at least 3 or more players
     if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 2 and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(DeathSpherePos.x, 0, DeathSpherePos.z), 0)
-    elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 1 or getNumberOfLivingPlayers(Team.2) == 1) and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
+    elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0) and getNumberOfPlayers(Team.ALL) != 2 and FinalDuelNuke:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(DeathSpherePos.x, 0, DeathSpherePos.z), 0)
     playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION, Color.WHITE, DeathSpherePos, 1)
     if RandomExplosionSounds:
