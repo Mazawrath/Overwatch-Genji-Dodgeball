@@ -519,16 +519,14 @@ rule "Player joins game":
     #@Condition isGameInProgress() == true
     @Condition eventPlayer.hasSpawned() == true
     
-    if not RoundInProgress or not isGameInProgress():
-        goto lbl_0
-    eventPlayer.teleport(CircleCenter + vect(0, 500, 0))
-    eventPlayer.setInvisibility(Invis.ALL)
-    kill(eventPlayer, null)
-    wait(0.25)
-    lbl_0:
+    if RoundInProgress or isGameInProgress():
+        eventPlayer.teleport(CircleCenter + vect(0, 500, 0))
+        eventPlayer.setInvisibility(Invis.ALL)
+        kill(eventPlayer, null)
+        wait(0.25)
     eventPlayer.teleport(CircleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
     eventPlayer.HasMoved = true
-    waitUntil(not RoundInProgress or not isGameInProgress(), 9999)
+    waitUntil((not RoundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
     eventPlayer.setInvisibility(Invis.NONE)  
 
 
