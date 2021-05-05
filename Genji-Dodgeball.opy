@@ -1050,7 +1050,7 @@ def DeflectFailed():
         UpdatedDeathEffects()
     else:
         CoolDeathEffects()
-    if PassingPlayer and TargetedPlayer.:
+    if PassingPlayer and TargetedPlayer.getTeam() != PassingPlayer.getTeam():
         # Please don't ask me why I need to do this. I don't know either.
         PassingPlayerName = PassingPlayer
         smallMessage(getAllPlayers(), "Passing assist from {0}!".format(PassingPlayerName))
