@@ -108,6 +108,8 @@ globalvar IsPassingTeam2 54
 globalvar ScoreToWin 55
 globalvar PassingEnabled 56
 globalvar BouncePadSuperjumpNerf 57
+globalvar PassingPlayer 58
+globalvar PassingAssistId 59
 
 
 #Player variables
@@ -993,6 +995,8 @@ rule "Ball reaches player -TEAMS":
         playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, PreviousTargetedPlayer.getPosition(), 10)
         playEffect(PreviousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, PreviousTargetedPlayer.getPosition(), 100)
         PreviousTargetedPlayer.setHealth(PassingDamage)
+        stopAssist(PassingAssistId)
+        PassingPlayer = null
         #Check which team is passing
         if PreviousTargetedPlayer.getTeam() == Team.1:
             IsPassingTeam1 = true
@@ -1003,9 +1007,16 @@ rule "Ball reaches player -TEAMS":
             TargetedPlayer = PreviousTargetedPlayer
             #Pass to another teammate
         else:
+            PassingPlayer = PreviousTargetedPlayer
+            PassingPlayer.startGrantingAssistFor(getAllPlayers(), AssistReeval.NONE)
+            PassingAssistId = getLastAssistID()
             TargetedPlayer = ((sorted([player for player in getLivingPlayers(PreviousTargetedPlayer.getTeam()) if player != PreviousTargetedPlayer], lambda i: angleBetweenVectors(TargetedPlayer.getFacingDirection(), directionTowards(TargetedPlayer, i.getPosition()))))[0])
         #Not passing, heal the person deflecting and target someone on the other team
     else:
+        # Only clear the passing player if this isn't that passing players ball
+        if IsPassingTeam1 == false or IsPassingTeam2 == false:
+            stopAssist(PassingAssistId)
+            PassingPlayer = null
         heal(PreviousTargetedPlayer, null, PassingDamage)
         IsPassingTeam1 = false
         IsPassingTeam2 = false
@@ -1014,6 +1025,16 @@ rule "Ball reaches player -TEAMS":
     #If deflecting and stuff breaks...disabling this is why.
     #if RULE_CONDITION:
     #        goto RULE_START
+
+
+rule "End assist after a second":
+    @Condition PassingPlayer != null
+    @Condition getCurrentGamemode() == Gamemode.TDM
+
+    waitUntil(PreviousTargetedPlayer != PassingPlayer, 10)
+    wait(1)
+    stopAssist(PassingAssistId)
+    PassingPlayer = null
 
 
 def DeflectFailed():
@@ -1030,6 +1051,8 @@ def DeflectFailed():
     TargetedPlayer.BouncePadCooldown = 0
     PreviousTargetedPlayer.CurrentUltPercent += 15
     kill(TargetedPlayer, PreviousTargetedPlayer)
+    stopAssist(PassingAssistId)
+    PassingPlayer = null
     TargetedPlayer.PlayerDeaths += 1
     PreviousTargetedPlayer.PlayerKills += 1
     BallDeleteRequested = true
