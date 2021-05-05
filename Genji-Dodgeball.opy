@@ -522,6 +522,7 @@ rule "Player joins game":
     if RoundInProgress or isGameInProgress():
         eventPlayer.teleport(CircleCenter + vect(0, 500, 0))
         eventPlayer.setInvisibility(Invis.ALL)
+        wait(0.05)
         kill(eventPlayer, null)
         wait(0.25)
     eventPlayer.teleport(CircleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
