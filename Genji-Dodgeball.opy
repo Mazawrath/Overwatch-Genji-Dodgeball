@@ -1447,16 +1447,13 @@ rule "Ball change color":
     #BallTail2 = getLastCreatedEntity()
     #BallColor = 1
     #elif BallColor != 2 and BallSpeed >= 25 and BallSpeed < 30:
-    destroyEffect(BallSmoke)
-    destroyEffect(BallTail1)
-    destroyEffect(BallTail2)
+    # destroyEffect(BallSmoke)
+    # destroyEffect(BallTail1)
+    # destroyEffect(BallTail2)
     #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.YELLOW, BallPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #BallSmoke = getLastCreatedEntity()
     createBeam(getAllPlayers(), Beam.BAD, PrevBallPos, BallPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    BallTail1 = getLastCreatedEntity()
     createBeam(getAllPlayers(), Beam.BAD, PrevBallPos, PrevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    BallTail2 = getLastCreatedEntity()
-    BallColor = 2
     #elif BallColor != 3 and BallSpeed >= 30 and BallSpeed < 35:
     #destroyEffect(BallSmoke)
     #destroyEffect(BallTail1)
@@ -1491,14 +1488,6 @@ rule "Ball change color":
     #BallTail2 = getLastCreatedEntity()
     #BallColor = 5
     #__end__()
-    wait(1)
-    if RULE_CONDITION:
-        goto RULE_START
-    playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.GREEN, BallPosition, 2)
-    playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.YELLOW, BallPosition, 2)
-    playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.ORANGE, BallPosition, 2)
-    playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.RED, BallPosition, 2)
-    playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.PURPLE, BallPosition, 4)
 
 
 rule "Chamber x collision":
