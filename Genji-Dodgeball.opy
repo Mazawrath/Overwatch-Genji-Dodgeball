@@ -381,17 +381,13 @@ rule "Create ball & targeted effect - TEAMS":
     @Condition getCurrentGamemode() == Gamemode.TDM
     
     #Team 1 standard targeting Team 2 ball
-    createEffect([player for player in getPlayers(Team.1) if player != TargetedPlayer and not IsPassingTeam1 and TargetedPlayer.getTeam() != Team.1], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.1) if player != TargetedPlayer and TargetedPlayer.getTeam() != Team.1], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #Team 1 standard targeting Team 1 ball
-    createEffect([player for player in getPlayers(Team.1) if player != TargetedPlayer and not IsPassingTeam1 and TargetedPlayer.getTeam() == Team.1], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #Team 1 passing ball
-    createEffect([player for player in getPlayers(Team.1) if IsPassingTeam1 and player != TargetedPlayer], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.1) if player != TargetedPlayer and TargetedPlayer.getTeam() == Team.1], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
      #Team 2 standard targeting Team 1 ball
-    createEffect([player for player in getPlayers(Team.2) if player != TargetedPlayer and not IsPassingTeam2 and TargetedPlayer.getTeam() != Team.2], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.2) if player != TargetedPlayer and TargetedPlayer.getTeam() != Team.2], Effect.ORB, Color.WHITE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
      #Team 2 standard targeting Team 2 ball
-    createEffect([player for player in getPlayers(Team.2) if player != TargetedPlayer and not IsPassingTeam2 and TargetedPlayer.getTeam() == Team.2], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #Team 2 passing ball
-    createEffect([player for player in getPlayers(Team.2) if IsPassingTeam2 and player != TargetedPlayer], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getPlayers(Team.2) if player != TargetedPlayer and TargetedPlayer.getTeam() == Team.2], Effect.ORB, Color.SKY_BLUE, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     if not RedGreenColorblindMode:
         #Team 1 Targeted Ball
         createEffect([i for i in TargetedPlayer], Effect.ORB, Color.RED, BallPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
