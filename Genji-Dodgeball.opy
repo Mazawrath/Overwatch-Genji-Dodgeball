@@ -132,6 +132,7 @@ playervar AntiFloatTimer 13
 playervar AntiStuckProtection 14
 playervar ToggleHUD 15
 playervar DashNerf 16
+playervar PassingSignal 17
 
 
 #Subroutine names
@@ -1182,6 +1183,17 @@ rule "Final duel - TEAMS":
     getLivingPlayers(Team.ALL)[0].setFacing(directionTowards(getLivingPlayers(Team.ALL)[0].getPosition(), CircleCenter), Relativity.TO_WORLD)
     getLivingPlayers(Team.ALL)[1].setFacing(directionTowards(getLivingPlayers(Team.ALL)[1].getPosition(), CircleCenter), Relativity.TO_WORLD)
 
+
+rule "Create passing aura":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE)
+    @Condition PassingEnabled
+    @Condition getCurrentGamemode() == Gamemode.TDM
+
+    createEffect([player for player in getPlayers(eventPlayer.getTeam()) if player != eventPlayer and not player.isDead()], Effect.BAD_AURA, Color.SKY_BLUE, eventPlayer.getEyePosition(), 0.25, EffectReeval.POSITION_AND_RADIUS)
+    eventPlayer.PassingSignal = getLastCreatedEntity()
+    waitUntil(not eventPlayer.isHoldingButton(Button.SECONDARY_FIRE), 60)
+    destroyEffect(eventPlayer.PassingSignal)
 
 rule "Check for last player surviving":
     @Condition isGameInProgress() == true
