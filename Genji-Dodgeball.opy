@@ -274,8 +274,14 @@ rule "Create game sphere":
 
 
 rule "Create global HUD elements":
+    if getCurrentGamemode() == Gamemode.FFA:
     #white normal
     hudSubtext([player for player in getAllPlayers() if player != TargetedPlayer], "Current Player Targeted: {0}".format(TargetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    if getCurrentGamemode() == Gamemode.TDM:
+        #white normal
+        hudSubtext([player for player in getAllPlayers() if player != TargetedPlayer and player.getTeam() != TargetedPlayer.getTeam()], "Current Player Targeted: {0}".format(TargetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+        #sky blue targeting teammate
+        hudSubtext([player for player in getAllPlayers() if player != TargetedPlayer and player.getTeam() == TargetedPlayer.getTeam()], "Current Player Targeted: {0}".format(TargetedPlayer), HudPosition.LEFT, -2, Color.SKY_BLUE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #red when you're targeted
     hudSubtext(TargetedPlayer, "Current Player Targeted: {0}".format(TargetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudText(getDeadPlayers(Team.ALL), "Waiting for next round", "You have been eliminated or joined during a round", "You will spawn once the next round starts", HudPosition.TOP, 2, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
