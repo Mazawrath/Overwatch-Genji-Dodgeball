@@ -112,6 +112,7 @@ globalvar BouncePadSuperjumpNerf 57
 globalvar PassingPlayer 58
 globalvar PassingAssistId 59
 globalvar PassingPlayerName 60
+globalvar PassingAuraToggle 61
 
 
 #Player variables
@@ -153,6 +154,7 @@ rule "// SETTINGS":
     PassingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 0)
     AllowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     ScoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
+    PassingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
     #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
     GameEndEnabled = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Time", false, 2)
     WatermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Enable Watermark", true, 0)
@@ -1188,6 +1190,7 @@ rule "Create passing aura":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE)
     @Condition PassingEnabled
+    @Condition PassingAuraToggle
     @Condition getCurrentGamemode() == Gamemode.TDM
 
     createEffect([player for player in getPlayers(eventPlayer.getTeam()) if player != eventPlayer and not player.isDead()], Effect.BAD_AURA, Color.SKY_BLUE, eventPlayer.getEyePosition(), 0.25, EffectReeval.POSITION_AND_RADIUS)
