@@ -1,6 +1,6 @@
 settings {
     "main": {
-        "description": "Genji Dodgeball v7.1.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "description": "Genji Dodgeball v7.1.1. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -312,6 +312,7 @@ rule "Create global HUD elements":
     hudSubtext([player for player in getAllPlayers() if BallSpeed > 55], "Current Ball Speed: {0}".format(BallSpeed), HudPosition.LEFT, -3, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudSubtext(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+    createInWorldText([player for player in getAllPlayers() if BallSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(BallSpawnCountdown)), vect(CircleCenter.x, CircleCenter.y + 2.5, CircleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
     if PassingEnabled:
         if getCurrentGamemode() == Gamemode.TDM:
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to pass the ball to another teammate!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
@@ -417,12 +418,6 @@ rule "Create ball & targeted effect - TEAMS":
     createEffect([player for player in getAllPlayers() if player != TargetedPlayer and (IsPassingTeam1 or IsPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, TargetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
 
 
-rule "Create ball countdown HUD":
-    @Condition BallSpawnCountdown > 0
-    
-    createInWorldText([player for player in getAllPlayers() if BallSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(BallSpawnCountdown)), vect(CircleCenter.x, CircleCenter.y + 2.5, CircleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
-
-
 rule "Enable Scoreboard":
     @Event eachPlayer
     @Hero all
@@ -448,7 +443,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not WatermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by u/Mazawrath. Version v7.1.0", HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by u/Mazawrath. Version v7.1.1", HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
