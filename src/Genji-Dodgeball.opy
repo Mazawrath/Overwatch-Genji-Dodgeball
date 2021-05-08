@@ -995,7 +995,7 @@ rule "Create passing aura":
 
     createEffect([player for player in getPlayers(eventPlayer.getTeam()) if player != eventPlayer and not player.isDead()], Effect.BAD_AURA, Color.SKY_BLUE, eventPlayer.getEyePosition(), 0.25, EffectReeval.POSITION_AND_RADIUS)
     eventPlayer.passingSignal = getLastCreatedEntity()
-    waitUntil(not eventPlayer.isHoldingButton(Button.SECONDARY_FIRE), 60)
+    waitUntil(not eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) or eventPlayer.isDead(), 60)
     destroyEffect(eventPlayer.passingSignal)
 
 rule "Check for last player surviving":
