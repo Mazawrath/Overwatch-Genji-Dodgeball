@@ -1,3 +1,5 @@
+#!mainFile "./Genji-Dodgeball.opy"
+
 settings {
     "main": {
         "description": "Genji Dodgeball v7.1.1. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
