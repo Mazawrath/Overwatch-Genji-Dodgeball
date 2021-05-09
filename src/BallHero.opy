@@ -32,3 +32,14 @@ rule "Teleport hero ball":
     eventPlayer.teleport(ballPosition - vect(0, 1, 0))
     wait(0.001)
     goto RULE_START
+
+
+rule "Set hero ball outline":
+    @Event eachPlayer
+    @Condition isGameInProgress()
+    @Condition eventPlayer.getCurrentHero() == ballHero
+
+    ballPlayer.startForcingOutlineFor([player for player in getAllPlayers() if player != targetedPlayer], true, Color.WHITE, OutlineVisibility.DEFAULT)
+    ballPlayer.startForcingOutlineFor([player for player in getAllPlayers() if player == targetedPlayer], true, Color.RED, OutlineVisibility.DEFAULT)
+    wait(0.1)
+    goto RULE_START
