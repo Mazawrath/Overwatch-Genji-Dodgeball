@@ -15,5 +15,5 @@ rule "Init ball":
     eventPlayer.stopFacing()
     eventPlayer.setGravity(0)
     eventPlayer.setStatusEffect(null, Status.PHASED_OUT, 9999)
-    eventPlayer.startForcingPosition(ballPosition, true)
+    eventPlayer.startForcingPosition(ballPosition - vect(0, 1, 0), true)
     eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
