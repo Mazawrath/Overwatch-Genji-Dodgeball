@@ -120,6 +120,7 @@ globalvar ballHero 63
 globalvar playerHero 64
 globalvar ballPlayer 65
 globalvar ballPlayerMock 66
+globalvar ballHeroRegretText 67
 
 
 #Player variables
@@ -343,8 +344,13 @@ rule "Player joins game":
         wait(0.25)
     eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
     eventPlayer.hasMoved = true
+    if (ballHero != null  and not isGameInProgress()):
+        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), ballPlayer.getEyePosition()), 100, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
-    eventPlayer.setInvisibility(Invis.NONE)  
+    eventPlayer.setInvisibility(Invis.NONE)
+    if (ballHero != null):
+        waitUntil(isGameInProgress(), 10)
+        eventPlayer.stopFacing()
 
 
 rule "Shorten Deflect Length":

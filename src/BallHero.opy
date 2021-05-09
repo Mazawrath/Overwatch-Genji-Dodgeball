@@ -6,12 +6,15 @@ rule "Create hero ball":
     waitUntil(hostPlayer.hasSpawned(), 9999)
     getPlayersOnHero(ballHero, Team.ALL).startFacing(directionTowards(getPlayersOnHero(ballHero, Team.ALL).getEyePosition(), hostPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     ballPlayer = getPlayersOnHero(ballHero, Team.ALL)[0]
+    createInWorldText(getAllPlayers(), "You have just made the biggest mistake in your life", ballPlayer.getEyePosition() + vect(0, 0.5, 0), 5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.RED, SpecVisibility.ALWAYS)
+    ballHeroRegretText = getLastCreatedText()
 
 rule "Init hero ball":
     @Event eachPlayer
     @Condition isGameInProgress()
     @Condition eventPlayer.getCurrentHero() == ballHero
 
+    destroyInWorldText(ballHeroRegretText)
     eventPlayer.stopFacing()
     eventPlayer.setGravity(0)
     eventPlayer.setStatusEffect(null, Status.PHASED_OUT, 9999)
