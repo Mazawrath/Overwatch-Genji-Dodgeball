@@ -118,6 +118,7 @@ globalvar passingAuraToggle 61
 globalvar torbBall 62
 globalvar ballHero 63
 globalvar playerHero 64
+globalvar ballPlayer 65
 
 
 #Player variables
