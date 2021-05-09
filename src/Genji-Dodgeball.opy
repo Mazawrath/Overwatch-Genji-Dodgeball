@@ -119,6 +119,7 @@ globalvar torbBall 62
 globalvar ballHero 63
 globalvar playerHero 64
 globalvar ballPlayer 65
+globalvar ballPlayerMock 66
 
 
 #Player variables
@@ -633,6 +634,7 @@ rule "Ball delete requested":
     @Condition ballDeleteRequested == true
     
     ballDeleteRequested = false
+    ballPlayerMock = true
     targetedPlayer = -1
     stopChasingVariable(ballDirection)
     stopChasingVariable(ballPosition)
@@ -708,6 +710,7 @@ rule "Spawn ball":
     ballPosition = circleCenter
     ballDirection = directionTowards(ballPosition, targetedPlayer.getEyePosition())
     ballSpeed = min(30, ballSpeed)
+    ballPlayerMock = false
     ballIsOut = true
 
 
@@ -864,6 +867,9 @@ def DeflectFailed():
     targetedPlayer.bouncePadCooldown = 0
     previousTargetedPlayer.currentUltPercent += 15
     kill(targetedPlayer, previousTargetedPlayer)
+    ballPlayer.communicate(Comms.SORRY)
+    ballPlayer.stopFacing()
+    ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
     if improvedExplosions == true:
         UpdatedDeathEffects()
     else:

@@ -24,6 +24,11 @@ rule "Teleport ball":
     @Condition isGameInProgress()
     @Condition eventPlayer.getCurrentHero() == ballHero
 
+    if (ballPlayerMock == true):
+        eventPlayer.setGravity(100)
+        waitUntil(ballPlayerMock == false, 9999)
+        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+        eventPlayer.setGravity(0)
     eventPlayer.teleport(ballPosition - vect(0, 1, 0))
     wait(0.001)
     goto RULE_START
