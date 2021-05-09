@@ -28,7 +28,7 @@ rule "Init global variables":
     disableGamemodeCompletion()
     disableMusic()
     disableAnnouncer()
-    if torbBall == 17:
+    if torbBall == 17 and getCurrentGamemode() == Gamemode.FFA:
         ballHero = Hero.TORBJORN
     # TODO get this working
     # playerHero = [hero for hero in getAllHeroes() if hero != ballHero]
