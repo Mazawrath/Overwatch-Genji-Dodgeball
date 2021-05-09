@@ -923,7 +923,7 @@ def UpdatedDeathEffects():
 
 rule "Final duel":
     @Condition isGameInProgress() == true
-    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved]) == 2
+    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() != ballHero]) == 2
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
     @Condition getCurrentGamemode() == Gamemode.FFA
