@@ -271,7 +271,7 @@ rule "Check for <2 players":
 
 rule "Check for <2 players - TEAMS":
     @Condition isGameInProgress() == true
-    #@Condition getNumberOfPlayers(Team.ALL) == 1
+    #@Condition getNumberOfHeroes(playerHero, Team.ALL) == 1
     @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == false
     @Condition getCurrentGamemode() == Gamemode.TDM
     
@@ -289,14 +289,14 @@ rule "Check for <2 players - TEAMS":
 
 
 rule "Wait for more players":
-    @Condition getNumberOfPlayers(Team.ALL) > 1
+    @Condition getNumberOfHeroes(playerHero, Team.ALL) > 1
     @Condition isEnoughPlayersToStart == false
     @Condition getCurrentGamemode() == Gamemode.FFA
     
     destroyHudText(waitingForPlayersHUD)
     bigMessage(getAllPlayers(), "Starting game in 5 seconds!")
     wait(5.5)
-    if getNumberOfPlayers(Team.ALL) < 2:
+    if getNumberOfHeroes(playerHero, Team.ALL) < 2:
         return
     unpauseMatchTime()
     isEnoughPlayersToStart = true
@@ -312,7 +312,7 @@ rule "Wait for more players - TEAMS":
     destroyHudText(waitingForPlayersHUD)
     bigMessage(getAllPlayers(), "Starting game in 5 seconds!")
     wait(5.5)
-    if getNumberOfPlayers(Team.ALL) < 2:
+    if getNumberOfHeroes(playerHero, Team.ALL) < 2:
         return
     unpauseMatchTime()
     isEnoughPlayersToStart = true
@@ -897,9 +897,9 @@ def UpdatedDeathEffects():
     
     deathSpherePos = targetedPlayer.getPosition()
     #Make sure it is final duel AND there are at least 3 or more players
-    if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 1 and getNumberOfPlayers(Team.ALL) != 2 and finalDuelNuke:
+    if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 1 and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
-    elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0) and getNumberOfPlayers(Team.ALL) != 2 and finalDuelNuke:
+    elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0) and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
     playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION, Color.WHITE, deathSpherePos, 1)
     if randomExplosionSounds:
@@ -934,7 +934,7 @@ rule "Final duel":
     lbl_0:
     isInFinalDuel = true
     getLivingPlayers(Team.ALL).bouncePadCooldown = 2
-    if getNumberOfPlayers(Team.ALL) <= 2:
+    if getNumberOfHeroes(playerHero, Team.ALL) <= 2:
         goto lbl_1
     bigMessage(getAllPlayers(), "Final Duel!")
     lbl_1:
@@ -971,7 +971,7 @@ rule "Final duel - TEAMS":
     lbl_0:
     isInFinalDuel = true
     getLivingPlayers(Team.ALL).bouncePadCooldown = 2
-    if getNumberOfPlayers(Team.ALL) <= 2:
+    if getNumberOfHeroes(playerHero, Team.ALL) <= 2:
         goto lbl_1
     bigMessage(getAllPlayers(), "Final Duel!")
     lbl_1:

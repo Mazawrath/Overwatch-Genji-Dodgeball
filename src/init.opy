@@ -30,6 +30,9 @@ rule "Init global variables":
     disableAnnouncer()
     if torbBall == 17:
         ballHero = Hero.TORBJORN
+    # TODO get this working
+    # playerHero = [hero for hero in getAllHeroes() if hero != ballHero]
+    playerHero = Hero.GENJI
     bouncePadStrength = 30
     bouncePadDistance = 12
     ballSpeed = 30
