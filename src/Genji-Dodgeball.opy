@@ -739,6 +739,12 @@ rule "Ball reaches player":
     DeflectFailed()
     return
     lbl_0:
+    ballPlayer.clearStatusEffect(Status.PHASED_OUT)
+    if targetedPlayer.isUsingAbility2():
+        ballPlayer.setStatusEffect(null, Status.STUNNED, 0.5)
+    else:
+        ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 0.5)
+    ballPlayer.setStatusEffect(null, Status.PHASED_OUT, 9999)
     #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
     #        goto lbl_1
     if targetedPlayer.isUsingAbility1():
