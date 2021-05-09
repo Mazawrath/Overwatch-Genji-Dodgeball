@@ -1007,7 +1007,7 @@ rule "Create passing aura":
 
 rule "Check for last player surviving":
     @Condition isGameInProgress() == true
-    @Condition getNumberOfLivingPlayers(Team.ALL) == 1
+    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) == 1
     @Condition isEnoughPlayersToStart == true
     @Condition getCurrentGamemode() == Gamemode.FFA
     
