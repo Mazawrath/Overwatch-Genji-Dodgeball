@@ -7,7 +7,7 @@ rule "Create hero ball":
     getPlayersOnHero(ballHero, Team.ALL).startFacing(directionTowards(getPlayersOnHero(ballHero, Team.ALL).getEyePosition(), hostPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     ballPlayer = getPlayersOnHero(ballHero, Team.ALL)[0]
 
-rule "Init ball":
+rule "Init hero ball":
     @Event eachPlayer
     @Condition isGameInProgress()
     @Condition eventPlayer.getCurrentHero() == ballHero
@@ -19,7 +19,7 @@ rule "Init ball":
     eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
 
 
-rule "Teleport ball":
+rule "Teleport hero ball":
     @Event eachPlayer
     @Condition isGameInProgress()
     @Condition eventPlayer.getCurrentHero() == ballHero
