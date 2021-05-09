@@ -115,6 +115,9 @@ globalvar passingPlayer 58
 globalvar passingAssistId 59
 globalvar passingPlayerName 60
 globalvar passingAuraToggle 61
+globalvar torbBall 62
+globalvar ballHero 63
+globalvar playerHero 64
 
 
 #Player variables
@@ -150,10 +153,12 @@ subroutine DeflectFailed 2
 #!extension buffAndDebuffSounds
 #!extension kineticExplosionEffects
 #!extension explosionSounds
+#!extension spawnMoreDummyBots
 
 
 rule "// SETTINGS":
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 0)
+    torbBall = createWorkshopSetting(enum["Don't touch this rule", "You must of accidently opened this rule, please close it", "Why haven't you closed it?", "Wait, what are you planning?", "No, stop", "Close this, now.", "Don't you dare pick that option", "Please stop", "I'm begging you", "You are putting yourself in grave danger", "Don't scroll, please, whatever you do", "Stop scrolling", "I am warning you.", "You will not be safe if you select this.", "You are unleashing ancient dangers by even opening this rule.", "You're not going to stop, are you?", "Don't say that I didn't warn you.", "Torb Ball"], "Deathmatch Settings", "Torb Ball", 0, 0)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
@@ -248,7 +253,7 @@ rule "// Not enough players testing":
 
 rule "Check for <2 players":
     @Condition isGameInProgress() == true
-    @Condition getNumberOfPlayers(Team.ALL) == 1
+    @Condition getNumberOfHeroes(playerHero, Team.ALL) == 1
     @Condition getCurrentGamemode() == Gamemode.FFA
     
     isInFinalDuel = false
@@ -648,6 +653,8 @@ rule "Only end game when there isn't a round in progress":
     
     enableMusic()
     enableGamemodeCompletion()
+
+#!include "./BallHero.opy"
 
 
 rule "primary = dash":

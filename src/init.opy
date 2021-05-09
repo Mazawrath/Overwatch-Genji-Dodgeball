@@ -28,6 +28,8 @@ rule "Init global variables":
     disableGamemodeCompletion()
     disableMusic()
     disableAnnouncer()
+    if torbBall == 17:
+        ballHero = Hero.TORBJORN
     bouncePadStrength = 30
     bouncePadDistance = 12
     ballSpeed = 30
