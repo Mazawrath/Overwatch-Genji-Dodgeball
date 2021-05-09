@@ -151,10 +151,12 @@ rule "Create ball & targeted effect":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.FFA
     
-    #Orb for when ball is not getting passed
-    createEffect([player for player in getAllPlayers() if player != targetedPlayer], Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    if not ballHero:
+        #Orb for when ball is not getting passed
+        createEffect([player for player in getAllPlayers() if player != targetedPlayer], Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     if not redGreenColorblindMode:
-        createEffect([i for i in targetedPlayer], Effect.ORB, Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        if not ballHero:
+            createEffect([i for i in targetedPlayer], Effect.ORB, Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect([player for player in getAllPlayers() if player != targetedPlayer], Effect.GOOD_AURA, Color.RED, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(targetedPlayer, Effect.GOOD_AURA, Color.RED, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(targetedPlayer, Effect.GOOD_AURA, Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
