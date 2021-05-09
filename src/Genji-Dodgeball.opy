@@ -246,6 +246,9 @@ rule "Disable Scoreboard":
     eventPlayer.toggleHUD = true
 
 
+#!include "./BallHero.opy"
+
+
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
@@ -657,8 +660,6 @@ rule "Only end game when there isn't a round in progress":
     enableMusic()
     enableGamemodeCompletion()
 
-#!include "./BallHero.opy"
-
 
 rule "primary = dash":
     @Event eachPlayer
@@ -1025,7 +1026,7 @@ rule "Check for last player surviving":
     @Condition getCurrentGamemode() == Gamemode.FFA
     
     isInFinalDuel = false
-    getLivingPlayers(Team.ALL).addToScore(1)
+    [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero].addToScore(1)
     wait(0.25)
     if (getMatchTime() == 0 or tieBreakerActive) and gameEndEnabled:
         #If there is alredy a tiebreaker, then the tiebreaker has ended.
@@ -1041,7 +1042,7 @@ rule "Check for last player surviving":
             tieBreakerActive = false
     stopChasingVariable(ballSpawnCountdown)
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
-    bigMessage(getAllPlayers(), "{0} has won the round!".format(getLivingPlayers(Team.ALL)[0]))
+    bigMessage(getAllPlayers(), "{0} has won the round!".format([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero]))
     wait(2)
     if not tieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
