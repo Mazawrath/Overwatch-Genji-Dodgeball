@@ -122,6 +122,7 @@ globalvar ballPlayer 65
 globalvar ballPlayerMock 66
 globalvar ballHeroRegretText 67
 globalvar ballHeroRandom 68
+globalvar name 69
 
 
 #Player variables
