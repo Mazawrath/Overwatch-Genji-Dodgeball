@@ -30,6 +30,11 @@ rule "Init global variables":
     disableAnnouncer()
     if torbBall == 17 and getCurrentGamemode() == Gamemode.FFA:
         ballHero = Hero.TORBJORN
+        name = ballHero
+    else:
+        # No touchy. I'm talking to you, person thinking it's funny to put your name here. Only Torbjörn can steal credit for making my game.
+        name = "u/Mazawrath"
+        ballHero = null
     # TODO get this working
     # playerHero = [hero for hero in getAllHeroes() if hero != ballHero]
     playerHero = Hero.GENJI
