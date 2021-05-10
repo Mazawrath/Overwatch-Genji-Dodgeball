@@ -131,6 +131,19 @@ def SuperFun():
             waitUntil(not ballPlayerMock, 9999)
             ballPlayer.clearStatusEffect(Status.ASLEEP)
             break
+        case 4:
+            waitUntil(targetedPlayer != "-1", 10)
+            ballPlayer.setGravity(0)
+            ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + vect(0, 1, 0), true)
+            ballPlayer.setFacing(vect(0, -1, 0), Relativity.TO_PLAYER)
+            createInWorldText(getAllPlayers(), "{0} is next, don't tell them :)".format(targetedPlayer), ballPlayer.getEyePosition() + vect(0, 0.5, 0), 3, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, Color.SKY_BLUE, SpecVisibility.ALWAYS)
+            ballHeroRegretText = getLastCreatedText()
+            wait(0.5)
+            ballPlayer.communicate(Comms.HELLO)
+            waitUntil(not ballPlayerMock, 9999)
+            destroyInWorldText(ballHeroRegretText)
+            ballPlayer.stopForcingPosition()
+            break
 
 
 def ShortFun():
