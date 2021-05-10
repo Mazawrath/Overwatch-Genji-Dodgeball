@@ -11,6 +11,7 @@ rule "Create hero ball":
 
 rule "Init hero ball":
     @Event eachPlayer
+    @Condition ballHero
     @Condition isGameInProgress()
     @Condition eventPlayer.getCurrentHero() == ballHero
 
@@ -24,6 +25,7 @@ rule "Init hero ball":
 
 rule "Teleport hero ball":
     @Event eachPlayer
+    @Condition ballHero
     @Condition isGameInProgress()
     @Condition eventPlayer.getCurrentHero() == ballHero
 
@@ -39,6 +41,7 @@ rule "Teleport hero ball":
 
 rule "Set hero ball outline":
     @Event eachPlayer
+    @Condition ballHero
     @Condition isGameInProgress()
     @Condition eventPlayer.getCurrentHero() == ballHero
 
