@@ -46,3 +46,22 @@ rule "Set hero ball outline":
     ballPlayer.startForcingOutlineFor([player for player in getAllPlayers() if player == targetedPlayer], true, Color.RED, OutlineVisibility.DEFAULT)
     wait(0.1)
     goto RULE_START
+
+
+rule "Hero ball tbag":
+    @Event eachPlayer
+    @Condition eventPlayer.getCurrentHero() == ballHero
+    @Condition ballPlayerMock == true
+
+    if (random.randint(0, 100) <= 5):
+        ballPlayer.communicate(Comms.YES)
+        ballPlayer.setWeapon(2)
+        ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
+        while ballPlayerMock == true:
+            wait(0.1)
+            ballPlayer.startForcingButton(Button.CROUCH)
+            wait(0.1)
+            ballPlayer.stopForcingButton(Button.CROUCH)
+        ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
+        ballPlayer.setWeapon(random.randint(0, 1))
+
