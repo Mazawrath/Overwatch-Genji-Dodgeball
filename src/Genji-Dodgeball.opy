@@ -151,6 +151,7 @@ playervar passingSignal 17
 subroutine CoolDeathEffects 0
 subroutine UpdatedDeathEffects 1
 subroutine DeflectFailed 2
+subroutine ShortFun 3
 
 
 #Activated extensions
