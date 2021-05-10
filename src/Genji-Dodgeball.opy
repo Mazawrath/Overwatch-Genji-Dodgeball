@@ -725,18 +725,6 @@ rule "Spawn ball":
     ballDirection = directionTowards(ballPosition, targetedPlayer.getEyePosition())
     ballSpeed = min(30, ballSpeed)
     ballPlayerMock = false
-    if (ballHero):
-        ballHeroRandom = random.randint(0, 100)
-        if (ballHeroRandom <= 3):
-            ballPlayer.setStatusEffect(null, Status.FROZEN, random.randint(10, 30))
-        elif (ballHeroRandom >= 5 and ballHeroRandom <= 8):
-            ballPlayer.setStatusEffect(null, Status.BURNING, random.randint(10, 30))
-        elif (ballHeroRandom >= 10 and ballHeroRandom <= 13):
-            ballPlayer.setStatusEffect(null, Status.HACKED, random.randint(10, 30))
-        if (random.randint(0, 100) <= 10):
-            ballPlayer.communicate(Comms.HELLO)
-        if (random.randint(0, 100) <= 5):
-            ballPlayer.forceButtonPress(Button.ABILITY_2)
     ballIsOut = true
 
 
@@ -893,11 +881,6 @@ def DeflectFailed():
     targetedPlayer.bouncePadCooldown = 0
     previousTargetedPlayer.currentUltPercent += 15
     kill(targetedPlayer, previousTargetedPlayer)
-    if (ballHero and random.randint(0, 100) >=20):
-        if (random.randint(0, 100) >=20):
-            ballPlayer.communicate(Comms.SORRY)
-        else:
-            ballPlayer.communicate(Comms.THANKS)
     ballPlayer.stopFacing()
     ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
     if improvedExplosions == true:
