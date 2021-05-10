@@ -53,7 +53,8 @@ rule "Hero ball tbag":
     @Condition eventPlayer.getCurrentHero() == ballHero
     @Condition ballPlayerMock == true
 
-    if (random.randint(0, 100) <= 5):
+    ballHeroRandom = random.randint(0, 100)
+    if (ballHeroRandom <= 5):
         ballPlayer.communicate(Comms.YES)
         ballPlayer.setWeapon(2)
         ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
@@ -64,6 +65,15 @@ rule "Hero ball tbag":
             ballPlayer.stopForcingButton(Button.CROUCH)
         ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
         ballPlayer.setWeapon(random.randint(0, 1))
+    # nice
+    elif (ballHeroRandom == 69):
+        ballPlayer.setWeapon(2)
+        while ballPlayerMock == true:
+            ballPlayer.communicate(Comms.YES)
+            wait(0.05)
+            ballPlayer.startForcingButton(Button.CROUCH)
+            wait(0.05)
+            ballPlayer.stopForcingButton(Button.CROUCH)
 
 
 rule "Hero ball whack":
