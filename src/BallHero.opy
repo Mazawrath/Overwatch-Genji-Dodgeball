@@ -67,6 +67,7 @@ rule "Hero ball do funny thing":
     ballHeroRandom = random.randint(0, 100)
     switch random.randint(1, 6):
         case 1:
+            if (ballHeroRandom <= 10):
                 ballSpawnCountdown = 5
                 # Tbag them
                 ballPlayer.communicate(Comms.YES)
@@ -92,6 +93,7 @@ rule "Hero ball do funny thing":
                     ballPlayer.stopForcingButton(Button.CROUCH)
             break
         case 2:
+            if (ballHeroRandom <= 10):
                 ballSpawnCountdown = 5
                 # Hammer their dead body
                 wait(0.5)
@@ -103,6 +105,7 @@ rule "Hero ball do funny thing":
                 ballPlayer.setWeapon(random.randint(0, 1))
             break
         case 3:
+            if (ballHeroRandom <= 10):
                 ballSpawnCountdown = 5
                 # That was so boring that Torb is going to take a nap
                 ballPlayer.setStatusEffect(null, Status.ASLEEP, 9999)
@@ -112,6 +115,7 @@ rule "Hero ball do funny thing":
                 ballPlayer.clearStatusEffect(Status.ASLEEP)
             break
         case 4:
+            if (ballHeroRandom <= 10):
                 ballSpawnCountdown = 5
                 # Torb is not joking around.
                 ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
@@ -122,6 +126,7 @@ rule "Hero ball do funny thing":
                 destroyInWorldText(ballHeroRegretText)
             break
         case 5:
+            if (ballHeroRandom <= 10):
                 ballSpawnCountdown = 5
                 # SPEEN
                 ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
@@ -135,6 +140,7 @@ rule "Hero ball do funny thing":
                 destroyInWorldText(ballHeroRegretText)
             break
         case 6:
+            if (ballHeroRandom <= 10):
                 ballSpawnCountdown = 5
                 waitUntil(targetedPlayer != "-1", 10)
                 ballPlayer.setGravity(0)
