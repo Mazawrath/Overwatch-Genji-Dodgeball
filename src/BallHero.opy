@@ -144,6 +144,24 @@ def SuperFun():
             destroyInWorldText(ballHeroRegretText)
             ballPlayer.stopForcingPosition()
             break
+        case 5:
+            ballPlayer.setUltCharge(100)
+            ballPlayer.startForcingButton(Button.ULTIMATE)
+            ballPlayer.setGravity(0)
+            ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.RIGHT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.teleport(circleCenter + vect(0,5,0))
+            wait(1)
+            while ballPlayer.isUsingUltimate() and ballPlayerMock:
+                ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), vect(random.uniform(-20, 20), random.uniform(0, 5), random.uniform(-20, 20))), Relativity.TO_WORLD)
+                wait(0.05)
+                ballPlayer.stopForcingButton(Button.ULTIMATE)
+                ballPlayer.forceButtonPress(Button.PRIMARY_FIRE)
+            ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE) 
 
 
 def ShortFun():
