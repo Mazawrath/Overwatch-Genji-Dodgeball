@@ -99,7 +99,6 @@ rule "Hero ball do funny thing":
                 waitUntil(not ballPlayerMock, 9999)
                 ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
                 ballPlayer.setWeapon(random.randint(0, 1))
-
         case 3:
             if (ballHeroRandom <= 10):
                 # That was so boring that Torb is going to take a nap
