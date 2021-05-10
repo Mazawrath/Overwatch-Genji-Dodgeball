@@ -18,8 +18,9 @@ rule "Init hero ball":
     destroyInWorldText(ballHeroRegretText)
     eventPlayer.stopFacing()
     eventPlayer.setGravity(0)
-    eventPlayer.setStatusEffect(null, Status.PHASED_OUT, 9999)
+    eventPlayer.disablePlayerCollision()
     # eventPlayer.startForcingPosition(updateEveryTick(ballPosition) + vect(0, -1, 0) , true)
+    wait(0.5)
     eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
 
 
