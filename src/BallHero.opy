@@ -100,7 +100,6 @@ def SuperFun():
     ballHeroRandom = random.randint(0, 100)
     switch random.randint(1, 6):
         case 1:
-            ballSpawnCountdown = 5
             # SPEEN
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 1000, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
@@ -108,12 +107,11 @@ def SuperFun():
             createInWorldText(getAllPlayers(), "Torbcopter, ready for takeoff.", ballPlayer.getPosition(), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
             ballHeroRegretText = getLastCreatedText()
             while ballPlayerMock:
-                ballPlayer.applyImpulse(Vector.UP, 20, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+                ballPlayer.applyImpulse(Vector.UP, 10, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
                 wait(0.5)
             destroyInWorldText(ballHeroRegretText)
             break
         case 2:
-            ballSpawnCountdown = 5
             # Hammer their dead body
             wait(0.5)
             ballPlayer.communicate(Comms.NO)
@@ -126,7 +124,6 @@ def SuperFun():
             ballPlayer.forceButtonPress(Button.INTERACT)
             break
         case 3:
-            ballSpawnCountdown = 5
             # That was so boring that Torb is going to take a nap
             ballPlayer.setStatusEffect(null, Status.ASLEEP, 9999)
             wait(0.5)
@@ -142,7 +139,6 @@ def ShortFun():
     switch random.randint(1, 6):
         case 1:
             if (ballHeroRandom <= 10):
-                ballSpawnCountdown = 5
                 # Tbag them
                 ballPlayer.communicate(Comms.YES)
                 ballPlayer.setWeapon(2)
@@ -168,7 +164,6 @@ def ShortFun():
             break
         case 2:
             if (ballHeroRandom <= 10):
-                ballSpawnCountdown = 5
                 # Hammer their dead body
                 wait(0.5)
                 ballPlayer.communicate(Comms.NO)
@@ -181,8 +176,7 @@ def ShortFun():
             break
         case 3:
             if (ballHeroRandom <= 10):
-                ballSpawnCountdown = 5
-                # That was so boring that Torb is going to take a nap
+                # That was so boring Torb is going to take a nap
                 ballPlayer.setStatusEffect(null, Status.ASLEEP, 9999)
                 wait(0.5)
                 ballPlayer.communicate(Comms.GOODBYE)
@@ -191,7 +185,6 @@ def ShortFun():
             break
         case 4:
             if (ballHeroRandom <= 10):
-                ballSpawnCountdown = 5
                 # Torb is not joking around.
                 ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
                 waitUntil(targetedPlayer != "-1", 9999)
@@ -202,7 +195,6 @@ def ShortFun():
             break
         case 5:
             if (ballHeroRandom <= 10):
-                ballSpawnCountdown = 5
                 waitUntil(targetedPlayer != "-1", 10)
                 ballPlayer.setGravity(0)
                 ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + vect(0, 1, 0), true)
