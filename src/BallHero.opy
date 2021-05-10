@@ -67,7 +67,7 @@ rule "Hero ball do funny thing":
     ballHeroRandom = random.randint(0, 100)
     switch random.randint(1, 6):
         case 1:
-            if (ballHeroRandom <= 15):
+                ballSpawnCountdown = 5
                 # Tbag them
                 ballPlayer.communicate(Comms.YES)
                 ballPlayer.setWeapon(2)
@@ -81,6 +81,7 @@ rule "Hero ball do funny thing":
                 ballPlayer.setWeapon(random.randint(0, 1))
             # nice
             elif (ballHeroRandom == 69):
+                ballSpawnCountdown = 5
                 # HYPER TBAG!
                 ballPlayer.setWeapon(2)
                 while ballPlayerMock == true:
@@ -90,7 +91,7 @@ rule "Hero ball do funny thing":
                     wait(0.05)
                     ballPlayer.stopForcingButton(Button.CROUCH)
         case 2:
-            if (ballHeroRandom <= 10):
+                ballSpawnCountdown = 5
                 # Hammer their dead body
                 wait(0.5)
                 ballPlayer.communicate(Comms.YES)
@@ -100,7 +101,7 @@ rule "Hero ball do funny thing":
                 ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
                 ballPlayer.setWeapon(random.randint(0, 1))
         case 3:
-            if (ballHeroRandom <= 10):
+                ballSpawnCountdown = 5
                 # That was so boring that Torb is going to take a nap
                 ballPlayer.setStatusEffect(null, Status.ASLEEP, 9999)
                 wait(0.5)
@@ -108,7 +109,7 @@ rule "Hero ball do funny thing":
                 waitUntil(not ballPlayerMock, 9999)
                 ballPlayer.clearStatusEffect(Status.ASLEEP)
         case 4:
-            if (ballHeroRandom <= 10):
+                ballSpawnCountdown = 5
                 # Torb is not joking around.
                 ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
                 waitUntil(targetedPlayer != "-1", 9999)
@@ -122,7 +123,7 @@ rule "Hero ball do funny thing":
                 ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
                 ballPlayer.startFacing(vect(0, 0, 1), 100, Relativity.TO_PLAYER, FacingReeval.NONE)
         case 6:
-            if (ballHeroRandom <= 5):
+                ballSpawnCountdown = 5
                 waitUntil(targetedPlayer != "-1", 10)
                 ballPlayer.setGravity(0)
                 ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + vect(0, 1, 0), true)
