@@ -125,6 +125,14 @@ rule "Hero ball do funny thing":
                 ballSpawnCountdown = 5
                 # SPEEN
                 ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
+                ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 1000, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
+                wait(1)
+                createInWorldText(getAllPlayers(), "Torbcopter, ready for takeoff.", ballPlayer.getPosition(), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
+                ballHeroRegretText = getLastCreatedText()
+                while ballPlayerMock:
+                    ballPlayer.applyImpulse(Vector.UP, 20, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+                    wait(0.5)
+                destroyInWorldText(ballHeroRegretText)
             break
         case 6:
                 ballSpawnCountdown = 5
