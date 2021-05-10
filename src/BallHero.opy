@@ -97,12 +97,15 @@ rule "Hero ball do funny thing":
                 ballSpawnCountdown = 5
                 # Hammer their dead body
                 wait(0.5)
-                ballPlayer.communicate(Comms.YES)
+                ballPlayer.communicate(Comms.NO)
                 ballPlayer.setWeapon(2)
+                if (ballHeroRandom <= 5):
+                    ballPlayer.forceButtonPress(Button.ABILITY_1)
                 ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
                 waitUntil(not ballPlayerMock, 9999)
                 ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
                 ballPlayer.setWeapon(random.randint(0, 1))
+                ballPlayer.forceButtonPress(Button.INTERACT)
             break
         case 3:
             if (ballHeroRandom <= 10):
@@ -145,7 +148,7 @@ rule "Hero ball do funny thing":
                 waitUntil(targetedPlayer != "-1", 10)
                 ballPlayer.setGravity(0)
                 ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + vect(0, 1, 0), true)
-                ballPlayer.setFacing(vect(0, 1, 0), Relativity.TO_PLAYER)
+                ballPlayer.setFacing(vect(0, -1, 0), Relativity.TO_PLAYER)
                 createInWorldText(getAllPlayers(), "{0} is next, don't tell them :)".format(targetedPlayer), ballPlayer.getEyePosition() + vect(0, 0.5, 0), 3, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, Color.SKY_BLUE, SpecVisibility.ALWAYS)
                 ballHeroRegretText = getLastCreatedText()
                 wait(0.5)
