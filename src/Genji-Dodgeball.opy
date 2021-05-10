@@ -121,6 +121,7 @@ globalvar playerHero 64
 globalvar ballPlayer 65
 globalvar ballPlayerMock 66
 globalvar ballHeroRegretText 67
+globalvar ballHeroRandom 68
 
 
 #Player variables
@@ -720,8 +721,18 @@ rule "Spawn ball":
     ballDirection = directionTowards(ballPosition, targetedPlayer.getEyePosition())
     ballSpeed = min(30, ballSpeed)
     ballPlayerMock = false
-    if (ballHero and random.randint(0, 100) >=90):
-        ballPlayer.communicate(Comms.HELLO)
+    if (ballHero):
+        ballHeroRandom = random.randint(0, 100)
+        if (ballHeroRandom <= 3):
+            ballPlayer.setStatusEffect(null, Status.FROZEN, random.randint(10, 30))
+        elif (ballHeroRandom >= 5 and ballHeroRandom <= 8):
+            ballPlayer.setStatusEffect(null, Status.BURNING, random.randint(10, 30))
+        elif (ballHeroRandom >= 10 and ballHeroRandom <= 13):
+            ballPlayer.setStatusEffect(null, Status.HACKED, random.randint(10, 30))
+        if (random.randint(0, 100) <= 10):
+            ballPlayer.communicate(Comms.HELLO)
+        if (random.randint(0, 100) <= 5):
+            ballPlayer.forceButtonPress(Button.ABILITY_2)
     ballIsOut = true
 
 
