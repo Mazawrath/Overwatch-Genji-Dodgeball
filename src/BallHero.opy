@@ -238,3 +238,8 @@ def ShortFun():
                 destroyInWorldText(ballHeroRegretText)
                 ballPlayer.stopForcingPosition()
             break
+        case 6:
+            if (ballHeroRandom <= 10):
+                # SPEEN
+                ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
+                ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE) 
