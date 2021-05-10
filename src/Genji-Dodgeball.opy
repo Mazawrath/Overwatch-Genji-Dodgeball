@@ -277,6 +277,7 @@ rule "Check for <2 players":
     ballDeleteRequested = true
     lbl_0:
     roundInProgress = false
+    ballPlayerMock = false
     pauseMatchTime()
 
 
@@ -703,6 +704,7 @@ rule "Start round":
     
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     roundInProgress = true
+    ballPlayerMock = false
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     ballSpawnCountdown = 5
 
