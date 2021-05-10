@@ -65,3 +65,17 @@ rule "Hero ball tbag":
         ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
         ballPlayer.setWeapon(random.randint(0, 1))
 
+
+rule "Hero ball whack":
+    @Event eachPlayer
+    @Condition eventPlayer.getCurrentHero() == ballHero
+    @Condition ballPlayerMock == true
+
+    if (random.randint(0, 100) <= 10):
+        wait(0.5)
+        ballPlayer.communicate(Comms.YES)
+        ballPlayer.setWeapon(2)
+        ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
+        waitUntil(not ballPlayerMock, 9999)
+        ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
+        ballPlayer.setWeapon(random.randint(0, 1))
