@@ -64,9 +64,13 @@ rule "Hero ball do funny thing":
         else:
             ballPlayer.communicate(Comms.YOURE_WELCOME)
 
-    if (not isInFinalDuel):
+    if (wasFinalDuel):
+        wasFinalDuel = false
+        SuperFun()
+    elif (not isInFinalDuel):
         ShortFun()
     else:
+        wasFinalDuel = true
         ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
         ballPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
         ballPlayer.applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
