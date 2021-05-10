@@ -90,6 +90,7 @@ rule "Hero ball do funny thing":
                     ballPlayer.startForcingButton(Button.CROUCH)
                     wait(0.05)
                     ballPlayer.stopForcingButton(Button.CROUCH)
+            break
         case 2:
                 ballSpawnCountdown = 5
                 # Hammer their dead body
@@ -100,6 +101,7 @@ rule "Hero ball do funny thing":
                 waitUntil(not ballPlayerMock, 9999)
                 ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
                 ballPlayer.setWeapon(random.randint(0, 1))
+            break
         case 3:
                 ballSpawnCountdown = 5
                 # That was so boring that Torb is going to take a nap
@@ -108,6 +110,7 @@ rule "Hero ball do funny thing":
                 ballPlayer.communicate(Comms.GOODBYE)
                 waitUntil(not ballPlayerMock, 9999)
                 ballPlayer.clearStatusEffect(Status.ASLEEP)
+            break
         case 4:
                 ballSpawnCountdown = 5
                 # Torb is not joking around.
@@ -117,11 +120,12 @@ rule "Hero ball do funny thing":
                 ballHeroRegretText = getLastCreatedText()
                 waitUntil(not ballPlayerMock, 9999)
                 destroyInWorldText(ballHeroRegretText)
+            break
         case 5:
-            if (ballHeroRandom <= 10):
+                ballSpawnCountdown = 5
                 # SPEEN
                 ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
-                ballPlayer.startFacing(vect(0, 0, 1), 100, Relativity.TO_PLAYER, FacingReeval.NONE)
+            break
         case 6:
                 ballSpawnCountdown = 5
                 waitUntil(targetedPlayer != "-1", 10)
@@ -135,6 +139,7 @@ rule "Hero ball do funny thing":
                 waitUntil(not ballPlayerMock, 9999)
                 destroyInWorldText(ballHeroRegretText)
                 ballPlayer.stopForcingPosition()
+            break
     waitUntil(not ballPlayerMock, 9999)
 
     #do a funny thing maybe.
