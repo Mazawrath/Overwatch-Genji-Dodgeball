@@ -123,6 +123,7 @@ globalvar ballPlayerMock 66
 globalvar ballHeroRegretText 67
 globalvar ballHeroRandom 68
 globalvar name 69
+globalvar wasFinalDuel 70
 
 
 #Player variables
@@ -152,6 +153,7 @@ subroutine CoolDeathEffects 0
 subroutine UpdatedDeathEffects 1
 subroutine DeflectFailed 2
 subroutine ShortFun 3
+subroutine SuperFun 4
 
 
 #Activated extensions
