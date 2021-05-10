@@ -95,6 +95,47 @@ rule "Hero ball do funny thing":
         ballPlayer.forceButtonPress(Button.ABILITY_2)
 
 
+def SuperFun():
+    @Name "Hero ball do a long super fun thing"
+    ballHeroRandom = random.randint(0, 100)
+    switch random.randint(1, 6):
+        case 1:
+            ballSpawnCountdown = 5
+            # SPEEN
+            ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
+            ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 1000, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
+            wait(1.5)
+            createInWorldText(getAllPlayers(), "Torbcopter, ready for takeoff.", ballPlayer.getPosition(), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
+            ballHeroRegretText = getLastCreatedText()
+            while ballPlayerMock:
+                ballPlayer.applyImpulse(Vector.UP, 20, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+                wait(0.5)
+            destroyInWorldText(ballHeroRegretText)
+            break
+        case 2:
+            ballSpawnCountdown = 5
+            # Hammer their dead body
+            wait(0.5)
+            ballPlayer.communicate(Comms.NO)
+            ballPlayer.setWeapon(2)
+            ballPlayer.forceButtonPress(Button.ABILITY_1)
+            ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
+            waitUntil(not ballPlayerMock, 9999)
+            ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
+            ballPlayer.setWeapon(random.randint(0, 1))
+            ballPlayer.forceButtonPress(Button.INTERACT)
+            break
+        case 3:
+            ballSpawnCountdown = 5
+            # That was so boring that Torb is going to take a nap
+            ballPlayer.setStatusEffect(null, Status.ASLEEP, 9999)
+            wait(0.5)
+            ballPlayer.communicate(Comms.GOODBYE)
+            waitUntil(not ballPlayerMock, 9999)
+            ballPlayer.clearStatusEffect(Status.ASLEEP)
+            break
+
+
 def ShortFun():
     @Name "Hero ball do a quick fun thing"
     ballHeroRandom = random.randint(0, 100)
@@ -132,8 +173,6 @@ def ShortFun():
                 wait(0.5)
                 ballPlayer.communicate(Comms.NO)
                 ballPlayer.setWeapon(2)
-                if (ballHeroRandom <= 5):
-                    ballPlayer.forceButtonPress(Button.ABILITY_1)
                 ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
                 waitUntil(not ballPlayerMock, 9999)
                 ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
@@ -162,20 +201,6 @@ def ShortFun():
                 destroyInWorldText(ballHeroRegretText)
             break
         case 5:
-            if (ballHeroRandom <= 10):
-                ballSpawnCountdown = 5
-                # SPEEN
-                ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
-                ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 1000, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
-                wait(1)
-                createInWorldText(getAllPlayers(), "Torbcopter, ready for takeoff.", ballPlayer.getPosition(), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
-                ballHeroRegretText = getLastCreatedText()
-                while ballPlayerMock:
-                    ballPlayer.applyImpulse(Vector.UP, 20, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
-                    wait(0.5)
-                destroyInWorldText(ballHeroRegretText)
-            break
-        case 6:
             if (ballHeroRandom <= 10):
                 ballSpawnCountdown = 5
                 waitUntil(targetedPlayer != "-1", 10)
