@@ -8,7 +8,7 @@ rule "Create hero ball":
     ballPlayer = getPlayersOnHero(ballHero, Team.ALL)[0]
     switch random.randint(1, 21):
         case 1:
-            startingText = "You have just made the biggest mistake in your life"
+            startingText = "People always underestimate the engineers!"
             break
         case 2:
             startingText = "I'm giving it all I've got!"
