@@ -233,6 +233,10 @@ def SuperFun():
 
 def ShortFun():
     @Name "Hero ball do a quick fun thing"
+
+    # Only have a 10% chance of doing a fun thing
+    if (random.randint(1, 100) <= 90):
+        break
     ballHeroRandom = random.randint(0, 100)
     switch random.randint(1, 6):
         case 1:
