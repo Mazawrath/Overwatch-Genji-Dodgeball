@@ -231,14 +231,16 @@ def LongFun():
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
             break
         case 6:
-            ballPlayer.setMoveSpeed(300)
-            ballPlayer.startThrottleInDirection(ballHeroRandom, 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+            ballPlayer.setMoveSpeed(500)
+            ballHeroRandom = vect(random.uniform(-20, 20), 1, random.uniform(-20, 20))
+            ballPlayer.startThrottleInDirection(directionTowards(ballPlayer.getPosition(), ballHeroRandom), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
             ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
             while ballPlayerMock:
-                ballHeroRandom = vect(random.uniform(-17, 17), 0, random.uniform(-17, 17))
-                waitUntil(distance(ballHero.getPosition(), ballHeroRandom) < 2.5, 9999)
-                wait(0.5)
+                if (distance(ballPlayer.getPosition(), ballHeroRandom) <  7):
+                    ballHeroRandom = vect(random.uniform(-20, 20), 1, random.uniform(-20, 20))
+                wait(0.1)
             ballPlayer.stopThrottleInDirection()
+            ballPlayer.setMoveSpeed(100)
             break
         case 7:
             # nice
