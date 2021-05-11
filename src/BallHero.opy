@@ -240,7 +240,18 @@ def ShortFun():
     ballHeroRandom = random.randint(0, 100)
     switch random.randint(1, 6):
         case 1:
-            if (ballHeroRandom <= 10):
+            # nice
+            if (ballHeroRandom == 69):
+                ballSpawnCountdown = 5
+                # HYPER TBAG!
+                ballPlayer.setWeapon(2)
+                while ballPlayerMock == true:
+                    ballPlayer.communicate(Comms.YES)
+                    wait(0.05)
+                    ballPlayer.startForcingButton(Button.CROUCH)
+                    wait(0.05)
+                    ballPlayer.stopForcingButton(Button.CROUCH)
+            else:
                 # Tbag them
                 ballPlayer.communicate(Comms.YES)
                 ballPlayer.setWeapon(2)
@@ -252,65 +263,51 @@ def ShortFun():
                     ballPlayer.stopForcingButton(Button.CROUCH)
                 ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
                 ballPlayer.setWeapon(random.randint(0, 1))
-            # nice
-            elif (ballHeroRandom == 69):
-                ballSpawnCountdown = 5
-                # HYPER TBAG!
-                ballPlayer.setWeapon(2)
-                while ballPlayerMock == true:
-                    ballPlayer.communicate(Comms.YES)
-                    wait(0.05)
-                    ballPlayer.startForcingButton(Button.CROUCH)
-                    wait(0.05)
-                    ballPlayer.stopForcingButton(Button.CROUCH)
             break
         case 2:
-            if (ballHeroRandom <= 10):
-                # Hammer their dead body
-                wait(0.5)
-                ballPlayer.communicate(Comms.NO)
-                ballPlayer.setWeapon(2)
-                ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
-                waitUntil(not ballPlayerMock, 9999)
-                ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
-                ballPlayer.setWeapon(random.randint(0, 1))
-                ballPlayer.forceButtonPress(Button.INTERACT)
+            # Hammer their dead body
+            wait(0.5)
+            ballPlayer.communicate(Comms.NO)
+            ballPlayer.setWeapon(2)
+            ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
+            waitUntil(not ballPlayerMock, 9999)
+            ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
+            ballPlayer.setWeapon(random.randint(0, 1))
+            ballPlayer.forceButtonPress(Button.INTERACT)
             break
         case 3:
-            if (ballHeroRandom <= 10):
-                # That was so boring Torb is going to take a nap
-                ballPlayer.setStatusEffect(null, Status.ASLEEP, 9999)
-                wait(0.5)
-                ballPlayer.communicate(Comms.GOODBYE)
-                waitUntil(not ballPlayerMock, 9999)
-                ballPlayer.clearStatusEffect(Status.ASLEEP)
+            # That was so boring Torb is going to take a nap
+            ballPlayer.setStatusEffect(null, Status.ASLEEP, 9999)
+            wait(0.5)
+            ballPlayer.communicate(Comms.GOODBYE)
+            waitUntil(not ballPlayerMock, 9999)
+            ballPlayer.clearStatusEffect(Status.ASLEEP)
             break
         case 4:
-            if (ballHeroRandom <= 10):
-                # Torb is not joking around.
-                ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-                waitUntil(targetedPlayer != "-1", 9999)
-                createInWorldText(getAllPlayers(), "You're next, {0}.".format(targetedPlayer), ballPlayer.getEyePosition() + vect(0, 0.5, 0), 3, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, Color.RED, SpecVisibility.ALWAYS)
-                ballHeroRegretText = getLastCreatedText()
-                waitUntil(not ballPlayerMock, 9999)
-                destroyInWorldText(ballHeroRegretText)
+            # Torb is not joking around.
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            waitUntil(targetedPlayer != "-1", 9999)
+            createInWorldText(getAllPlayers(), "You're next, {0}.".format(targetedPlayer), ballPlayer.getEyePosition() + vect(0, 0.5, 0), 3, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, Color.RED, SpecVisibility.ALWAYS)
+            ballHeroRegretText = getLastCreatedText()
+            waitUntil(not ballPlayerMock, 9999)
+            destroyInWorldText(ballHeroRegretText)
             break
         case 5:
-            if (ballHeroRandom <= 10):
-                waitUntil(targetedPlayer != "-1", 10)
-                ballPlayer.setGravity(0)
-                ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + vect(0, 1, 0), true)
-                ballPlayer.setFacing(vect(0, -1, 0), Relativity.TO_PLAYER)
-                createInWorldText(getAllPlayers(), "{0} is next, don't tell them :)".format(targetedPlayer), ballPlayer.getEyePosition() + vect(0, 0.5, 0), 3, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, Color.SKY_BLUE, SpecVisibility.ALWAYS)
-                ballHeroRegretText = getLastCreatedText()
-                wait(0.5)
-                ballPlayer.communicate(Comms.HELLO)
-                waitUntil(not ballPlayerMock, 9999)
-                destroyInWorldText(ballHeroRegretText)
-                ballPlayer.stopForcingPosition()
+            waitUntil(targetedPlayer != "-1", 10)
+            ballPlayer.setGravity(0)
+            ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + vect(0, 1, 0), true)
+            ballPlayer.setFacing(vect(0, -1, 0), Relativity.TO_PLAYER)
+            createInWorldText(getAllPlayers(), "{0} is next, don't tell them :)".format(targetedPlayer), ballPlayer.getEyePosition() + vect(0, 0.5, 0), 3, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, Color.SKY_BLUE, SpecVisibility.ALWAYS)
+            ballHeroRegretText = getLastCreatedText()
+            wait(0.5)
+            ballPlayer.communicate(Comms.HELLO)
+            waitUntil(not ballPlayerMock, 9999)
+            destroyInWorldText(ballHeroRegretText)
+            ballPlayer.stopForcingPosition()
             break
         case 6:
-            if (ballHeroRandom <= 10):
-                # SPEEN
-                ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
+            # SPEEN
+            ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
+            ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE) 
                 ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE) 
+            ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE) 
