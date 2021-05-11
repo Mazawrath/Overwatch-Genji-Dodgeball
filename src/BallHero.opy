@@ -164,7 +164,7 @@ def SuperFun():
     ballHeroRandom = random.randint(0, 100)
     # Only have a 50% chance of doing a fun thing
     if random.randint(0,1):
-        break
+        return
     switch random.randint(1, 6):
         case 1:
             # SPEEN
@@ -236,7 +236,7 @@ def ShortFun():
 
     # Only have a 10% chance of doing a fun thing
     if (random.randint(1, 100) <= 90):
-        break
+        return
     ballHeroRandom = random.randint(0, 100)
     switch random.randint(1, 6):
         case 1:
