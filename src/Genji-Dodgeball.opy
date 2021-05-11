@@ -124,7 +124,7 @@ globalvar ballHeroRegretText 67
 globalvar ballHeroRandom 68
 globalvar name 69
 globalvar wasFinalDuel 70
-globalvar startingText
+globalvar startingText 71
 
 
 #Player variables
