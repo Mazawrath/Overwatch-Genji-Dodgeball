@@ -73,6 +73,7 @@ rule "Create hero ball":
     createInWorldText(getAllPlayers(), startingText, ballPlayer.getEyePosition() + vect(0, 0.5, 0), 5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.RED, SpecVisibility.ALWAYS)
     ballHeroRegretText = getLastCreatedText()
 
+
 rule "Init hero ball":
     @Event eachPlayer
     @Condition ballHero
@@ -165,7 +166,7 @@ def LongFun():
     # Only have a 50% chance of doing a fun thing
     if random.randint(0,1):
         return
-    switch random.randint(1, 7):
+    switch random.randint(1, 8):
         case 1:
             # SPEEN
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
@@ -266,6 +267,24 @@ def LongFun():
                 ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
                 ballPlayer.setWeapon(random.randint(0, 1))
             break
+        case 8:
+            wait(1)
+            ballHeroRandom = random.choice(getPlayersOnHero(playerHero, Team.ALL))
+            ballPlayer.enablePlayerCollision()
+            ballPlayer.setMoveSpeed(150)
+            ballPlayer.startThrottleInDirection(directionTowards(ballPlayer.getPosition(), ballHeroRandom.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom.getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            ballPlayer.setWeapon(2)
+            ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
+            createInWorldText(getAllPlayers(), "Come here {0}, I'll fix you right up!".format(ballHeroRandom), ballPlayer.getEyePosition() + vect(0, 1, 0), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
+            ballHeroRegretText = getLastCreatedText()
+            waitUntil(not ballPlayerMock, 9999)
+            ballPlayer.disablePlayerCollision()
+            ballPlayer.stopThrottleInDirection()
+            ballPlayer.setMoveSpeed(100)
+            ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
+            ballPlayer.setWeapon(random.randint(0, 1))
+            destroyInWorldText(ballHeroRegretText)
 
 
 def ShortFun():
