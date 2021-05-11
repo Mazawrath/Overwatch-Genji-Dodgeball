@@ -162,6 +162,9 @@ rule "Hero ball do funny thing":
 def SuperFun():
     @Name "Hero ball do a long super fun thing"
     ballHeroRandom = random.randint(0, 100)
+    # Only have a 50% chance of doing a fun thing
+    if random.randint(0,1):
+        break
     switch random.randint(1, 6):
         case 1:
             # SPEEN
