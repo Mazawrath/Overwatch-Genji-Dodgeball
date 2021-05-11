@@ -165,7 +165,7 @@ def SuperFun():
     # Only have a 50% chance of doing a fun thing
     if random.randint(0,1):
         return
-    switch random.randint(1, 6):
+    switch random.randint(1, 7):
         case 1:
             # SPEEN
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
@@ -239,6 +239,30 @@ def SuperFun():
                 waitUntil(distance(ballHero.getPosition(), ballHeroRandom) < 2.5, 9999)
                 wait(0.5)
             ballPlayer.stopThrottleInDirection()
+            break
+        case 7:
+            # nice
+            if (ballHeroRandom == 69):
+                # HYPER TBAG!
+                ballPlayer.setWeapon(2)
+                while ballPlayerMock == true:
+                    ballPlayer.communicate(Comms.YES)
+                    wait(0.05)
+                    ballPlayer.startForcingButton(Button.CROUCH)
+                    wait(0.05)
+                    ballPlayer.stopForcingButton(Button.CROUCH)
+            else:
+                # Tbag them
+                ballPlayer.communicate(Comms.YES)
+                ballPlayer.setWeapon(2)
+                ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
+                while ballPlayerMock == true:
+                    wait(0.1)
+                    ballPlayer.startForcingButton(Button.CROUCH)
+                    wait(0.1)
+                    ballPlayer.stopForcingButton(Button.CROUCH)
+                ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
+                ballPlayer.setWeapon(random.randint(0, 1))
             break
 
 
