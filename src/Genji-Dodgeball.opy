@@ -154,7 +154,7 @@ subroutine CoolDeathEffects 0
 subroutine UpdatedDeathEffects 1
 subroutine DeflectFailed 2
 subroutine ShortFun 3
-subroutine SuperFun 4
+subroutine LongFun 4
 
 
 #Activated extensions
