@@ -225,7 +225,7 @@ def SuperFun():
                 wait(0.05)
                 ballPlayer.stopForcingButton(Button.ULTIMATE)
                 ballPlayer.forceButtonPress(Button.PRIMARY_FIRE)
-            ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE) 
+            ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
 
 
 def ShortFun():
