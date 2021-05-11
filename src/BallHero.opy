@@ -229,6 +229,17 @@ def SuperFun():
                 ballPlayer.stopForcingButton(Button.ULTIMATE)
                 ballPlayer.forceButtonPress(Button.PRIMARY_FIRE)
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
+            break
+        case 6:
+            ballPlayer.setMoveSpeed(300)
+            ballPlayer.startThrottleInDirection(ballHeroRandom, 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            while ballPlayerMock:
+                ballHeroRandom = vect(random.uniform(-17, 17), 0, random.uniform(-17, 17))
+                waitUntil(distance(ballHero.getPosition(), ballHeroRandom) < 2.5, 9999)
+                wait(0.5)
+            ballPlayer.stopThrottleInDirection()
+            break
 
 
 def ShortFun():
