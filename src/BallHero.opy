@@ -1,3 +1,5 @@
+#!mainFile "./Genji-Dodgeball.opy"
+
 rule "Create hero ball":
     @Condition ballHero != null
 
