@@ -1134,6 +1134,14 @@ rule "Check for last player surviving":
             beamStyle++
             beamStyleText = "Beam 7 - Symmetra Projector"
             break
+        case 7:
+            createBeam(getAllPlayers(), Beam.TORBJORN_TURRET_SIGHT, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail1 = getLastCreatedEntity()
+            createBeam(getAllPlayers(), Beam.TORBJORN_TURRET_SIGHT, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail2 = getLastCreatedEntity()
+            beamStyle++
+            beamStyleText = "Beam 8 - Torbjorn Turret Sight"
+            break
         default:
             createBeam(getAllPlayers(), Beam.ORISA_AMPLIFIER, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
             ballTail1 = getLastCreatedEntity()
