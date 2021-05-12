@@ -290,6 +290,7 @@ def LongFun():
             ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
             ballPlayer.setWeapon(random.randint(0, 1))
             destroyInWorldText(ballHeroRegretText)
+            break
         case 9:
             ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
             ballPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
@@ -313,14 +314,18 @@ def LongFun():
             ballPlayer.startScalingSize(1, false)
             stopChasingVariable(ballHeroRandom)
             stopChasingVariable(ballHeroRegretText)
+            break
         case 10:
-            wait(0.5)
-            ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + (targetedPlayer.getFacingDirection() * 1), true)
-            waitUntil(targetedPlayer.isHoldingButton(Button.RELOAD) or not ballPlayerMock, 5)
-            ballHeroRandom = targetedPlayer.getEyePosition()
+            wait(0.25)
+            ballHeroRandom = targetedPlayer
+            ballPlayer.startForcingPosition(ballHeroRandom.getEyePosition() + (ballHeroRandom.getFacingDirection() * 1), true)
             ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 9999)
-            chase(ballHeroRandom, raycast(targetedPlayer.getEyePosition(), targetedPlayer.getEyePosition() + (targetedPlayer.getFacingDirection() * 100), getPlayersOnHero(playerHero, Team.ALL), [targetedPlayer, ballPlayer], true).getHitPosition(), rate=20, ChaseReeval.DESTINATION_AND_RATE)
-            ballPlayer.startForcingPosition(ballHeroRandom, true)
+            smallMessage(ballHeroRandom, "Press reload to yeet Torbjörn")
+            waitUntil(ballHeroRandom.isHoldingButton(Button.RELOAD) or not ballPlayerMock, 5)
+            ballPlayer.stopForcingPosition()
+            ballPlayer.applyImpulse(directionTowards(ballPlayer.getPosition(), raycast(ballHeroRandom.getEyePosition(), ballHeroRandom.getEyePosition() + (ballHeroRandom.getFacingDirection() * 100), getPlayersOnHero(playerHero, Team.ALL), [ballHeroRandom, ballPlayer], true).getHitPosition()), 75    , Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            waitUntil(not ballPlayerMock, 5)
+            ballPlayer.clearStatusEffect(Status.KNOCKED_DOWN)
 
 
 
