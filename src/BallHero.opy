@@ -168,7 +168,7 @@ def LongFun():
     # Only have a 50% chance of doing a fun thing
     if random.randint(0,1):
         return
-    switch random.randint(1, 9):
+    switch random.randint(1, 10):
         case 1:
             # SPEEN
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
@@ -313,6 +313,15 @@ def LongFun():
             ballPlayer.startScalingSize(1, false)
             stopChasingVariable(ballHeroRandom)
             stopChasingVariable(ballHeroRegretText)
+        case 10:
+            wait(0.5)
+            ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + (targetedPlayer.getFacingDirection() * 1), true)
+            waitUntil(targetedPlayer.isHoldingButton(Button.RELOAD) or not ballPlayerMock, 5)
+            ballHeroRandom = targetedPlayer.getEyePosition()
+            ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 9999)
+            chase(ballHeroRandom, raycast(targetedPlayer.getEyePosition(), targetedPlayer.getEyePosition() + (targetedPlayer.getFacingDirection() * 100), getPlayersOnHero(playerHero, Team.ALL), [targetedPlayer, ballPlayer], true).getHitPosition(), rate=20, ChaseReeval.DESTINATION_AND_RATE)
+            ballPlayer.startForcingPosition(ballHeroRandom, true)
+
 
 
 def ShortFun():
