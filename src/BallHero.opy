@@ -72,7 +72,7 @@ rule "Create hero ball":
         case 21:
             startingText = "There's no prize for coming in second"
             break
-    createInWorldText(getAllPlayers(), startingText, ballPlayer.getEyePosition() + vect(0, 0.5, 0), 5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.RED, SpecVisibility.ALWAYS)
+    createInWorldText(getAllPlayers(), startingText, ballPlayer.getEyePosition() + vect(0, 0.5, 0), 5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
     ballHeroRegretText = getLastCreatedText()
 
 
@@ -238,10 +238,13 @@ def LongFun():
             ballHeroRandom = vect(random.uniform(-20, 20), 1, random.uniform(-20, 20))
             ballPlayer.startThrottleInDirection(directionTowards(ballPlayer.getPosition(), ballHeroRandom), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
             ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            createInWorldText(getAllPlayers(), "Zip zoom".format(ballHeroRandom), ballPlayer.getEyePosition() + vect(0, 1, 0), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
+            ballHeroRegretText = getLastCreatedText()
             while ballPlayerMock:
                 if (distance(ballPlayer.getPosition(), ballHeroRandom) <  7):
                     ballHeroRandom = vect(random.uniform(-20, 20), 1, random.uniform(-20, 20))
                 wait(0.1)
+            destroyInWorldText(ballHeroRegretText)
             ballPlayer.stopThrottleInDirection()
             ballPlayer.setMoveSpeed(100)
             break
