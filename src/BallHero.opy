@@ -318,13 +318,14 @@ def LongFun():
         case 10:
             wait(0.25)
             ballHeroRandom = targetedPlayer
+            ballPlayer.communicate(Comms.HELLO)
             ballPlayer.startForcingPosition(ballHeroRandom.getEyePosition() + (ballHeroRandom.getFacingDirection() * 1), true)
-            ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 9999)
-            smallMessage(ballHeroRandom, "Press reload to yeet Torbjörn")
+            smallMessage(ballHeroRandom, "Press reload to yeet {0}".format(ballHero))
             waitUntil(ballHeroRandom.isHoldingButton(Button.RELOAD) or not ballPlayerMock, 5)
             ballPlayer.stopForcingPosition()
-            ballPlayer.applyImpulse(directionTowards(ballPlayer.getPosition(), raycast(ballHeroRandom.getEyePosition(), ballHeroRandom.getEyePosition() + (ballHeroRandom.getFacingDirection() * 100), getPlayersOnHero(playerHero, Team.ALL), [ballHeroRandom, ballPlayer], true).getHitPosition()), 75    , Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
-            waitUntil(not ballPlayerMock, 5)
+            ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 9999)
+            ballPlayer.applyImpulse(directionTowards(ballPlayer.getPosition(), ballHeroRandom.getEyePosition() + (ballHeroRandom.getFacingDirection() * 20)), 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            waitUntil(not ballPlayerMock, 4)
             ballPlayer.clearStatusEffect(Status.KNOCKED_DOWN)
 
 
