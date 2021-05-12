@@ -1,8 +1,9 @@
 #!mainFile "./Genji-Dodgeball.opy"
+#!obfuscate
 
 settings {
     "main": {
-        "description": "Genji Dodgeball Beta v7.3.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "description": "Genji Dodgeball Beta Beam Test v1. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -128,6 +129,8 @@ globalvar ballHeroRandom 68
 globalvar name 69
 globalvar wasFinalDuel 70
 globalvar startingText 71
+globalvar beamStyle 72
+globalvar beamStyleText 73
 
 
 #Player variables
@@ -165,6 +168,7 @@ subroutine LongFun 4
 #!extension buffAndDebuffSounds
 #!extension kineticExplosionEffects
 #!extension explosionSounds
+#!extension beamEffects
 #!extension spawnMoreDummyBots
 
 
@@ -181,6 +185,7 @@ rule "// SETTINGS":
     #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
     gameEndEnabled = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Time", false, 2)
     watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Enable Watermark", true, 0)
+    beamStyle = createWorkshopSetting(enum["Modern", "Classic"], "Visual Settings", "Ball Tail Style (currently does nothing but will if this becomes offical)", 0, 1)
     cooldownDashingEnabled = true
     redGreenColorblindMode = createWorkshopSetting(bool, "Visual Settings", "Red/Green Colorblind Mode", false, 2)
     finalDuelNuke = createWorkshopSetting(bool, "Visual Settings", "Final Duel Explosion", true, 3)
@@ -266,7 +271,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Beta Version 7.3.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Beta Beam Test v1".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -1078,6 +1083,65 @@ rule "Check for last player surviving":
         return
     roundInProgress = false
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    destroyEffect(ballTail1)
+    destroyEffect(ballTail2)
+    switch (beamStyle):
+        case 1:
+            createBeam(getAllPlayers(), Beam.WINSTON_TESLA_CANNON, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail1 = getLastCreatedEntity()
+            createBeam(getAllPlayers(), Beam.WINSTON_TESLA_CANNON, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail2 = getLastCreatedEntity()
+            beamStyle++
+            beamStyleText = "Beam 2 - Winston Tesla Cannon"
+            break
+        case 2:
+            createBeam(getAllPlayers(), Beam.ORISA_HALT_TENDRIL, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail1 = getLastCreatedEntity()
+            createBeam(getAllPlayers(), Beam.ORISA_HALT_TENDRIL, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail2 = getLastCreatedEntity()
+            beamStyle++
+            beamStyleText = "Beam 3 - Orisa Halt Tendril"
+            break
+        case 3:
+            createBeam(getAllPlayers(), Beam.MERCY_BOOST, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail1 = getLastCreatedEntity()
+            createBeam(getAllPlayers(), Beam.MERCY_BOOST, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail2 = getLastCreatedEntity()
+            beamStyle++
+            beamStyleText = "Beam 4 - Mercy Damage"
+            break
+        case 4:
+            createBeam(getAllPlayers(), Beam.MERCY_HEAL, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail1 = getLastCreatedEntity()
+            createBeam(getAllPlayers(), Beam.MERCY_HEAL, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail2 = getLastCreatedEntity()
+            beamStyle++
+            beamStyleText = "Beam 5 - Mercy Heal"
+            break
+        case 5:
+            createBeam(getAllPlayers(), Beam.MOIRA_ORB_DAMAGE, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail1 = getLastCreatedEntity()
+            createBeam(getAllPlayers(), Beam.MOIRA_ORB_DAMAGE, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail2 = getLastCreatedEntity()
+            beamStyle++
+            beamStyleText = "Beam 6 - Moira Orb Damage"
+            break
+        case 6:
+            createBeam(getAllPlayers(), Beam.SYMMETRA_PROJECTOR, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail1 = getLastCreatedEntity()
+            createBeam(getAllPlayers(), Beam.SYMMETRA_PROJECTOR, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail2 = getLastCreatedEntity()
+            beamStyle++
+            beamStyleText = "Beam 7 - Symmetra Projector"
+            break
+        default:
+            createBeam(getAllPlayers(), Beam.ORISA_AMPLIFIER, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail1 = getLastCreatedEntity()
+            createBeam(getAllPlayers(), Beam.ORISA_AMPLIFIER, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballTail2 = getLastCreatedEntity()
+            beamStyle = 1
+            beamStyleText = "Beam 1 - Orisa Amplifier"
+            
     targetedPlayer = -1
     ballSpawnCountdown = 5
     wait(1)
@@ -1308,8 +1372,17 @@ rule "Ball change color":
     # destroyEffect(ballTail2)
     #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.YELLOW, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #ballSmoke = getLastCreatedEntity()
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    # TODO UNCOMMENT THIS IF THIS BECOMES A THING
+    # if beamStyle == 0:
+    createBeam(getAllPlayers(), Beam.ORISA_AMPLIFIER, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    ballTail1 = getLastCreatedEntity()
+    createBeam(getAllPlayers(), Beam.ORISA_AMPLIFIER, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    ballTail2 = getLastCreatedEntity()
+    beamStyle = 1
+    beamStyleText = "Beam 1 - Orisa Amplifier"
+    # else:
+    #     createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #     createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #elif ballColor != 3 and ballSpeed >= 30 and ballSpeed < 35:
     #destroyEffect(ballSmoke)
     #destroyEffect(ballTail1)
