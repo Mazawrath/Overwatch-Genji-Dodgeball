@@ -168,7 +168,7 @@ def LongFun():
     # Only have a 50% chance of doing a fun thing
     if random.randint(0,1):
         return
-    switch random.randint(1, 8):
+    switch random.randint(1, 9):
         case 1:
             # SPEEN
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
@@ -287,6 +287,29 @@ def LongFun():
             ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
             ballPlayer.setWeapon(random.randint(0, 1))
             destroyInWorldText(ballHeroRegretText)
+        case 9:
+            ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.RIGHT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.teleport(circleCenter + vect(0,5,0))
+            ballPlayer.stopFacing()
+            ballHeroRandom = 0
+            chase(ballHeroRandom, 2, duration=7.5, ChaseReeval.NONE)
+            ballHeroRegretText = 0.75
+            ballPlayer.startScalingSize(ballHeroRandom, true)
+            ballPlayer.startModifyingVoicelinePitch(ballHeroRandom, true)
+            ballHeroRegretText = 0.75
+            chase(ballHeroRegretText, 0.05, duration=15, ChaseReeval.NONE)
+            while ballPlayerMock:
+                ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), random.choice(getPlayersOnHero(playerHero, Team.ALL)).getEyePosition()), Relativity.TO_WORLD)
+                ballPlayer.communicate(Comms.HELLO)
+                waitUntil(not ballPlayerMock, ballHeroRegretText)
+            ballPlayer.startScalingSize(1, false)
+            stopChasingVariable(ballHeroRandom)
+            stopChasingVariable(ballHeroRegretText)
 
 
 def ShortFun():
