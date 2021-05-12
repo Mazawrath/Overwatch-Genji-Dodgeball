@@ -1,3 +1,5 @@
+#!mainFile "./Genji-Dodgeball.opy"
+
 rule "Init player variables":
     @Event eachPlayer
     @Hero all
