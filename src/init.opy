@@ -73,7 +73,7 @@ rule "Create game sphere":
 
 
 rule "Create global HUD elements":
-    # hudText(getAllPlayers(), null, null, "BETA BUILD - NOT FULLY TESTED - CHANGES ARE NOT FINAL", HudPosition.LEFT, -20, null, null, Color.RED, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    # hudText(getAllPlayers(), null, null, "BETA BUILD - NOT FULLY TESTED - CHANGES ARE NOT FINAL", HudPosition.LEFT, -20, null, null, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     if getCurrentGamemode() == Gamemode.FFA:
         #white normal
         hudSubtext([player for player in getAllPlayers() if player != targetedPlayer], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
