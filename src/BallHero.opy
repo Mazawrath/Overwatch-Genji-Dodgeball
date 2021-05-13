@@ -341,7 +341,7 @@ def ShortFun():
     if (random.randint(1, 100) >= 10):
         return
     ballHeroRandom = random.randint(0, 100)
-    switch random.randint(1, 8):
+    switch random.randint(1, 9):
         case 1:
             # nice
             if (ballHeroRandom == 69):
@@ -437,4 +437,16 @@ def ShortFun():
             playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.SKY_BLUE, ballHeroRandom, 40)
             playEffect(getAllPlayers(), DynamicEffect.GOOD_EXPLOSION, Color.WHITE, ballHeroRandom, 2)
             destroyEffect(ballHeroRegretText)
+            destroyInWorldText(getLastCreatedText())
+        case 9:
+            wait()
+            createBeam(getAllPlayers(), Beam.GRAPPLE, updateEveryTick(ballPlayer.getEyePosition()), updateEveryTick(targetedPlayer.getPosition()), null, EffectReeval.POSITION_AND_RADIUS)
+            ballHeroRandom = getLastCreatedEntity()
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            createInWorldText(getAllPlayers(), "Get over here!", updateEveryTick(ballPlayer.getPosition()) + vect(0, 1, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
+            while ballPlayerMock:
+                ballPlayer.applyImpulse(directionTowards(ballPlayer.getPosition(), targetedPlayer.getPosition()), 2, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+                wait()
+                waitUntil(distance(ballPlayer.getPosition(), targetedPlayer.getPosition()) > 2, 9999)
+            destroyEffect(ballHeroRandom)
             destroyInWorldText(getLastCreatedText())
