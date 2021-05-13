@@ -170,7 +170,7 @@ def LongFun():
     @Name "Hero ball do a long super fun thing"
     ballHeroRandom = random.randint(0, 100)
     # Have a 12% chance of doing a fun thing for each player, up to 50% in a full server, minus torb
-    if random.randint(0, 100) <= getNumberOfPlayers * 4.17 - 12:
+    if random.randint(0, 100) >= getNumberOfPlayers(Team.ALL) * 4.17 - 12:
         return
     switch random.randint(1, 10):
         case 1:
