@@ -341,7 +341,7 @@ def ShortFun():
     if (random.randint(1, 100) >= 10):
         return
     ballHeroRandom = random.randint(0, 100)
-    switch random.randint(1, 7):
+    switch random.randint(1, 8):
         case 1:
             # nice
             if (ballHeroRandom == 69):
@@ -425,4 +425,16 @@ def ShortFun():
             destroyInWorldText(ballHeroRegretText)
             ballPlayer.stopForcingPosition()
             break
-            
+        case 8:
+            wait()
+            ballHeroRandom = ballPlayer.getPosition()
+            chase(ballHeroRandom, targetedPlayer.getEyePosition(), rate=20, ChaseReeval.DESTINATION_AND_RATE)
+            createEffect(getAllPlayers(), Effect.ORB, Color.RED, ballHeroRandom, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            ballHeroRegretText = getLastCreatedEntity()
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            createInWorldText(getAllPlayers(), "Think fast!", ballHeroRandom + vect(0, 0.5, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
+            waitUntil(distance(ballHeroRandom, targetedPlayer.getEyePosition()) < 1.9 or not ballPlayerMock, 9999)
+            playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.SKY_BLUE, ballHeroRandom, 40)
+            playEffect(getAllPlayers(), DynamicEffect.GOOD_EXPLOSION, Color.WHITE, ballHeroRandom, 2)
+            destroyEffect(ballHeroRegretText)
+            destroyInWorldText(getLastCreatedText())
