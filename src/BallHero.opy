@@ -206,7 +206,7 @@ def LongFun():
             ballPlayer.clearStatusEffect(Status.ASLEEP)
             break
         case 4:
-            waitUntil(targetedPlayer != "-1", 10)
+            wait(2.25)
             ballPlayer.setGravity(0)
             ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + vect(0, 1, 0), true)
             ballPlayer.setFacing(vect(0, -1, 0), Relativity.TO_PLAYER)
