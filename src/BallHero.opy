@@ -242,7 +242,7 @@ def LongFun():
             ballHeroRandom = vect(random.uniform(-20, 20), 1, random.uniform(-20, 20))
             ballPlayer.startThrottleInDirection(directionTowards(ballPlayer.getPosition(), ballHeroRandom), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
             ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-            createInWorldText(getAllPlayers(), "Zip zoom".format(ballHeroRandom), ballPlayer.getEyePosition() + vect(0, 1, 0), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
+            createInWorldText(getAllPlayers(), "Zip zoom".format(ballHeroRandom), updateEveryTick(ballPlayer.getEyePosition()) + vect(0, 1, 0), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
             ballHeroRegretText = getLastCreatedText()
             while ballPlayerMock:
                 if (distance(ballPlayer.getPosition(), ballHeroRandom) <  7):
