@@ -417,7 +417,7 @@ def ShortFun():
             ballPlayer.startForcingPosition(circleCenter + vect(random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1), -circleCenter.y, random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1)), true)
             eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
             wait()
-            createInWorldText(getAllPlayers(), "Jealous that I can be in here and you can't? :)", ballPlayer.getEyePosition() + vect(0, 0.5, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.SKY_BLUE, SpecVisibility.ALWAYS)
+            createInWorldText(getAllPlayers(), "Jealous that I can be in here and you can't? :)", ballPlayer.getEyePosition() + vect(0, 0.5, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
             ballHeroRegretText = getLastCreatedText()
             wait(0.5)
             ballPlayer.communicate(Comms.HELLO)
