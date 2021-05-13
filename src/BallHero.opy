@@ -341,7 +341,7 @@ def ShortFun():
     if (random.randint(1, 100) <= 90):
         return
     ballHeroRandom = random.randint(0, 100)
-    switch random.randint(1, 6):
+    switch random.randint(1, 7):
         case 1:
             # nice
             if (ballHeroRandom == 69):
@@ -412,3 +412,17 @@ def ShortFun():
             # SPEEN
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE) 
+            break
+        case 7:
+            ballPlayer.startForcingPosition(circleCenter + vect(random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1), -circleCenter.y, random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1)), true)
+            eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            wait()
+            createInWorldText(getAllPlayers(), "Jealous that I can be in here and you can't? :)", ballPlayer.getEyePosition() + vect(0, 0.5, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.SKY_BLUE, SpecVisibility.ALWAYS)
+            ballHeroRegretText = getLastCreatedText()
+            wait(0.5)
+            ballPlayer.communicate(Comms.HELLO)
+            waitUntil(not ballPlayerMock, 9999)
+            destroyInWorldText(ballHeroRegretText)
+            ballPlayer.stopForcingPosition()
+            break
+            
