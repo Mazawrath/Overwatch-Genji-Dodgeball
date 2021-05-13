@@ -160,6 +160,10 @@ rule "Hero ball do funny thing":
         ballPlayer.communicate(Comms.HELLO)
     if (random.randint(0, 100) <= 5):
         ballPlayer.forceButtonPress(Button.ABILITY_2)
+    if (random.randint(0, 100) <= 5):
+        ballPlayer.startModifyingVoicelinePitch(random.uniform(0, 2), false)
+    else:
+        ballPlayer.startModifyingVoicelinePitch(1, false)
 
 
 def LongFun():
