@@ -306,8 +306,11 @@ def LongFun():
             ballPlayer.stopFacing()
             ballHeroRandom = 0
             chase(ballHeroRandom, 2, duration=7.5, ChaseReeval.NONE)
+            # Pretty sure this variable literally does nothing, I added this when I started develpoment and couldn't even get it to work...
+            ballPlayer.currentUltPercent = 4
+            chase(ballPlayer.currentUltPercent, 0, duration=7.5, ChaseReeval.NONE)
             ballHeroRegretText = 0.75
-            ballPlayer.startScalingSize(ballHeroRandom, true)
+            ballPlayer.startScalingSize(ballPlayer.currentUltPercent, true)
             ballPlayer.startModifyingVoicelinePitch(ballHeroRandom, true)
             ballHeroRegretText = 0.75
             chase(ballHeroRegretText, 0.05, duration=15, ChaseReeval.NONE)
