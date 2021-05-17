@@ -182,7 +182,7 @@ def LongFun():
             ballHeroRegretText = getLastCreatedText()
             while ballPlayerMock:
                 ballPlayer.applyImpulse(Vector.UP, 10, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
-                wait(0.5)
+                waitUntil(not ballPlayerMock,0.5)
             destroyInWorldText(ballHeroRegretText)
             break
         case 2:
