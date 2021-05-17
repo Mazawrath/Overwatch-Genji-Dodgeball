@@ -341,6 +341,7 @@ def LongFun():
             ballPlayer.applyImpulse(directionTowards(ballPlayer.getPosition(), ballHeroRandom.getEyePosition() + (ballHeroRandom.getFacingDirection() * 20)), 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
             waitUntil(not ballPlayerMock, 4)
             ballPlayer.clearStatusEffect(Status.KNOCKED_DOWN)
+            break
 
 
 
@@ -449,6 +450,7 @@ def ShortFun():
             playEffect(getAllPlayers(), DynamicEffect.GOOD_EXPLOSION, Color.WHITE, ballHeroRandom, 2)
             destroyEffect(ballHeroRegretText)
             destroyInWorldText(getLastCreatedText())
+            break
         case 9:
             wait()
             createBeam(getAllPlayers(), Beam.GRAPPLE, updateEveryTick(ballPlayer.getEyePosition()), updateEveryTick(targetedPlayer.getPosition()), null, EffectReeval.POSITION_AND_RADIUS)
@@ -461,6 +463,7 @@ def ShortFun():
                 waitUntil(distance(ballPlayer.getPosition(), targetedPlayer.getPosition()) > 2, 9999)
             destroyEffect(ballHeroRandom)
             destroyInWorldText(getLastCreatedText())
+            break
         case 10:
             # Torb horror game.
             wait()
@@ -472,3 +475,4 @@ def ShortFun():
             waitUntil(not ballPlayerMock, 9999)
             ballPlayer.stopForcingPosition()
             destroyInWorldText(getLastCreatedText())
+            break
