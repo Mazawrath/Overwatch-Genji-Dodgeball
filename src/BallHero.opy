@@ -174,7 +174,7 @@ def LongFun():
         return
     switch random.randint(1, 10):
         case 1:
-            # SPEEN
+            # I think this one is easily my favorite.
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 1000, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
             wait(1.5)
@@ -238,6 +238,7 @@ def LongFun():
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
             break
         case 6:
+            # Torb got a case of the zoomies.
             ballPlayer.setMoveSpeed(500)
             ballHeroRandom = vect(random.uniform(-20, 20), 1, random.uniform(-20, 20))
             ballPlayer.startThrottleInDirection(directionTowards(ballPlayer.getPosition(), ballHeroRandom), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
@@ -277,6 +278,7 @@ def LongFun():
                 ballPlayer.setWeapon(random.randint(0, 1))
             break
         case 8:
+            # Torb thinks one Genji in specific is broken.
             wait(1)
             ballHeroRandom = random.choice(getPlayersOnHero(playerHero, Team.ALL))
             ballPlayer.enablePlayerCollision()
@@ -323,6 +325,7 @@ def LongFun():
             stopChasingVariable(ballHeroRegretText)
             break
         case 10:
+            # Get the chance to let your anger out and yeet torb.
             wait(0.25)
             ballHeroRandom = targetedPlayer
             ballPlayer.communicate(Comms.HELLO)
@@ -417,6 +420,7 @@ def ShortFun():
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE) 
             break
         case 7:
+            # To the person who keeps telling me to remove the center orb.
             ballPlayer.startForcingPosition(circleCenter + vect(random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1), -circleCenter.y, random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1)), true)
             eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
             wait()
@@ -454,6 +458,7 @@ def ShortFun():
             destroyEffect(ballHeroRandom)
             destroyInWorldText(getLastCreatedText())
         case 10:
+            # Torb horror game.
             wait()
             ballHeroRandom = random.choice([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero])
             ballPlayer.setGravity(0)
