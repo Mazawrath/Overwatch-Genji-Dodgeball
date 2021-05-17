@@ -328,10 +328,14 @@ def LongFun():
             # Get the chance to let your anger out and yeet torb.
             wait(0.25)
             ballHeroRandom = targetedPlayer
-            ballPlayer.communicate(Comms.HELLO)
-            ballPlayer.startForcingPosition(ballHeroRandom.getEyePosition() + (ballHeroRandom.getFacingDirection() * 1), true)
-            smallMessage(ballHeroRandom, "Press reload to yeet {0}".format(ballHero))
+            ballPlayer.communicate(Comms.NO)
+            ballPlayer.setGravity(0)
+            ballPlayer.startForcingPosition((updateEveryTick(ballHeroRandom.getEyePosition()) + vect(0, -1.1, 0)) + (ballHeroRandom.getFacingDirection() * 2), true)
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            createInWorldText(ballHeroRandom, "Press reload to yeet {0}".format(ballHero), (updateEveryTick(ballHeroRandom.getEyePosition()) + vect(0, -0.06, 0)) + (ballHeroRandom.getFacingDirection() * 0.5), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
             waitUntil(ballHeroRandom.isHoldingButton(Button.RELOAD) or not ballPlayerMock, 5)
+            ballPlayer.setGravity(100)
+            destroyInWorldText(getLastCreatedText())
             ballPlayer.stopForcingPosition()
             ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 9999)
             ballPlayer.applyImpulse(directionTowards(ballPlayer.getPosition(), ballHeroRandom.getEyePosition() + (ballHeroRandom.getFacingDirection() * 20)), 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
