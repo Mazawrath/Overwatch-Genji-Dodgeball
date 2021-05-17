@@ -466,7 +466,7 @@ def ShortFun():
             wait()
             ballHeroRandom = random.choice([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero])
             ballPlayer.setGravity(0)
-            ballPlayer.startForcingPosition((updateEveryTick(ballHeroRandom.getEyePosition()) + vect(0, -1.1, 0)) + (ballHeroRandom.getFacingDirection() * 1), true)
+            ballPlayer.startForcingPosition((updateEveryTick(ballHeroRandom.getEyePosition()) + vect(0, -1.1, 0)) + (ballHeroRandom.getFacingDirection() * 0.75), true)
             ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
             createInWorldText(getAllPlayers(), "Boo!", ballPlayer.getEyePosition() + vect(0, 0.5, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
             waitUntil(not ballPlayerMock, 9999)
