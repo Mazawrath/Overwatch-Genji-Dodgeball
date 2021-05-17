@@ -341,7 +341,7 @@ def ShortFun():
     if (random.randint(1, 100) >= 10):
         return
     ballHeroRandom = random.randint(0, 100)
-    switch random.randint(1, 9):
+    switch random.randint(1, 10):
         case 1:
             # nice
             if (ballHeroRandom == 69):
@@ -449,4 +449,14 @@ def ShortFun():
                 wait()
                 waitUntil(distance(ballPlayer.getPosition(), targetedPlayer.getPosition()) > 2, 9999)
             destroyEffect(ballHeroRandom)
+            destroyInWorldText(getLastCreatedText())
+        case 10:
+            wait()
+            ballHeroRandom = [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero]
+            ballPlayer.setGravity(0)
+            ballPlayer.startForcingPosition((updateEveryTick(ballHeroRandom.getEyePosition()) + vect(0, -1.1, 0)) + (ballHeroRandom.getFacingDirection() * 1), true)
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            createInWorldText(getAllPlayers(), "Boo!", ballPlayer.getEyePosition() + vect(0, 0.5, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
+            waitUntil(not ballPlayerMock, 9999)
+            ballPlayer.stopForcingPosition()
             destroyInWorldText(getLastCreatedText())
