@@ -1,0 +1,1414 @@
+#!mainFile "./Genji-Dodgeball.opy"
+
+settings {
+    "main": {
+        "description": "Genji Dodgeball Beta v7.3.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+    },
+    "lobby": {
+        "allowPlayersInQueue": true,
+        "mapRotation": "afterGame",
+        "enableMatchVoiceChat": true,
+        "spectatorSlots": 6,
+        "returnToLobby": "never",
+        "swapTeamsAfterMatch": false,
+        "teamBalancing": "afterGame"
+    },
+    "gamemodes": {
+        "ffa": {
+            "enabledMaps": [
+                "workshopIslandNight"
+            ],
+            "gameLengthInMn": 15,
+            "enableSelfInitiatedRespawn": false
+        },
+        "tdm": {
+            "enabled": false,
+            "gameLengthInMn": 15,
+            "needsImbalancedTeamScoreToWin": true,
+            "team1ScoreToWin": 10,
+            "team2ScoreToWin": 10
+        },
+        "general": {
+            "enableHeroSwitching": false,
+            "gamemodeStartTrigger": "immediately",
+            "heroLimit": "off",
+            "enableRandomHeroes": true
+        }
+    },
+    "heroes": {
+        "allTeams": {
+            "genji": {
+                "ability2Cooldown%": 0,
+                "enableInfiniteAmmo": true,
+                "enablePrimaryFire": false,
+                "enableMelee": false,
+                "enableSecondaryFire": false,
+                "ability1Cooldown%": 38,
+                "combatUltGen%": 0,
+                "passiveUltGen%": 0
+            },
+            "torbjorn": {
+                "ability2Duration%": 300
+            },
+            "enabledHeroes": [
+                "genji"
+            ]
+        }
+    }
+}
+
+#Global variables
+
+globalvar targetedPlayer 0
+globalvar previousTargetedPlayer 1
+globalvar ballSpeed 2
+globalvar ballPosition 3
+globalvar ballSpawnCountdown 4
+globalvar ballIsOut 5
+globalvar ballDeleteRequested 6
+globalvar roundInProgress 7
+globalvar bouncePadCooldownLength 8
+globalvar ballSpawnSpeed 9
+globalvar maxBallSpeed 10
+globalvar isInFinalDuel 11
+globalvar ballSpawnCountdownHUD 12
+globalvar bouncePadDistance 13
+globalvar bouncePadStrength 14
+globalvar bouncePad1 15
+globalvar bouncePad2 16
+globalvar bouncePad3 17
+globalvar bouncePad4 18
+globalvar deathSphere 19
+globalvar deathSphereRad 20
+globalvar isEnoughPlayersToStart 21
+globalvar waitingForPlayersHUD 22
+globalvar centerOffLimitsSize 23
+globalvar sphereSize 24
+globalvar circleCenter 25
+globalvar redGreenColorblindMode 26
+globalvar watermarkEnabled 27
+globalvar bouncepadDashingEnabled 28
+globalvar gameEndEnabled 29
+globalvar cooldownDashingEnabled 30
+globalvar deathSpherePos 31
+globalvar deathBeam 32
+globalvar ballDirection 33
+globalvar ballCollisionSurfaceNormal 34
+globalvar prevBallPos 35
+globalvar prevBallPos2 36
+globalvar ballSmoke 37
+globalvar ballTail1 38
+globalvar ballTail2 39
+globalvar ballColor 40
+globalvar highestScore 41
+globalvar tieBreakerActive 42
+globalvar randomExplosionPicker 43
+globalvar explosionSoundVolume 44
+globalvar improvedExplosions 45
+globalvar randomExplosionSounds 46
+globalvar finalDuelNuke 47
+globalvar allowMatchEnd 51
+globalvar passingDamage 52
+globalvar isPassingTeam1 53
+globalvar isPassingTeam2 54
+globalvar scoreToWin 55
+globalvar passingEnabled 56
+globalvar bouncePadSuperjumpNerf 57
+globalvar passingPlayer 58
+globalvar passingAssistId 59
+globalvar passingPlayerName 60
+globalvar passingAuraToggle 61
+globalvar torbBall 62
+globalvar ballHero 63
+globalvar playerHero 64
+globalvar ballPlayer 65
+globalvar ballPlayerMock 66
+globalvar ballHeroRegretText 67
+globalvar ballHeroRandom 68
+globalvar name 69
+globalvar wasFinalDuel 70
+globalvar startingText 71
+
+
+#Player variables
+
+playervar hasMoved 0
+playervar currentUltPercent 1
+playervar bouncePadCooldown 2
+playervar playerDeflects 4
+playervar playerKills 5
+playervar playerDeaths 6
+playervar playerEffects 7
+playervar playerUI 8
+playervar isDashEnabled 9
+playervar moveSpeed 10
+playervar maxBallSpeed 11
+playervar antiFloatProtection 12
+playervar antiFloatTimer 13
+playervar antiStuckProtection 14
+playervar toggleHUD 15
+playervar dashNerf 16
+playervar passingSignal 17
+
+
+#Subroutine names
+
+subroutine CoolDeathEffects 0
+subroutine UpdatedDeathEffects 1
+subroutine DeflectFailed 2
+subroutine ShortFun 3
+subroutine LongFun 4
+
+
+#Activated extensions
+
+#!extension buffAndDebuffSounds
+#!extension kineticExplosionEffects
+#!extension explosionSounds
+#!extension spawnMoreDummyBots
+
+
+rule "// SETTINGS":
+    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 0)
+    torbBall = createWorkshopSetting(enum["Don't touch this rule", "You must of accidently opened this rule, please close it", 
+    "Why haven't you closed it?", "Wait, what are you planning?", "No, stop", "Close this, now.", "Don't you dare pick that option", "Please stop", 
+    "I'm begging you", "You are putting yourself in grave danger", "Don't scroll, please, whatever you do", "Stop scrolling", "I am warning you.", 
+    "You will not be safe if you select this.", "You are unleashing ancient dangers by even opening this rule.", "You're not going to stop, are you?", 
+    "Don't say that I didn't warn you.", "Torb Ball"], "Deathmatch Settings", "Torb Ball", 0, 0)
+    allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
+    scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
+    passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
+    #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
+    gameEndEnabled = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Time", false, 2)
+    watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Enable Watermark", true, 0)
+    cooldownDashingEnabled = true
+    redGreenColorblindMode = createWorkshopSetting(bool, "Visual Settings", "Red/Green Colorblind Mode", false, 2)
+    finalDuelNuke = createWorkshopSetting(bool, "Visual Settings", "Final Duel Explosion", true, 3)
+
+
+rule "// MAP ZONES":
+    targetedPlayer = 0
+
+
+rule "Set Workshop Island":
+    @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
+    
+    circleCenter = vect(0, 1.199, 0)
+    sphereSize = 60
+
+
+rule "Set Workshop Chamber":
+    @Condition getCurrentMap() == Map.WORKSHOP_CHAMBER
+    
+    circleCenter = vect(0, 1.199, 0)
+    sphereSize = 29.7
+
+
+rule "Set Workshop Expanse Center":
+    @Condition getCurrentMap() == Map.WORKSHOP_EXPANSE
+    
+    circleCenter = vect(0, 1.199, 0)
+    sphereSize = 20
+
+
+rule "Set Oasis University Center":
+    @Condition getCurrentMap() == Map.OASIS_UNIVERSITY
+    
+    circleCenter = vect(-192.609, 60.349, 2.252)
+    sphereSize = 20
+
+
+rule "Set Kings Row center (NOTE: Lower the max players! This arena is smaller then the others!)":
+    @Condition getCurrentMap() == Map.KINGS_ROW
+    
+    circleCenter = vect(-20.504, 40.538, -74.601)
+    sphereSize = 17
+
+
+rule "Set Blizz World center (fun fact: you can't use the name of the company who made this game in rule names)":
+    @Condition getCurrentMap() == Map.BLIZZ_WORLD
+    
+    circleCenter = vect(2.554, -4.651, -71.211)
+    sphereSize = 20
+
+
+rule "// INITIALIZATION":
+
+
+#!include "./init.opy"
+
+
+rule "Enable Scoreboard":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
+    @Condition eventPlayer.toggleHUD == true
+    
+    eventPlayer.disableGamemodeHud()
+    waitUntil(not eventPlayer.isHoldingButton(Button.INTERACT), 10)
+    eventPlayer.toggleHUD = false
+
+
+rule "Disable Scoreboard":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
+    @Condition eventPlayer.toggleHUD == false
+    
+    eventPlayer.enableGamemodeHud()
+    waitUntil(not eventPlayer.isHoldingButton(Button.INTERACT), 10)
+    eventPlayer.toggleHUD = true
+
+
+#!include "./BallHero.opy"
+
+
+rule "// Not enough players testing":
+    if not watermarkEnabled:
+        goto lbl_0
+    hudSubheader(getAllPlayers(), "Original by {0}. Beta Version 7.3.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    lbl_0:
+
+
+rule "Check for <2 players":
+    @Condition isGameInProgress() == true
+    @Condition getNumberOfHeroes(playerHero, Team.ALL) == 1
+    @Condition getCurrentGamemode() == Gamemode.FFA
+    
+    isInFinalDuel = false
+    hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+    waitingForPlayersHUD = getLastCreatedText()
+    isEnoughPlayersToStart = false
+    stopChasingVariable(ballSpawnCountdown)
+    if roundInProgress == false:
+        goto lbl_0
+    ballDeleteRequested = true
+    lbl_0:
+    roundInProgress = false
+    ballPlayerMock = false
+    pauseMatchTime()
+
+
+rule "Check for <2 players - TEAMS":
+    @Condition isGameInProgress() == true
+    #@Condition getNumberOfHeroes(playerHero, Team.ALL) == 1
+    @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == false
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    
+    isInFinalDuel = false
+    hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+    waitingForPlayersHUD = getLastCreatedText()
+    isEnoughPlayersToStart = false
+    stopChasingVariable(ballSpawnCountdown)
+    if roundInProgress == false:
+        goto lbl_0
+    ballDeleteRequested = true
+    lbl_0:
+    roundInProgress = false
+    pauseMatchTime()
+
+
+rule "Wait for more players":
+    @Condition getNumberOfHeroes(playerHero, Team.ALL) > 1
+    @Condition isEnoughPlayersToStart == false
+    @Condition getCurrentGamemode() == Gamemode.FFA
+    
+    destroyHudText(waitingForPlayersHUD)
+    bigMessage(getAllPlayers(), "Starting game in 5 seconds!")
+    wait(5.5)
+    if getNumberOfHeroes(playerHero, Team.ALL) < 2:
+        return
+    unpauseMatchTime()
+    isEnoughPlayersToStart = true
+    targetedPlayer = -1
+    previousTargetedPlayer = -1
+
+
+rule "Wait for more players - TEAMS":
+    @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == true
+    @Condition isEnoughPlayersToStart == false
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    
+    destroyHudText(waitingForPlayersHUD)
+    bigMessage(getAllPlayers(), "Starting game in 5 seconds!")
+    wait(5.5)
+    if getNumberOfHeroes(playerHero, Team.ALL) < 2:
+        return
+    unpauseMatchTime()
+    isEnoughPlayersToStart = true
+    targetedPlayer = -1
+    previousTargetedPlayer = -1
+
+
+rule "// GAME RULES":
+
+
+rule "Player joins game":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.hasMoved == false
+    #@Condition isGameInProgress() == true
+    @Condition eventPlayer.hasSpawned() == true
+    
+    if roundInProgress and isGameInProgress():
+        eventPlayer.teleport(circleCenter + vect(0, 500, 0))
+        eventPlayer.setInvisibility(Invis.ALL)
+        wait(0.05)
+        kill(eventPlayer, null)
+        wait(0.25)
+    eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
+    eventPlayer.hasMoved = true
+    if (ballHero != null  and not isGameInProgress()):
+        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), ballPlayer.getEyePosition()), 100, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
+    eventPlayer.setInvisibility(Invis.NONE)
+    if (ballHero != null):
+        waitUntil(isGameInProgress(), 10)
+        eventPlayer.stopFacing()
+
+
+rule "Shorten Deflect Length":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.isUsingAbility2() == true
+    @Condition eventPlayer.isUsingUltimate() == false
+    
+    wait(0.3)
+    eventPlayer.setAbility2Enabled(false)
+    eventPlayer.setAbility1Enabled(false)
+    wait(0.5)
+    eventPlayer.setAbility2Enabled(true)
+    eventPlayer.setAbility1Enabled(true)
+
+
+rule "Unlock dash after using jumppad":
+    @Event eachPlayer
+    @Hero all
+    @Condition bouncepadDashingEnabled == true
+    @Condition eventPlayer.isDashEnabled == true
+    
+    eventPlayer.setAbility1Enabled(true)
+
+
+rule "Disable dash after using":
+    @Event eachPlayer
+    @Hero all
+    @Condition bouncepadDashingEnabled == true
+    @Condition eventPlayer.isUsingAbility1() == true
+    
+    eventPlayer.setAbility1Enabled(false)
+    eventPlayer.isDashEnabled = false
+
+
+rule "Target random player":
+    @Condition isGameInProgress() == true
+    @Condition targetedPlayer == -1
+    
+    targetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and previousTargetedPlayer != getPlayersInSlot(player, Team.ALL) and player.getCurrentHero() != ballHero]))
+
+
+rule "Push to circle":
+    @Event eachPlayer
+    @Hero all
+    @Condition distance(eventPlayer.getPosition(), vect(circleCenter.x, eventPlayer.getPosition().y, circleCenter.z)) > sphereSize - 1.5
+    #Workshop Island Fix
+    @Condition getCurrentMap() != Map.WORKSHOP_ISLAND
+    @Condition getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT
+    
+    eventPlayer.applyImpulse(vect(directionTowards(eventPlayer.getPosition(), circleCenter).x, 0, directionTowards(eventPlayer.getPosition(), circleCenter).z), 6, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+    wait(0.25)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Put out center":
+    @Event eachPlayer
+    @Hero all
+    @Condition distance(eventPlayer.getPosition(), circleCenter) < centerOffLimitsSize + 0.5
+    
+    eventPlayer.applyImpulse(directionTowards(circleCenter, eventPlayer), 10, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION_XYZ)
+    eventPlayer.applyImpulse(Vector.UP, 1.5, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION_XYZ)
+    wait(0.25)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Player dashes too far out of bounds":
+    @Event eachPlayer
+    @Hero all
+    @Condition distance(eventPlayer.getPosition(), vect(circleCenter.x, eventPlayer.getPosition().y, circleCenter.z)) > sphereSize + 1
+    #Workshop Island Fix
+    #@Condition (getCurrentMap() != Map.WORKSHOP_ISLAND and getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT) == true
+    
+    eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 2.5)
+    #eventPlayer.teleport(circleCenter + vect(random.randint(-15, 15), 8, random.randint(-15, 15)))
+    eventPlayer.applyImpulse(vect(directionTowards(eventPlayer.getPosition(), circleCenter).x, 0, directionTowards(eventPlayer.getPosition(), circleCenter).z), 20, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    bigMessage(eventPlayer, "Do not dash out of the arena!")
+
+
+rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.getPosition().y < -0.5
+    @Condition eventPlayer.isAlive() == true
+    #Workshop Island Fix
+    @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
+    
+    #Prevents people from going under the ledge on Workshop Island, which caused ball to go into floor.  Used to be an annoying stunkill
+    eventPlayer.applyImpulse(Vector.UP, 2, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.applyImpulse(directionTowards(eventPlayer, circleCenter), 2, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+    wait(0.008)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Player falls off Workshop Island":
+    @Event eachPlayer
+    @Hero all
+    @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
+    @Condition eventPlayer.getPosition().y < -0.25
+    
+    #A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!
+    if not eventPlayer.isAlive():
+        eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
+        if eventPlayer == targetedPlayer:
+            if ballIsOut:
+                ballDeleteRequested = true
+    wait(0.5)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Anti-Bounce Detection Positive X":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.getPosition().y < 0
+    @Condition eventPlayer.getPosition().x > 20.5
+    #Workshop Island Fix
+    @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
+    
+    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
+    #Busted!
+    eventPlayer.antiFloatProtection = true
+    wait(0.25)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Anti-Bounce Detection Netgative X":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.getPosition().y < 0
+    @Condition eventPlayer.getPosition().x < -20.5
+    #Workshop Island Fix
+    @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
+    
+    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
+    #Busted!
+    eventPlayer.antiFloatProtection = true
+    wait(0.25)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Anti-Bounce Detection Positive Z":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.getPosition().y < 0
+    @Condition eventPlayer.getPosition().z > 20.5
+    #Workshop Island Fix
+    @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
+    
+    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
+    #Busted!
+    eventPlayer.antiFloatProtection = true
+    wait(0.25)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Anti-Bounce Detection Negative Z":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.getPosition().y < 0
+    @Condition eventPlayer.getPosition().z < -20.5
+    #Workshop Island Fix
+    @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
+    
+    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
+    #Busted!
+    eventPlayer.antiFloatProtection = true
+    wait(0.25)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Disable Anti-Bounce":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.getPosition().y >= 0
+    @Condition eventPlayer.antiFloatProtection == true
+    #Workshop Island Fix
+    @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
+    
+    eventPlayer.stopForcingThrottle()
+    eventPlayer.antiFloatProtection = false
+
+
+rule "Anti-Stuck Activation":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.getPosition().y < -4
+    @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
+    
+    eventPlayer.applyImpulse(Vector.UP, 5, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION_XYZ)
+    wait(0.5)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Bounce when near pad 1":
+    @Event eachPlayer
+    @Hero all
+    @Condition distance(eventPlayer.getPosition(), bouncePad1) <= 2.75
+    @Condition eventPlayer.bouncePadCooldown == 0
+    @Condition eventPlayer.isAlive() == true
+    @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
+    
+    eventPlayer.isDashEnabled = true
+    if eventPlayer.dashNerf:
+        eventPlayer.applyImpulse(Vector.UP, bouncePadStrength - bouncePadSuperjumpNerf, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    else:
+        eventPlayer.applyImpulse(Vector.UP, bouncePadStrength, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.WHITE, bouncePad1, 25)
+    eventPlayer.playerEffects[1] = getLastCreatedEntity()
+    wait(2)
+    destroyEffect(eventPlayer.playerEffects[1])
+
+
+rule "Bounce when near pad 2":
+    @Event eachPlayer
+    @Hero all
+    @Condition distance(eventPlayer.getPosition(), bouncePad2) <= 2.75
+    @Condition eventPlayer.bouncePadCooldown == 0
+    @Condition eventPlayer.isAlive() == true
+    @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
+    
+    eventPlayer.isDashEnabled = true
+    if eventPlayer.dashNerf:
+        eventPlayer.applyImpulse(Vector.UP, bouncePadStrength - bouncePadSuperjumpNerf, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    else:
+        eventPlayer.applyImpulse(Vector.UP, bouncePadStrength, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.WHITE, bouncePad1, 25)
+    eventPlayer.playerEffects[1] = getLastCreatedEntity()
+    wait(2)
+    destroyEffect(eventPlayer.playerEffects[1])
+
+
+rule "Bounce when near pad 3":
+    @Event eachPlayer
+    @Hero all
+    @Condition distance(eventPlayer.getPosition(), bouncePad3) <= 2.75
+    @Condition eventPlayer.bouncePadCooldown == 0
+    @Condition eventPlayer.isAlive() == true
+    @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
+    
+    eventPlayer.isDashEnabled = true
+    if eventPlayer.dashNerf:
+        eventPlayer.applyImpulse(Vector.UP, bouncePadStrength - bouncePadSuperjumpNerf, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    else:
+        eventPlayer.applyImpulse(Vector.UP, bouncePadStrength, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.WHITE, bouncePad1, 25)
+    eventPlayer.playerEffects[1] = getLastCreatedEntity()
+    wait(2)
+    destroyEffect(eventPlayer.playerEffects[1])
+
+
+rule "Bounce when near pad 4":
+    @Event eachPlayer
+    @Hero all
+    @Condition distance(eventPlayer.getPosition(), bouncePad4) <= 2.75
+    @Condition eventPlayer.bouncePadCooldown == 0
+    @Condition eventPlayer.isAlive() == true
+    @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
+    
+    eventPlayer.isDashEnabled = true
+    if eventPlayer.dashNerf:
+        eventPlayer.applyImpulse(Vector.UP, bouncePadStrength - bouncePadSuperjumpNerf, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    else:
+        eventPlayer.applyImpulse(Vector.UP, bouncePadStrength, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.WHITE, bouncePad1, 25)
+    eventPlayer.playerEffects[1] = getLastCreatedEntity()
+    wait(2)
+    destroyEffect(eventPlayer.playerEffects[1])
+
+
+rule "Ball delete requested":
+    @Condition ballDeleteRequested == true
+    
+    ballDeleteRequested = false
+    ballPlayerMock = true
+    targetedPlayer = -1
+    stopChasingVariable(ballDirection)
+    stopChasingVariable(ballPosition)
+    stopChasingVariable(ballSpeed)
+    ballPosition = vect(0, -1, 0)
+    ballDirection = vect(0, 0, 0)
+    ballIsOut = false
+    previousTargetedPlayer = -1
+    ballSpawnCountdown = 2
+    prevBallPos = vect(0, 0, 0)
+    prevBallPos2 = vect(0, 0, 0)
+
+
+rule "Only end game when there isn't a round in progress":
+    @Condition getMatchTime() == 0
+    @Condition roundInProgress == false
+    @Condition gameEndEnabled == true
+    @Condition tieBreakerActive == false
+    
+    enableMusic()
+    enableGamemodeCompletion()
+
+
+rule "primary = dash":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) == true
+    @Condition "{0}".format(eventPlayer) != "bytestats"
+    @Condition eventPlayer.getCurrentHero() != ballHero
+    
+    eventPlayer.forceButtonPress(Button.ABILITY_1)
+
+
+rule "secondary = deflect":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) == true
+    @Condition "{0}".format(eventPlayer) != "bytestats"
+    @Condition passingEnabled == false
+    @Condition eventPlayer.getCurrentHero() != ballHero
+    
+    eventPlayer.forceButtonPress(Button.ABILITY_2)
+
+
+rule "// ACTIVE GAME":
+
+
+rule "Start round":
+    @Condition isEnoughPlayersToStart == true
+    @Condition isGameInProgress() == true
+    @Condition getCurrentGamemode() == Gamemode.FFA
+    
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    roundInProgress = true
+    ballPlayerMock = false
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    ballSpawnCountdown = 5
+
+
+rule "Start round - TEAMS":
+    @Condition isEnoughPlayersToStart == true
+    @Condition isGameInProgress() == true
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    roundInProgress = true
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    ballSpawnCountdown = 5
+
+
+rule "Spawn ball":
+    @Condition ballSpawnCountdown == 0
+    
+    ballPosition = circleCenter
+    ballDirection = directionTowards(ballPosition, targetedPlayer.getEyePosition())
+    ballSpeed = min(30, ballSpeed)
+    ballPlayerMock = false
+    ballIsOut = true
+
+
+rule "ball motion (has to be done weird due to chase vector variable bugs)":
+    @Condition ballIsOut == true
+    
+    prevBallPos2 = prevBallPos
+    prevBallPos = ballPosition
+    chase(ballPosition, ballPosition + ballDirection * ballSpeed * 1, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+    wait(0.05)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Ball reaches player":
+    @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
+    @Condition ballIsOut == true
+    @Condition getCurrentGamemode() == Gamemode.FFA
+    
+    if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
+        #If they don't have enough health, kill em
+        if targetedPlayer.getHealth() <= 100:
+            DeflectFailed()
+            return
+    if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
+        goto lbl_0
+    DeflectFailed()
+    return
+    lbl_0:
+    if targetedPlayer.isUsingAbility2():
+        ballPlayer.setStatusEffect(null, Status.STUNNED, 0.5)
+    else:
+        ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 0.5)
+    #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
+    #        goto lbl_1
+    if targetedPlayer.isUsingAbility1():
+        targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+        targetedPlayer.teleport(ballPosition)
+    targetedPlayer.currentUltPercent += 5
+    playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, targetedPlayer.getPosition(), 200)
+    targetedPlayer.playerDeflects += 1
+    previousTargetedPlayer = targetedPlayer
+    ballSpeed = min(500, ballSpeed * 1.05)
+    if ballSpeed > targetedPlayer.maxBallSpeed:
+        targetedPlayer.maxBallSpeed = ballSpeed
+    stopChasingVariable(ballDirection)
+    lbl_1:
+    ballDirection = targetedPlayer.getFacingDirection()
+    wait(0.001)
+    # Check if player is passing and if passing is enabled
+    if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
+        isPassingTeam1 = true
+        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
+        playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
+        previousTargetedPlayer.setHealth(passingDamage)
+        targetedPlayer = previousTargetedPlayer
+    else:
+        isPassingTeam1 = false
+        heal(previousTargetedPlayer, null, passingDamage)
+        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+    #if RULE_CONDITION:
+    #        goto RULE_START
+
+
+rule "Ball reaches player -TEAMS":
+    @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
+    @Condition ballIsOut == true
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    
+    if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
+        #If they don't have enough health, kill em
+        if targetedPlayer.getHealth() <= 100:
+            DeflectFailed()
+            return
+    if not targetedPlayer.isUsingAbility2() and not targetedPlayer.isUsingAbility1():
+        DeflectFailed()
+        return
+    #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
+    #        goto lbl_1
+    if targetedPlayer.isUsingAbility1():
+        targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+        targetedPlayer.teleport(ballPosition)
+    targetedPlayer.currentUltPercent += 5
+    playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, targetedPlayer.getPosition(), 200)
+    targetedPlayer.playerDeflects += 1
+    previousTargetedPlayer = targetedPlayer
+    ballSpeed = min(500, ballSpeed * 1.05)
+    if ballSpeed > targetedPlayer.maxBallSpeed:
+        targetedPlayer.maxBallSpeed = ballSpeed
+    stopChasingVariable(ballDirection)
+    lbl_1:
+    ballDirection = targetedPlayer.getFacingDirection()
+    wait(0.001)
+    # Check if player is passing and if passing is enabled
+    if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
+        #if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
+        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
+        playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
+        previousTargetedPlayer.setHealth(passingDamage)
+        stopAssist(passingAssistId)
+        #passingPlayer = null
+        #Check which team is passing
+        if previousTargetedPlayer.getTeam() == Team.1:
+            isPassingTeam1 = true
+        else:
+            isPassingTeam2 = true
+        #If the member is the only one left on their team, self pass
+        if len([player for player in getLivingPlayers(previousTargetedPlayer.getTeam()) if true]) == 1:
+            targetedPlayer = previousTargetedPlayer
+            #Pass to another teammate
+        else:
+            passingPlayer = previousTargetedPlayer
+            passingPlayer.startGrantingAssistFor(getAllPlayers(), AssistReeval.NONE)
+            passingAssistId = getLastAssistID()
+            targetedPlayer = ((sorted([player for player in getLivingPlayers(previousTargetedPlayer.getTeam()) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+        #Not passing, heal the person deflecting and target someone on the other team
+    else:
+        # Only clear the passing player if this isn't that passing players ball
+        if isPassingTeam1 == false or isPassingTeam2 == false:
+            stopAssist(passingAssistId)
+            #passingPlayer = null
+        heal(previousTargetedPlayer, null, passingDamage)
+        isPassingTeam1 = false
+        isPassingTeam2 = false
+        targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+    #If deflecting and stuff breaks...disabling this is why.
+    #if RULE_CONDITION:
+    #        goto RULE_START
+
+
+rule "End assist after a second":
+    @Condition passingPlayer != null
+    @Condition getCurrentGamemode() == Gamemode.TDM
+
+    waitUntil(previousTargetedPlayer != passingPlayer, 10)
+    wait(1)
+    stopAssist(passingAssistId)
+    passingPlayer = null
+
+
+def DeflectFailed():
+    @Name "Player Didn't Deflect - Kill"
+    
+    heal(getLivingPlayers(Team.ALL), null, 200)
+    isPassingTeam1 = false
+    isPassingTeam2 = false
+    targetedPlayer.setStatusEffect(previousTargetedPlayer, Status.STUNNED, 1)
+    targetedPlayer.bouncePadCooldown = 0
+    previousTargetedPlayer.currentUltPercent += 15
+    kill(targetedPlayer, previousTargetedPlayer)
+    ballPlayer.stopFacing()
+    ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
+    if improvedExplosions == true:
+        UpdatedDeathEffects()
+    else:
+        CoolDeathEffects()
+    if passingPlayer and targetedPlayer.getTeam() != passingPlayer.getTeam():
+        # Please don't ask me why I need to do this. I don't know either.
+        passingPlayerName = passingPlayer
+        smallMessage(getAllPlayers(), "Passing assist from {0}!".format(passingPlayerName))
+    stopAssist(passingAssistId)
+    passingPlayer = null
+    targetedPlayer.playerDeaths += 1
+    previousTargetedPlayer.playerKills += 1
+    ballDeleteRequested = true
+    return
+
+
+def CoolDeathEffects():
+    @Name "CoolDeathEffects sub"
+    
+    createBeam(getAllPlayers(), Beam.BAD, previousTargetedPlayer, targetedPlayer, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    deathBeam = getLastCreatedEntity()
+    deathSpherePos = targetedPlayer.getPosition()
+    deathSphereRad = 30
+    chase(deathSphereRad, 0, duration=0.25, ChaseReeval.DESTINATION_AND_DURATION)
+    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.SKY_BLUE, deathSpherePos, 40)
+    createEffect(getAllPlayers(), Effect.SPHERE, Color.BLACK, deathSpherePos, deathSphereRad, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    deathSphere = getLastCreatedEntity()
+    playEffect(getAllPlayers(), DynamicEffect.GOOD_EXPLOSION, Color.WHITE, deathSpherePos, 5)
+    wait(0.25)
+    destroyEffect(deathSphere)
+    #playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.RED, deathSpherePos, sphereSize * 1.5)
+    #playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, deathSpherePos, 40)
+    destroyEffect(deathBeam)
+
+
+def UpdatedDeathEffects():
+    @Name "Updated Death Effects Sub"
+    
+    deathSpherePos = targetedPlayer.getPosition()
+    #Make sure it is final duel AND there are at least 3 or more players
+    if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 1 and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
+            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
+    elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0) and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
+            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
+    playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION, Color.WHITE, deathSpherePos, 1)
+    if randomExplosionSounds:
+        #Pick a random explosion sound
+        randomExplosionPicker = random.randint(0, 4)
+        if randomExplosionPicker == 0:
+            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT_SOUND, Color.WHITE, deathSpherePos, explosionSoundVolume)
+        elif randomExplosionPicker == 1:
+            playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, explosionSoundVolume)
+        elif randomExplosionPicker == 2:
+            playEffect(getAllPlayers(), DynamicEffect.ASHE_DYNAMITE_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, explosionSoundVolume)
+        elif randomExplosionPicker == 3:
+            playEffect(getAllPlayers(), DynamicEffect.PHARAH_BARRAGE_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, explosionSoundVolume)
+        elif randomExplosionPicker == 4:
+            playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_FRAG_LAUNCHER_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, explosionSoundVolume)
+    else:
+        #playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT_SOUND, Color.WHITE, deathSpherePos, explosionSoundVolume)
+        playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_FRAG_LAUNCHER_EXPLOSION_SOUND, Color.WHITE, deathSpherePos, explosionSoundVolume)
+
+
+rule "Final duel":
+    @Condition isGameInProgress() == true
+    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() != ballHero]) == 2
+    @Condition isEnoughPlayersToStart == true
+    @Condition isInFinalDuel == false
+    @Condition getCurrentGamemode() == Gamemode.FFA
+    
+    getLivingPlayers(Team.ALL).isDashEnabled = false
+    if ballIsOut == false:
+        goto lbl_0
+    ballDeleteRequested = true
+    lbl_0:
+    isInFinalDuel = true
+    getLivingPlayers(Team.ALL).bouncePadCooldown = 2
+    if getNumberOfHeroes(playerHero, Team.ALL) <= 2:
+        goto lbl_1
+    bigMessage(getAllPlayers(), "Final Duel!")
+    lbl_1:
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.RIGHT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    if getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT:
+        getLivingPlayers(Team.ALL)[0].teleport(circleCenter + vect(-1, 0, 0) * (sphereSize / 4))
+        getLivingPlayers(Team.ALL)[1].teleport(circleCenter + vect(1, 0, 0) * (sphereSize / 4))
+    else:
+        getLivingPlayers(Team.ALL)[0].teleport(circleCenter + vect(-1, 0, 0) * (sphereSize / 1.5))
+        getLivingPlayers(Team.ALL)[1].teleport(circleCenter + vect(1, 0, 0) * (sphereSize / 1.5))
+    getLivingPlayers(Team.ALL).setStatusEffect(null, Status.ROOTED, 2)
+    wait(0.001)
+    getLivingPlayers(Team.ALL)[0].setFacing(directionTowards(getLivingPlayers(Team.ALL)[0].getPosition(), circleCenter), Relativity.TO_WORLD)
+    getLivingPlayers(Team.ALL)[1].setFacing(directionTowards(getLivingPlayers(Team.ALL)[1].getPosition(), circleCenter), Relativity.TO_WORLD)
+
+
+rule "Final duel - TEAMS":
+    @Condition isGameInProgress() == true
+    #@Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved]) == 2
+    @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
+    @Condition isEnoughPlayersToStart == true
+    @Condition isInFinalDuel == false
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    
+    getLivingPlayers(Team.ALL).isDashEnabled = false
+    if ballIsOut == false:
+        goto lbl_0
+    ballDeleteRequested = true
+    lbl_0:
+    isInFinalDuel = true
+    getLivingPlayers(Team.ALL).bouncePadCooldown = 2
+    if getNumberOfHeroes(playerHero, Team.ALL) <= 2:
+        goto lbl_1
+    bigMessage(getAllPlayers(), "Final Duel!")
+    lbl_1:
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.RIGHT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    getLivingPlayers(Team.ALL).applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    if getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT:
+        getLivingPlayers(Team.ALL)[0].teleport(circleCenter + vect(-1, 0, 0) * (sphereSize / 4))
+        getLivingPlayers(Team.ALL)[1].teleport(circleCenter + vect(1, 0, 0) * (sphereSize / 4))
+    else:
+        getLivingPlayers(Team.ALL)[0].teleport(circleCenter + vect(-1, 0, 0) * (sphereSize / 1.5))
+        getLivingPlayers(Team.ALL)[1].teleport(circleCenter + vect(1, 0, 0) * (sphereSize / 1.5))
+    getLivingPlayers(Team.ALL).setStatusEffect(null, Status.ROOTED, 2)
+    wait(0.001)
+    getLivingPlayers(Team.ALL)[0].setFacing(directionTowards(getLivingPlayers(Team.ALL)[0].getPosition(), circleCenter), Relativity.TO_WORLD)
+    getLivingPlayers(Team.ALL)[1].setFacing(directionTowards(getLivingPlayers(Team.ALL)[1].getPosition(), circleCenter), Relativity.TO_WORLD)
+
+
+rule "Create passing aura":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE)
+    @Condition passingEnabled
+    @Condition passingAuraToggle
+    @Condition getCurrentGamemode() == Gamemode.TDM
+
+    createEffect([player for player in getPlayers(eventPlayer.getTeam()) if player != eventPlayer and not player.isDead()], Effect.BAD_AURA, Color.SKY_BLUE, eventPlayer.getEyePosition(), 1.5, EffectReeval.POSITION_AND_RADIUS)
+    eventPlayer.passingSignal = getLastCreatedEntity()
+    waitUntil(not eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) or eventPlayer.isDead(), 60)
+    destroyEffect(eventPlayer.passingSignal)
+
+rule "Check for last player surviving":
+    @Condition isGameInProgress() == true
+    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) == 1
+    @Condition isEnoughPlayersToStart == true
+    @Condition getCurrentGamemode() == Gamemode.FFA
+    
+    isInFinalDuel = false
+    [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero].addToScore(1)
+    wait(0.25)
+    if (getMatchTime() == 0 or tieBreakerActive) and gameEndEnabled:
+        #If there is alredy a tiebreaker, then the tiebreaker has ended.
+        #if tieBreakerActive:
+        #break
+        #__end__()
+        highestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
+        #Check if there is more then 1 person with the highest score
+        if len([player for player in getAllPlayers() if player.getScore() == highestScore]) > 1:
+            #There is more then 1, activate tie breaker
+            tieBreakerActive = true
+        else:
+            tieBreakerActive = false
+    stopChasingVariable(ballSpawnCountdown)
+    stopChasingVariable(getAllPlayers().bouncePadCooldown)
+    bigMessage(getAllPlayers(), "{0} has won the round!".format([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero]))
+    wait(2)
+    if not tieBreakerActive:
+        getDeadPlayers(Team.ALL).resurrect()
+    else:
+        #Kill anyone alive who doesn't have the highest score.
+        kill([player for player in getLivingPlayers(Team.ALL) if player.getScore() != highestScore], null)
+        #During tiebreaker, only revive the people who have the same score as the highest score.
+        ([player for player in getDeadPlayers(Team.ALL) if player.getScore() == highestScore]).resurrect()
+        wait(0.25)
+        targetedPlayer = -1
+        bigMessage(getAllPlayers(), "Tiebreaker!")
+    if not isEnoughPlayersToStart:
+        return
+    roundInProgress = false
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    targetedPlayer = -1
+    ballSpawnCountdown = 5
+    wait(1)
+    roundInProgress = true
+    if not bouncepadDashingEnabled:
+        goto lbl_0
+    getAllPlayers().isDashEnabled = false
+    getAllPlayers().setAbility1Enabled(false)
+    lbl_0:
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+
+
+rule "Team 1 Last Surviving":
+    @Condition isGameInProgress() == true
+    @Condition getNumberOfLivingPlayers(Team.2) == 0
+    @Condition isEnoughPlayersToStart == true
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    
+    isInFinalDuel = false
+    addToTeamScore(Team.1, 1)
+    wait(0.25)
+    if (getMatchTime() == 0 or tieBreakerActive) and gameEndEnabled:
+        #If there is alredy a tiebreaker, then the tiebreaker has ended.
+        #if tieBreakerActive:
+        #break
+        #__end__()
+        highestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
+        #Check if there is more then 1 person with the highest score
+        if teamScore(Team.1) == teamScore(Team.2):
+            #There is more then 1, activate tie breaker
+            tieBreakerActive = true
+        else:
+            tieBreakerActive = false
+    stopChasingVariable(ballSpawnCountdown)
+    stopChasingVariable(getAllPlayers().bouncePadCooldown)
+    bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.1))
+    wait(2)
+    if not tieBreakerActive:
+        getDeadPlayers(Team.ALL).resurrect()
+    else:
+        #Kill anyone alive who doesn't have the highest score.
+        kill([player for player in getLivingPlayers(Team.ALL) if player.getScore() != highestScore], null)
+        #During tiebreaker, only revive the people who have the same score as the highest score.
+        ([player for player in getDeadPlayers(Team.ALL) if player.getScore() == highestScore]).resurrect()
+        wait(0.25)
+        targetedPlayer = -1
+        bigMessage(getAllPlayers(), "Tiebreaker!")
+    heal(getAllPlayers(), null, 200)
+    if not isEnoughPlayersToStart:
+        return
+    roundInProgress = false
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    targetedPlayer = -1
+    ballSpawnCountdown = 5
+    wait(1)
+    roundInProgress = true
+    if not bouncepadDashingEnabled:
+        goto lbl_0
+    getAllPlayers().isDashEnabled = false
+    getAllPlayers().setAbility1Enabled(false)
+    lbl_0:
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+
+
+rule "Team 2 Last Surviving":
+    @Condition isGameInProgress() == true
+    @Condition getNumberOfLivingPlayers(Team.1) == 0
+    @Condition isEnoughPlayersToStart == true
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    
+    isInFinalDuel = false
+    addToTeamScore(Team.2, 1)
+    wait(0.25)
+    if (getMatchTime() == 0 or tieBreakerActive) and gameEndEnabled:
+        #If there is alredy a tiebreaker, then the tiebreaker has ended.
+        #if tieBreakerActive:
+        #break
+        #__end__()
+        highestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
+        #Check if there is more then 1 person with the highest score
+        if teamScore(Team.1) == teamScore(Team.2):
+            #There is more then 1, activate tie breaker
+            tieBreakerActive = true
+        else:
+            tieBreakerActive = false
+    stopChasingVariable(ballSpawnCountdown)
+    stopChasingVariable(getAllPlayers().bouncePadCooldown)
+    bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.2))
+    wait(2)
+    if not tieBreakerActive:
+        getDeadPlayers(Team.ALL).resurrect()
+    else:
+        #Kill anyone alive who doesn't have the highest score.
+        kill([player for player in getLivingPlayers(Team.ALL) if player.getScore() != highestScore], null)
+        #During tiebreaker, only revive the people who have the same score as the highest score.
+        ([player for player in getDeadPlayers(Team.ALL) if player.getScore() == highestScore]).resurrect()
+        wait(0.25)
+        targetedPlayer = -1
+        bigMessage(getAllPlayers(), "Tiebreaker!")
+    heal(getAllPlayers(), null, 200)
+    if not isEnoughPlayersToStart:
+        return
+    roundInProgress = false
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    targetedPlayer = -1
+    ballSpawnCountdown = 5
+    wait(1)
+    roundInProgress = true
+    if not bouncepadDashingEnabled:
+        goto lbl_0
+    getAllPlayers().isDashEnabled = false
+    getAllPlayers().setAbility1Enabled(false)
+    lbl_0:
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+
+
+rule "Player check":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.isAlive() == true
+    @Condition "{0}".format(eventPlayer) == "daboss"
+    
+    kill(eventPlayer, null)
+    wait(1)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "All players dead failsafe":
+    @Condition getNumberOfLivingPlayers(Team.ALL) == 0
+    @Condition isGameInProgress() == true
+    @Condition tieBreakerActive == false
+    
+    isInFinalDuel = false
+    if ballIsOut == false:
+        goto lbl_0
+    ballDeleteRequested = true
+    lbl_0:
+    roundInProgress = false
+    stopChasingVariable(ballSpawnCountdown)
+    getDeadPlayers(Team.ALL).resurrect()
+    smallMessage(getAllPlayers(), "All players detected dead! Resetting game.")
+    stopChasingVariable(getAllPlayers().bouncePadCooldown)
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    ballSpawnCountdown = 5
+    wait(1)
+    if RULE_CONDITION:
+        goto RULE_START
+    wait(2)
+    if not isEnoughPlayersToStart:
+        return
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    roundInProgress = true
+    ballPosition = vect(0, -1, 0)
+
+
+rule "dash slow":
+    @Event eachPlayer
+    @Hero all
+    @Condition eventPlayer.isUsingAbility1() == true
+    
+    eventPlayer.dashNerf = true
+    eventPlayer.moveSpeed = 0
+    chase(eventPlayer.moveSpeed, 100, rate=max(eventPlayer.moveSpeed, 16) ** 1.25, ChaseReeval.DESTINATION_AND_RATE)
+    while eventPlayer.moveSpeed != 100:
+        eventPlayer.setMoveSpeed(eventPlayer.moveSpeed)
+        eventPlayer.setGravity(eventPlayer.moveSpeed)
+        wait(0.1)
+    eventPlayer.setMoveSpeed(100)
+    eventPlayer.setGravity(100)
+    eventPlayer.dashNerf = false
+
+
+rule "Ball bounce off surface":
+    @Condition ballIsOut == true
+    @Condition raycast(ballPosition, ballPosition + ballDirection * ballSpeed * 0.033, null, getAllPlayers(), false).getHitPosition() != ballPosition + ballDirection * ballSpeed * 0.033
+    @Condition getCurrentMap() != Map.WORKSHOP_CHAMBER
+    
+    #normal of the plane of the surface with which the ball collides, n
+    ballCollisionSurfaceNormal = raycast(ballPosition, ballPosition + ballDirection * ballSpeed * 0.066, null, getAllPlayers(), false).getNormal()
+    #reflected vector formula --- new v = v - 2 * (v•n)/(n•n) * n
+    ballDirection = ballDirection - 2 * ballDirection * ballCollisionSurfaceNormal / dotProduct(ballCollisionSurfaceNormal, ballCollisionSurfaceNormal) * ballCollisionSurfaceNormal
+    playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.WHITE, ballPosition, 1)
+    wait(0.02)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Ball no down when y < -0.5":
+    @Condition ballIsOut == true
+    @Condition ballPosition.y < -0.5
+    @Condition ballDirection.y < 0
+    
+    ballDirection *= vect(1, 0, 1)
+    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.WHITE, ballPosition, 2)
+
+
+rule "Ball change color":
+    #if ballColor != 0 and ballSpeed < 20 and true:
+    #destroyEffect(ballSmoke)
+    #destroyEffect(ballTail1)
+    #destroyEffect(ballTail2)
+    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballSmoke = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail1 = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail2 = getLastCreatedEntity()
+    #ballColor = 0
+    #elif ballColor != 1 and ballSpeed >= 20 and ballSpeed < 25:
+    #destroyEffect(ballSmoke)
+    #destroyEffect(ballTail1)
+    #destroyEffect(ballTail2)
+    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.GREEN, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballSmoke = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.GREEN, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail1 = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.GREEN, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail2 = getLastCreatedEntity()
+    #ballColor = 1
+    #elif ballColor != 2 and ballSpeed >= 25 and ballSpeed < 30:
+    # destroyEffect(ballSmoke)
+    # destroyEffect(ballTail1)
+    # destroyEffect(ballTail2)
+    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.YELLOW, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballSmoke = getLastCreatedEntity()
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #elif ballColor != 3 and ballSpeed >= 30 and ballSpeed < 35:
+    #destroyEffect(ballSmoke)
+    #destroyEffect(ballTail1)
+    #destroyEffect(ballTail2)
+    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.ORANGE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballSmoke = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.ORANGE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail1 = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.ORANGE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail2 = getLastCreatedEntity()
+    #ballColor = 3
+    #elif ballColor != 4 and ballSpeed >= 35 and ballSpeed < 55:
+    #destroyEffect(ballSmoke)
+    #destroyEffect(ballTail1)
+    #destroyEffect(ballTail2)
+    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballSmoke = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.RED, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail1 = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.RED, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail2 = getLastCreatedEntity()
+    #ballColor = 4
+    #elif ballColor != 5 and ballSpeed >= 55 and true:
+    #destroyEffect(ballSmoke)
+    #destroyEffect(ballTail1)
+    #destroyEffect(ballTail2)
+    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.PURPLE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballSmoke = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.PURPLE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail1 = getLastCreatedEntity()
+    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.PURPLE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #ballTail2 = getLastCreatedEntity()
+    #ballColor = 5
+    #__end__()
+
+
+rule "Chamber x collision":
+    #This collision is the lazy way but its only for chamber so who cares
+    @Condition getCurrentMap() == Map.WORKSHOP_CHAMBER
+    @Condition ballIsOut == true
+    @Condition (ballPosition.x + 0.4 >= 20 or ballPosition.x - 0.4 <= -20) == true
+    
+    if ballPosition.x + 0.4 >= 20 and ballDirection.x > 0 or ballPosition.x - 0.4 <= -20 and ballDirection.x < 0:
+        ballDirection = vect(ballDirection.x * -1, ballDirection.y, ballDirection.z)
+        playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.WHITE, ballPosition, 1)
+    wait()
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Chamber y collision":
+    @Condition getCurrentMap() == Map.WORKSHOP_CHAMBER
+    @Condition ballIsOut == true
+    @Condition (ballPosition.y + 0.4 >= 40) - (ballPosition.y - 0.4 <= 0) == true
+    
+    if ballPosition.y + 0.4 >= 40 and ballDirection.y > 0 or ballPosition.y - 0.4 <= 0 and ballDirection.y < 0:
+        ballDirection = vect(ballDirection.x, ballDirection.y * -1, ballDirection.z)
+        playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.WHITE, ballPosition, 1)
+    wait()
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Chamber z collision":
+    @Condition getCurrentMap() == Map.WORKSHOP_CHAMBER
+    @Condition ballIsOut == true
+    @Condition (ballPosition.z + 0.4 >= 20 or ballPosition.z - 0.4 <= -20) == true
+    
+    if ballPosition.z + 0.4 >= 20 and ballDirection.z > 0 or ballPosition.z - 0.4 <= -20 and ballDirection.z < 0:
+        ballDirection = vect(ballDirection.x, ballDirection.y, ballDirection.z * -1)
+        playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.WHITE, ballPosition, 1)
+    wait()
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "No Undermaps":
+    @Condition getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT
+    @Condition ballIsOut == true
+    @Condition ballPosition.y < -2.85
+    @Condition ballDirection.y < 0
+    
+    ballDirection *= vect(1, 0, 1)
+    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.WHITE, ballPosition, 2)
+
+
+rule "Team 1 Win":
+    @Condition allowMatchEnd == true
+    @Condition teamScore(Team.1) == scoreToWin
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    
+    enableAnnouncer()
+    declareTeamVictory(Team.1)
+
+
+rule "Team 2 Win":
+    @Condition allowMatchEnd == true
+    @Condition teamScore(Team.2) == scoreToWin
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    
+    enableAnnouncer()
+    declareTeamVictory(Team.2)
