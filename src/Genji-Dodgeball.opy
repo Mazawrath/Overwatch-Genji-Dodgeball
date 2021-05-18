@@ -134,7 +134,7 @@ globalvar startingText 71
 
 playervar hasMoved 0
 playervar currentUltPercent 1
-playervar bouncePadCooldown 2
+playervar bouncePad1Cooldown 2
 playervar playerDeflects 4
 playervar playerKills 5
 playervar playerDeaths 6
@@ -149,6 +149,9 @@ playervar antiStuckProtection 14
 playervar toggleHUD 15
 playervar dashNerf 16
 playervar passingSignal 17
+playervar bouncePad2Cooldown
+playervar bouncePad3Cooldown
+playervar bouncePad4Cooldown
 
 
 #Subroutine names
@@ -572,7 +575,7 @@ rule "Bounce when near pad 1":
     @Event eachPlayer
     @Hero all
     @Condition distance(eventPlayer.getPosition(), bouncePad1) <= 2.75
-    @Condition eventPlayer.bouncePadCooldown == 0
+    @Condition eventPlayer.bouncePad1Cooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
     
@@ -581,7 +584,7 @@ rule "Bounce when near pad 1":
         eventPlayer.applyImpulse(Vector.UP, bouncePadStrength - bouncePadSuperjumpNerf, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     else:
         eventPlayer.applyImpulse(Vector.UP, bouncePadStrength, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
-    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    eventPlayer.bouncePad1Cooldown = bouncePadCooldownLength
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.WHITE, bouncePad1, 25)
     eventPlayer.playerEffects[1] = getLastCreatedEntity()
     wait(2)
@@ -592,7 +595,7 @@ rule "Bounce when near pad 2":
     @Event eachPlayer
     @Hero all
     @Condition distance(eventPlayer.getPosition(), bouncePad2) <= 2.75
-    @Condition eventPlayer.bouncePadCooldown == 0
+    @Condition eventPlayer.bouncePad2Cooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
     
@@ -601,7 +604,7 @@ rule "Bounce when near pad 2":
         eventPlayer.applyImpulse(Vector.UP, bouncePadStrength - bouncePadSuperjumpNerf, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     else:
         eventPlayer.applyImpulse(Vector.UP, bouncePadStrength, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
-    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    eventPlayer.bouncePad2Cooldown = bouncePadCooldownLength
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.WHITE, bouncePad1, 25)
     eventPlayer.playerEffects[1] = getLastCreatedEntity()
     wait(2)
@@ -612,7 +615,7 @@ rule "Bounce when near pad 3":
     @Event eachPlayer
     @Hero all
     @Condition distance(eventPlayer.getPosition(), bouncePad3) <= 2.75
-    @Condition eventPlayer.bouncePadCooldown == 0
+    @Condition eventPlayer.bouncePad3Cooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
     
@@ -621,7 +624,7 @@ rule "Bounce when near pad 3":
         eventPlayer.applyImpulse(Vector.UP, bouncePadStrength - bouncePadSuperjumpNerf, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     else:
         eventPlayer.applyImpulse(Vector.UP, bouncePadStrength, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
-    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    eventPlayer.bouncePad3Cooldown = bouncePadCooldownLength
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.WHITE, bouncePad1, 25)
     eventPlayer.playerEffects[1] = getLastCreatedEntity()
     wait(2)
@@ -632,7 +635,7 @@ rule "Bounce when near pad 4":
     @Event eachPlayer
     @Hero all
     @Condition distance(eventPlayer.getPosition(), bouncePad4) <= 2.75
-    @Condition eventPlayer.bouncePadCooldown == 0
+    @Condition eventPlayer.bouncePad4Cooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
     
@@ -641,7 +644,7 @@ rule "Bounce when near pad 4":
         eventPlayer.applyImpulse(Vector.UP, bouncePadStrength - bouncePadSuperjumpNerf, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     else:
         eventPlayer.applyImpulse(Vector.UP, bouncePadStrength, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
-    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    eventPlayer.bouncePad4Cooldown = bouncePadCooldownLength
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.WHITE, bouncePad1, 25)
     eventPlayer.playerEffects[1] = getLastCreatedEntity()
     wait(2)
@@ -708,7 +711,10 @@ rule "Start round":
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     roundInProgress = true
     ballPlayerMock = false
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad1Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad2Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad3Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad4Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     ballSpawnCountdown = 5
 
 
@@ -719,7 +725,10 @@ rule "Start round - TEAMS":
     
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     roundInProgress = true
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad1Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad2Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad3Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad4Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     ballSpawnCountdown = 5
 
 
@@ -881,7 +890,10 @@ def DeflectFailed():
     isPassingTeam1 = false
     isPassingTeam2 = false
     targetedPlayer.setStatusEffect(previousTargetedPlayer, Status.STUNNED, 1)
-    targetedPlayer.bouncePadCooldown = 0
+    targetedPlayer.bouncePad1Cooldown = 0
+    targetedPlayer.bouncePad2Cooldown = 0
+    targetedPlayer.bouncePad3Cooldown = 0
+    targetedPlayer.bouncePad4Cooldown = 0
     previousTargetedPlayer.currentUltPercent += 15
     kill(targetedPlayer, previousTargetedPlayer)
     ballPlayer.stopFacing()
@@ -962,7 +974,10 @@ rule "Final duel":
     ballDeleteRequested = true
     lbl_0:
     isInFinalDuel = true
-    getLivingPlayers(Team.ALL).bouncePadCooldown = 2
+    getLivingPlayers(Team.ALL).bouncePad1Cooldown = 2
+    getLivingPlayers(Team.ALL).bouncePad2Cooldown = 2
+    getLivingPlayers(Team.ALL).bouncePad3Cooldown = 2
+    getLivingPlayers(Team.ALL).bouncePad4Cooldown = 2
     if getNumberOfHeroes(playerHero, Team.ALL) <= 2:
         goto lbl_1
     bigMessage(getAllPlayers(), "Final Duel!")
@@ -999,7 +1014,10 @@ rule "Final duel - TEAMS":
     ballDeleteRequested = true
     lbl_0:
     isInFinalDuel = true
-    getLivingPlayers(Team.ALL).bouncePadCooldown = 2
+    getLivingPlayers(Team.ALL).bouncePad1Cooldown = 2
+    getLivingPlayers(Team.ALL).bouncePad2Cooldown = 2
+    getLivingPlayers(Team.ALL).bouncePad3Cooldown = 2
+    getLivingPlayers(Team.ALL).bouncePad4Cooldown = 2
     if getNumberOfHeroes(playerHero, Team.ALL) <= 2:
         goto lbl_1
     bigMessage(getAllPlayers(), "Final Duel!")
@@ -1056,7 +1074,10 @@ rule "Check for last player surviving":
         else:
             tieBreakerActive = false
     stopChasingVariable(ballSpawnCountdown)
-    stopChasingVariable(getAllPlayers().bouncePadCooldown)
+    stopChasingVariable(getAllPlayers().bouncePad1Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad2Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad3Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad4Cooldown)
     bigMessage(getAllPlayers(), "{0} has won the round!".format([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero]))
     wait(2)
     if not tieBreakerActive:
@@ -1072,7 +1093,10 @@ rule "Check for last player surviving":
     if not isEnoughPlayersToStart:
         return
     roundInProgress = false
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    getAllPlayers().bouncePad1Cooldown = 3
+    getAllPlayers().bouncePad2Cooldown = 3
+    getAllPlayers().bouncePad3Cooldown = 3
+    getAllPlayers().bouncePad4Cooldown = 3
     targetedPlayer = -1
     ballSpawnCountdown = 5
     wait(1)
@@ -1083,7 +1107,10 @@ rule "Check for last player surviving":
     getAllPlayers().setAbility1Enabled(false)
     lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad1Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad2Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad3Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad4Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
 
 
 rule "Team 1 Last Surviving":
@@ -1108,7 +1135,10 @@ rule "Team 1 Last Surviving":
         else:
             tieBreakerActive = false
     stopChasingVariable(ballSpawnCountdown)
-    stopChasingVariable(getAllPlayers().bouncePadCooldown)
+    stopChasingVariable(getAllPlayers().bouncePad1Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad2Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad3Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad4Cooldown)
     bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.1))
     wait(2)
     if not tieBreakerActive:
@@ -1125,7 +1155,10 @@ rule "Team 1 Last Surviving":
     if not isEnoughPlayersToStart:
         return
     roundInProgress = false
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    getAllPlayers().bouncePad1Cooldown = 3
+    getAllPlayers().bouncePad2Cooldown = 3
+    getAllPlayers().bouncePad3Cooldown = 3
+    getAllPlayers().bouncePad4Cooldown = 3
     targetedPlayer = -1
     ballSpawnCountdown = 5
     wait(1)
@@ -1136,7 +1169,10 @@ rule "Team 1 Last Surviving":
     getAllPlayers().setAbility1Enabled(false)
     lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad1Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad2Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad3Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad4Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
 
 
 rule "Team 2 Last Surviving":
@@ -1161,7 +1197,10 @@ rule "Team 2 Last Surviving":
         else:
             tieBreakerActive = false
     stopChasingVariable(ballSpawnCountdown)
-    stopChasingVariable(getAllPlayers().bouncePadCooldown)
+    stopChasingVariable(getAllPlayers().bouncePad1Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad2Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad3Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad4Cooldown)
     bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.2))
     wait(2)
     if not tieBreakerActive:
@@ -1178,7 +1217,10 @@ rule "Team 2 Last Surviving":
     if not isEnoughPlayersToStart:
         return
     roundInProgress = false
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    getAllPlayers().bouncePad1Cooldown = 3
+    getAllPlayers().bouncePad2Cooldown = 3
+    getAllPlayers().bouncePad3Cooldown = 3
+    getAllPlayers().bouncePad4Cooldown = 3
     targetedPlayer = -1
     ballSpawnCountdown = 5
     wait(1)
@@ -1189,7 +1231,10 @@ rule "Team 2 Last Surviving":
     getAllPlayers().setAbility1Enabled(false)
     lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad1Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad2Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad3Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad4Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
 
 
 rule "Player check":
@@ -1218,8 +1263,14 @@ rule "All players dead failsafe":
     stopChasingVariable(ballSpawnCountdown)
     getDeadPlayers(Team.ALL).resurrect()
     smallMessage(getAllPlayers(), "All players detected dead! Resetting game.")
-    stopChasingVariable(getAllPlayers().bouncePadCooldown)
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    stopChasingVariable(getAllPlayers().bouncePad1Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad2Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad3Cooldown)
+    stopChasingVariable(getAllPlayers().bouncePad4Cooldown)
+    getAllPlayers().bouncePad1Cooldown = 3
+    getAllPlayers().bouncePad2Cooldown = 3
+    getAllPlayers().bouncePad3Cooldown = 3
+    getAllPlayers().bouncePad4Cooldown = 3
     ballSpawnCountdown = 5
     wait(1)
     if RULE_CONDITION:
@@ -1227,7 +1278,10 @@ rule "All players dead failsafe":
     wait(2)
     if not isEnoughPlayersToStart:
         return
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad1Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad2Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad3Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePad4Cooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     roundInProgress = true
     ballPosition = vect(0, -1, 0)
@@ -1407,3 +1461,12 @@ rule "Team 2 Win":
     
     enableAnnouncer()
     declareTeamVictory(Team.2)
+
+
+rule "dummi":
+    createDummy(Hero.GENJI, Team.ALL, -1, circleCenter, null)
+    createDummy(Hero.GENJI, Team.ALL, -1, circleCenter, null)
+    createDummy(Hero.GENJI, Team.ALL, -1, circleCenter, null)
+    createDummy(Hero.GENJI, Team.ALL, -1, circleCenter, null)
+    createDummy(Hero.GENJI, Team.ALL, -1, circleCenter, null)
+    createDummy(Hero.GENJI, Team.ALL, -1, circleCenter, null)
