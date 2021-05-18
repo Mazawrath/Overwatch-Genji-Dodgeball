@@ -131,7 +131,7 @@ rule "Hero ball do funny thing":
         else:
             ballPlayer.communicate(Comms.YOURE_WELCOME)
 
-    if wasFinalDuel or getPlayersOnHero(playerHero, Team.ALL) <= 2:
+    if wasFinalDuel or getNumberOfHeroes(playerHero, Team.ALL) <= 2:
         wasFinalDuel = false
         LongFun()
     elif (not isInFinalDuel):
