@@ -1,4 +1,5 @@
 #!mainFile "./Genji-Dodgeball.opy"
+#!obfuscate
 
 settings {
     "main": {
