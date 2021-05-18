@@ -181,8 +181,8 @@ def LongFun():
             createInWorldText(getAllPlayers(), "Torbcopter, ready for takeoff.", ballPlayer.getPosition(), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
             ballHeroRegretText = getLastCreatedText()
             while ballPlayerMock:
-                ballPlayer.applyImpulse(Vector.UP, 10, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
-                waitUntil(not ballPlayerMock,0.5)
+                ballPlayer.applyImpulse(Vector.UP, 5.5, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+                waitUntil(not ballPlayerMock,0.25)
             destroyInWorldText(ballHeroRegretText)
             break
         case 2:
@@ -210,7 +210,7 @@ def LongFun():
             ballPlayer.setGravity(0)
             ballPlayer.startForcingPosition(targetedPlayer.getEyePosition() + vect(0, 1, 0), true)
             ballPlayer.setFacing(vect(0, -1, 0), Relativity.TO_PLAYER)
-            createInWorldText(getAllPlayers(), "{0} is next, don't tell them :)".format(targetedPlayer), ballPlayer.getEyePosition() + vect(0, 0.5, 0), 3, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, Color.SKY_BLUE, SpecVisibility.ALWAYS)
+            createInWorldText(getAllPlayers(), "{0} is next, don't tell them :)".format(targetedPlayer), ballPlayer.getEyePosition() + vect(0, 0.5, 0), 3, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, Color.ORANGE, SpecVisibility.ALWAYS)
             ballHeroRegretText = getLastCreatedText()
             wait(0.5)
             ballPlayer.communicate(Comms.HELLO)
