@@ -179,7 +179,7 @@ subroutine LongFun 4
 
 
 rule "// SETTINGS":
-    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 0)
+    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", true, 0)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
