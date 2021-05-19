@@ -360,13 +360,13 @@ rule "Player joins game":
     #@Condition isGameInProgress() == true
     @Condition eventPlayer.hasSpawned() == true
     
+    eventPlayer.startForcingHero(playerHero)
     if roundInProgress and isGameInProgress():
         eventPlayer.teleport(circleCenter + vect(0, 500, 0))
         eventPlayer.setInvisibility(Invis.ALL)
         wait(0.05)
         kill(eventPlayer, null)
         wait(0.25)
-    eventPlayer.startForcingHero(playerHero)
     eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
     eventPlayer.hasMoved = true
     if (ballHero != null  and not isGameInProgress()):
