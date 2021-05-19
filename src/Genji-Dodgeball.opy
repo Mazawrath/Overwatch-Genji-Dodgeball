@@ -1428,10 +1428,3 @@ rule "Team 2 Win":
     
     enableAnnouncer()
     declareTeamVictory(Team.2)
-
-
-rule "dummi":
-    createDummy(playerHero, Team.2, -1, circleCenter, null)
-    createDummy(playerHero, Team.2, -1, circleCenter, null)
-    createDummy(playerHero, Team.2, -1, circleCenter, null)
-    createDummy(playerHero, Team.2, -1, circleCenter, null)
