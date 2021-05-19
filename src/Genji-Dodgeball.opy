@@ -169,7 +169,6 @@ subroutine LongFun 4
 #!extension buffAndDebuffSounds
 #!extension kineticExplosionEffects
 #!extension explosionSounds
-#!extension spawnMoreDummyBots
 
 
 rule "// SETTINGS":
