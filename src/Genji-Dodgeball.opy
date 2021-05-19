@@ -14,25 +14,28 @@ settings {
         "teamBalancing": "afterGame"
     },
     "gamemodes": {
-        "ffa": {
-            "enabledMaps": [
-                "workshopIslandNight"
-            ],
-            "gameLengthInMn": 15,
-            "enableSelfInitiatedRespawn": false
-        },
-        "tdm": {
+        "assault": {
             "enabled": false,
-            "gameLengthInMn": 15,
-            "needsImbalancedTeamScoreToWin": true,
-            "team1ScoreToWin": 10,
-            "team2ScoreToWin": 10
+            "roleLimit": "2OfEachRolePerTeam"
         },
-        "general": {
-            "enableHeroSwitching": false,
-            "gamemodeStartTrigger": "immediately",
-            "heroLimit": "off",
-            "enableRandomHeroes": true
+        "control": {
+            "enabled": false,
+            "roleLimit": "2OfEachRolePerTeam"
+        },
+        "escort": {
+            "enabled": false,
+            "roleLimit": "2OfEachRolePerTeam"
+        },
+        "hybrid": {
+            "enabled": false,
+            "roleLimit": "2OfEachRolePerTeam"
+        },
+        "lucioball": {
+            "enabledMaps": [
+                "busanStadium"
+            ],
+            "initialBallCount": 0,
+            "maxBallCount": 0
         }
     },
     "heroes": {
@@ -51,7 +54,8 @@ settings {
                 "ability2Duration%": 300
             },
             "enabledHeroes": [
-                "genji"
+                "genji",
+                "lucio"
             ]
         }
     }
@@ -236,7 +240,7 @@ rule "Set Busan Stadium Center":
     @Condition getCurrentMap() == Map.BUSAN_STADIUM
     
     circleCenter = vect(0, 0, 0)
-    sphereSize = 40
+    sphereSize = 60
 
 
 rule "// INITIALIZATION":
@@ -300,7 +304,7 @@ rule "Check for <2 players - TEAMS":
     @Condition isGameInProgress() == true
     #@Condition getNumberOfHeroes(playerHero, Team.ALL) == 1
     @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
     isInFinalDuel = false
     hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
@@ -334,7 +338,7 @@ rule "Wait for more players":
 rule "Wait for more players - TEAMS":
     @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == true
     @Condition isEnoughPlayersToStart == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
     destroyHudText(waitingForPlayersHUD)
     bigMessage(getAllPlayers(), "Starting game in 5 seconds!")
@@ -363,6 +367,7 @@ rule "Player joins game":
         wait(0.05)
         kill(eventPlayer, null)
         wait(0.25)
+    eventPlayer.startForcingHero(playerHero)
     eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
     eventPlayer.hasMoved = true
     if (ballHero != null  and not isGameInProgress()):
@@ -727,8 +732,10 @@ rule "Start round":
 rule "Start round - TEAMS":
     @Condition isEnoughPlayersToStart == true
     @Condition isGameInProgress() == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
+    if getCurrentGamemode() == Gamemode.LUCIOBALL:
+        wait(10)
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     roundInProgress = true
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
@@ -812,7 +819,7 @@ rule "Ball reaches player":
 rule "Ball reaches player -TEAMS":
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
     if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
         #If they don't have enough health, kill em
@@ -878,7 +885,7 @@ rule "Ball reaches player -TEAMS":
 
 rule "End assist after a second":
     @Condition passingPlayer != null
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
 
     waitUntil(previousTargetedPlayer != passingPlayer, 10)
     wait(1)
@@ -1003,7 +1010,7 @@ rule "Final duel - TEAMS":
     @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
@@ -1039,7 +1046,7 @@ rule "Create passing aura":
     @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE)
     @Condition passingEnabled
     @Condition passingAuraToggle
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
 
     createEffect([player for player in getPlayers(eventPlayer.getTeam()) if player != eventPlayer and not player.isDead()], Effect.BAD_AURA, Color.SKY_BLUE, eventPlayer.getEyePosition(), 1.5, EffectReeval.POSITION_AND_RADIUS)
     eventPlayer.passingSignal = getLastCreatedEntity()
@@ -1102,7 +1109,7 @@ rule "Team 1 Last Surviving":
     @Condition isGameInProgress() == true
     @Condition getNumberOfLivingPlayers(Team.2) == 0
     @Condition isEnoughPlayersToStart == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
     isInFinalDuel = false
     addToTeamScore(Team.1, 1)
@@ -1155,7 +1162,7 @@ rule "Team 2 Last Surviving":
     @Condition isGameInProgress() == true
     @Condition getNumberOfLivingPlayers(Team.1) == 0
     @Condition isEnoughPlayersToStart == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
     isInFinalDuel = false
     addToTeamScore(Team.2, 1)
@@ -1406,7 +1413,7 @@ rule "No Undermaps":
 rule "Team 1 Win":
     @Condition allowMatchEnd == true
     @Condition teamScore(Team.1) == scoreToWin
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
     enableAnnouncer()
     declareTeamVictory(Team.1)
@@ -1415,7 +1422,14 @@ rule "Team 1 Win":
 rule "Team 2 Win":
     @Condition allowMatchEnd == true
     @Condition teamScore(Team.2) == scoreToWin
-    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
     enableAnnouncer()
     declareTeamVictory(Team.2)
+
+
+rule "dummi":
+    createDummy(playerHero, Team.2, -1, circleCenter, null)
+    createDummy(playerHero, Team.2, -1, circleCenter, null)
+    createDummy(playerHero, Team.2, -1, circleCenter, null)
+    createDummy(playerHero, Team.2, -1, circleCenter, null)
