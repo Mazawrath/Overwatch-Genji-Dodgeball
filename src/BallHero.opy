@@ -96,15 +96,25 @@ rule "Teleport hero ball":
     @Condition ballHero
     @Condition isGameInProgress()
     @Condition eventPlayer.getCurrentHero() == ballHero
+    @Condition not ballPlayerMock
 
-    if (ballPlayerMock == true):
-        eventPlayer.setGravity(100)
-        waitUntil(ballPlayerMock == false, 9999)
-        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-        eventPlayer.setGravity(0)
     eventPlayer.teleport(ballPosition - vect(0, 1, 0))
     wait(0.001)
-    goto RULE_START
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Mock players while ball isn't in play":
+    @Event eachPlayer
+    @Condition ballHero
+    @Condition isGameInProgress()
+    @Condition eventPlayer.getCurrentHero() == ballHero
+    @Condition ballPlayerMock
+
+    eventPlayer.setGravity(100)
+    waitUntil(not ballPlayerMock, 9999)
+    eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    eventPlayer.setGravity(0)
 
 
 rule "Set hero ball outline":
