@@ -232,6 +232,13 @@ rule "Set Blizz World center (fun fact: you can't use the name of the company wh
     sphereSize = 20
 
 
+rule "Set Busan Stadium Center":
+    @Condition getCurrentMap() == Map.BUSAN_STADIUM
+    
+    circleCenter = vect(0, 0, 0)
+    sphereSize = 40
+
+
 rule "// INITIALIZATION":
 
 
