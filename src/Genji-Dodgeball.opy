@@ -38,6 +38,9 @@ settings {
             ],
             "initialBallCount": 0,
             "maxBallCount": 0
+        },
+        "general": {
+                "gamemodeStartTrigger": "immediately",
         }
     },
     "heroes": {
@@ -735,8 +738,6 @@ rule "Start round - TEAMS":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.TDM or getCurrentGamemode() == Gamemode.LUCIOBALL
     
-    if getCurrentGamemode() == Gamemode.LUCIOBALL:
-        wait(10)
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     roundInProgress = true
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
