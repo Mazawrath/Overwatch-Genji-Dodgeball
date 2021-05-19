@@ -244,7 +244,7 @@ rule "Set Busan Stadium Center":
     @Condition getCurrentMap() == Map.BUSAN_STADIUM
     
     circleCenter = vect(0, 0, 0)
-    sphereSize = 60
+    sphereSize = 47
 
 
 rule "// INITIALIZATION":
