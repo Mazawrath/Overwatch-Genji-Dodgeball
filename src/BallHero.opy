@@ -104,7 +104,7 @@ rule "Teleport hero ball":
         goto RULE_START
 
 
-rule "Mock players while ball isn't in play":
+rule "Don't move while ball isn't in play":
     @Event eachPlayer
     @Condition ballHero
     @Condition isGameInProgress()
