@@ -746,7 +746,7 @@ rule "Spawn ball":
     
     ballPosition = circleCenter
     ballDirection = directionTowards(ballPosition, targetedPlayer.getEyePosition())
-    ballSpeed = min(30, ballSpeed)
+    ballSpeed = min(40, ballSpeed)
     ballPlayerMock = false
     ballIsOut = true
 
