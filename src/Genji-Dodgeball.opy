@@ -9,6 +9,8 @@ settings {
         "mapRotation": "afterGame",
         "enableMatchVoiceChat": true,
         "spectatorSlots": 6,
+        "team1Slots": 5,
+        "team2Slots": 5,
         "returnToLobby": "never",
         "swapTeamsAfterMatch": false,
         "teamBalancing": "afterGame"
