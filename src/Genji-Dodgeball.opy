@@ -1434,4 +1434,12 @@ rule "Maximum amount of rounds reached":
     @Condition maxRoundsToggle
     @Condition currentRound > maxRounds
     
-    declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())
+    if getCurrentGamemode() == Gamemode.TDM:
+        if teamScore(Team.1) == teamScore(Team.2):
+            declareDraw()
+        elif teamScore(Team.1) > teamScore(Team.2):
+            declareTeamVictory(Team.1)
+        elif teamScore(Team.2) > teamScore(Team.1):
+            declareTeamVictory(Team.2)
+    else:
+        declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())
