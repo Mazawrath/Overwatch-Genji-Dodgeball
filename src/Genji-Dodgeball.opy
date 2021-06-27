@@ -128,7 +128,9 @@ globalvar ballHeroRandom 68
 globalvar name 69
 globalvar wasFinalDuel 70
 globalvar startingText 71
+globalvar arenaType 72
 globalvar startingBallSpeed 73
+globalvar bouncePadRange = 74
 
 
 #Player variables
@@ -170,6 +172,7 @@ subroutine LongFun 4
 
 
 rule "// SETTINGS":
+    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Firebending", "Waterbending"], "Dodgeball Settings", "Arena Type", 0)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 1)
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 2)
     torbBall = createWorkshopSetting(enum["Don't touch this rule", "You must of accidently opened this rule, please close it", 
@@ -578,7 +581,8 @@ rule "Anti-Stuck Activation":
 rule "Bounce when near pad 1":
     @Event eachPlayer
     @Hero all
-    @Condition distance(eventPlayer.getPosition(), bouncePad1) <= 2.75
+    @Condition bouncePad1 != null
+    @Condition distance(eventPlayer.getPosition(), bouncePad1) <= bouncePadRange
     @Condition eventPlayer.bouncePadCooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
@@ -598,7 +602,8 @@ rule "Bounce when near pad 1":
 rule "Bounce when near pad 2":
     @Event eachPlayer
     @Hero all
-    @Condition distance(eventPlayer.getPosition(), bouncePad2) <= 2.75
+    @Condition bouncePad2 != null
+    @Condition distance(eventPlayer.getPosition(), bouncePad2) <= bouncePadRange
     @Condition eventPlayer.bouncePadCooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
@@ -618,7 +623,8 @@ rule "Bounce when near pad 2":
 rule "Bounce when near pad 3":
     @Event eachPlayer
     @Hero all
-    @Condition distance(eventPlayer.getPosition(), bouncePad3) <= 2.75
+    @Condition bouncePad3 != null
+    @Condition distance(eventPlayer.getPosition(), bouncePad3) <= bouncePadRange
     @Condition eventPlayer.bouncePadCooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
@@ -638,7 +644,8 @@ rule "Bounce when near pad 3":
 rule "Bounce when near pad 4":
     @Event eachPlayer
     @Hero all
-    @Condition distance(eventPlayer.getPosition(), bouncePad4) <= 2.75
+    @Condition bouncePad4 != null
+    @Condition distance(eventPlayer.getPosition(), bouncePad4) <= bouncePadRange
     @Condition eventPlayer.bouncePadCooldown == 0
     @Condition eventPlayer.isAlive() == true
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
@@ -1414,3 +1421,12 @@ rule "Team 2 Win":
     
     enableAnnouncer()
     declareTeamVictory(Team.2)
+
+
+rule "dummi":
+    createDummy(playerHero, Team.ALL, -1, circleCenter, null)
+    createDummy(playerHero, Team.ALL, -1, circleCenter, null)
+    createDummy(playerHero, Team.ALL, -1, circleCenter, null)
+    createDummy(playerHero, Team.ALL, -1, circleCenter, null)
+    createDummy(playerHero, Team.ALL, -1, circleCenter, null)
+    

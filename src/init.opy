@@ -30,7 +30,7 @@ rule "Init global variables":
     disableGamemodeCompletion()
     disableMusic()
     disableAnnouncer()
-    disableInspector()
+    # disableInspector()
     if torbBall == 17 and getCurrentGamemode() == Gamemode.FFA:
         ballHero = Hero.TORBJORN
         name = ballHero
@@ -42,7 +42,6 @@ rule "Init global variables":
     # playerHero = [hero for hero in getAllHeroes() if hero != ballHero]
     playerHero = Hero.GENJI
     bouncePadStrength = 30
-    bouncePadDistance = 12
     ballSpeed = startingBallSpeed
     ballSpawnSpeed = 30
     maxBallSpeed = 1000
@@ -137,22 +136,38 @@ rule "Create player HUD elements":
 
 
 rule "Create bounce pads":
-    bouncePad1 = vect(circleCenter.x + bouncePadDistance, circleCenter.y, circleCenter.z)
-    bouncePad2 = vect(circleCenter.x + bouncePadDistance * -1, circleCenter.y, circleCenter.z)
-    bouncePad3 = vect(circleCenter.x, circleCenter.y, circleCenter.z + bouncePadDistance * 1)
-    bouncePad4 = vect(circleCenter.x, circleCenter.y, circleCenter.z + bouncePadDistance * -1)
     
-    # Bouncepad ready
-    createEffect([player for player in getAllPlayers() if player.bouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, bouncePad1, 2, EffectReeval.VISIBILITY)
-    createEffect([player for player in getAllPlayers() if player.bouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, bouncePad2, 2, EffectReeval.VISIBILITY)
-    createEffect([player for player in getAllPlayers() if player.bouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, bouncePad3, 2, EffectReeval.VISIBILITY)
-    createEffect([player for player in getAllPlayers() if player.bouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, bouncePad4, 2, EffectReeval.VISIBILITY)
+    if arenaType != 1:
+        bouncePadDistance = 12
+        bouncePadRange = 2.75
 
-    # Bouncepad not ready
-    createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad1, 2, EffectReeval.VISIBILITY)
-    createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad2, 2, EffectReeval.VISIBILITY)
-    createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad3, 2, EffectReeval.VISIBILITY)
-    createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad4, 2, EffectReeval.VISIBILITY)
+        bouncePad1 = vect(circleCenter.x + bouncePadDistance, circleCenter.y, circleCenter.z)
+        bouncePad2 = vect(circleCenter.x + bouncePadDistance * -1, circleCenter.y, circleCenter.z)
+        bouncePad3 = vect(circleCenter.x, circleCenter.y, circleCenter.z + bouncePadDistance * 1)
+        bouncePad4 = vect(circleCenter.x, circleCenter.y, circleCenter.z + bouncePadDistance * -1)
+
+        # Bouncepad ready
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, bouncePad1, 2, EffectReeval.VISIBILITY)
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, bouncePad2, 2, EffectReeval.VISIBILITY)
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, bouncePad3, 2, EffectReeval.VISIBILITY)
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, bouncePad4, 2, EffectReeval.VISIBILITY)
+
+        # Bouncepad not ready
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad1, 2, EffectReeval.VISIBILITY)
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad2, 2, EffectReeval.VISIBILITY)
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad3, 2, EffectReeval.VISIBILITY)
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad4, 2, EffectReeval.VISIBILITY)
+    else:
+        bouncePadDistance = 0
+        bouncePadRange = 20.75
+        
+        bouncePad1 = vect(circleCenter.x + bouncePadDistance, circleCenter.y, circleCenter.z)
+
+        #Bouncepad ready
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown == 0], Effect.RING, Color.SKY_BLUE, bouncePad1, 20, EffectReeval.VISIBILITY)
+
+        #Bouncepad not ready
+        createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad1, 20, EffectReeval.VISIBILITY)
 
 
 rule "Create ball & targeted effect":
