@@ -131,6 +131,9 @@ globalvar startingText 71
 globalvar arenaType 72
 globalvar startingBallSpeed 73
 globalvar bouncePadRange 74
+globalvar maxRoundsToggle 75
+globalvar maxRounds 76
+globalvar currentRound 77
 
 
 #Player variables
@@ -175,6 +178,8 @@ rule "// SETTINGS":
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Firebending", "Waterbending"], "Dodgeball Settings", "Arena Type", 0)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 1)
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 2)
+    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Toggle Match End After A Certain Round", false, 3)
+    maxRounds = createWorkshopSetting(int[1:100], "Dodgeball Settings", "Total Rounds Per Match", 5, 4)
     torbBall = createWorkshopSetting(enum["Don't touch this rule", "You must of accidently opened this rule, please close it", 
     "Why haven't you closed it?", "Wait, what are you planning?", "No, stop", "Close this, now.", "Don't you dare pick that option", "Please stop", 
     "I'm begging you", "You are putting yourself in grave danger", "Don't scroll, please, whatever you do", "Stop scrolling", "I am warning you.", 
@@ -1086,6 +1091,7 @@ rule "Check for last player surviving":
     if not isEnoughPlayersToStart:
         return
     roundInProgress = false
+    currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
     targetedPlayer = -1
     ballSpawnCountdown = 5
@@ -1139,6 +1145,7 @@ rule "Team 1 Last Surviving":
     if not isEnoughPlayersToStart:
         return
     roundInProgress = false
+    currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
     targetedPlayer = -1
     ballSpawnCountdown = 5
@@ -1192,6 +1199,7 @@ rule "Team 2 Last Surviving":
     if not isEnoughPlayersToStart:
         return
     roundInProgress = false
+    currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
     targetedPlayer = -1
     ballSpawnCountdown = 5
@@ -1421,3 +1429,9 @@ rule "Team 2 Win":
     
     enableAnnouncer()
     declareTeamVictory(Team.2)
+
+rule "Maximum amount of rounds reached":
+    @Condition maxRoundsToggle
+    @Condition currentRound > maxRounds
+    
+    declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())

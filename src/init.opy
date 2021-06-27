@@ -58,6 +58,7 @@ rule "Init global variables":
     isPassingTeam1 = false
     isPassingTeam2 = false
     passingPlayer = null
+    currentRound = 1
     if getCurrentGamemode() == Gamemode.FFA:
         gameEndEnabled = true
 
