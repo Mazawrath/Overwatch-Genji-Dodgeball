@@ -43,7 +43,7 @@ rule "Init global variables":
     playerHero = Hero.GENJI
     bouncePadStrength = 30
     bouncePadDistance = 12
-    ballSpeed = 30
+    ballSpeed = startingBallSpeed
     ballSpawnSpeed = 30
     maxBallSpeed = 1000
     centerOffLimitsSize = 3.5
