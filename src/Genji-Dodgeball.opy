@@ -130,7 +130,7 @@ globalvar wasFinalDuel 70
 globalvar startingText 71
 globalvar arenaType 72
 globalvar startingBallSpeed 73
-globalvar bouncePadRange = 74
+globalvar bouncePadRange 74
 
 
 #Player variables
