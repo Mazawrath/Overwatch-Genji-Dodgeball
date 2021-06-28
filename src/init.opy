@@ -46,9 +46,10 @@ rule "Init global variables":
     ballSpawnSpeed = 30
     maxBallSpeed = 1000
     if arenaType == 2:
-        centerOffLimitsSize = 12.5
-    elif arenaType == 3:
-        centerOffLimitsSize = 20
+        if (getCurrentMap() == Map.WORKSHOP_EXPANSE or getCurrentMap() == Map.WORKSHOP_EXPANSE_NIGHT) == true:
+            centerOffLimitsSize = 20
+        else: 
+            centerOffLimitsSize = 12.5
     else:
         centerOffLimitsSize = 3.5
     isInFinalDuel = false
