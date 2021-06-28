@@ -334,19 +334,6 @@ def ShortFun():
             destroyInWorldText(getLastCreatedText())
             break
         case 9:
-            wait()
-            createBeam(getAllPlayers(), Beam.GRAPPLE, updateEveryTick(ballPlayer.getEyePosition()), updateEveryTick(targetedPlayer.getPosition()), null, EffectReeval.POSITION_AND_RADIUS)
-            ballHeroRandom = getLastCreatedEntity()
-            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-            createInWorldText(getAllPlayers(), "Get over here!", updateEveryTick(ballPlayer.getPosition()) + vect(0, 1, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
-            while ballPlayerMock:
-                ballPlayer.applyImpulse(directionTowards(ballPlayer.getPosition(), targetedPlayer.getPosition()), 2, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
-                wait()
-                waitUntil(distance(ballPlayer.getPosition(), targetedPlayer.getPosition()) > 2, 9999)
-            destroyEffect(ballHeroRandom)
-            destroyInWorldText(getLastCreatedText())
-            break
-        case 10:
             # Torb horror game.
             wait()
             ballHeroRandom = random.choice([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero])
@@ -358,3 +345,16 @@ def ShortFun():
             ballPlayer.stopForcingPosition()
             destroyInWorldText(getLastCreatedText())
             break
+        # case 9:
+        #     wait()
+        #     createBeam(getAllPlayers(), Beam.GRAPPLE, updateEveryTick(ballPlayer.getEyePosition()), updateEveryTick(targetedPlayer.getPosition()), null, EffectReeval.POSITION_AND_RADIUS)
+        #     ballHeroRandom = getLastCreatedEntity()
+        #     ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+        #     createInWorldText(getAllPlayers(), "Get over here!", updateEveryTick(ballPlayer.getPosition()) + vect(0, 1, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
+        #     while ballPlayerMock:
+        #         ballPlayer.applyImpulse(directionTowards(ballPlayer.getPosition(), targetedPlayer.getPosition()), 2, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+        #         wait()
+        #         waitUntil(distance(ballPlayer.getPosition(), targetedPlayer.getPosition()) > 2, 9999)
+        #     destroyEffect(ballHeroRandom)
+        #     destroyInWorldText(getLastCreatedText())
+        #     break
