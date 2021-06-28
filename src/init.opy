@@ -143,6 +143,7 @@ rule "Create player HUD elements":
 
 
 rule "Create bounce pads":
+    @Condition bouncePadToggle
     
     if arenaType == 0:
         bouncePadDistance = 12

@@ -134,6 +134,7 @@ globalvar bouncePadRange 74
 globalvar maxRoundsToggle 75
 globalvar maxRounds 76
 globalvar currentRound 77
+globalvar bouncePadToggle 78
 
 
 #Player variables
@@ -177,9 +178,10 @@ subroutine LongFun 4
 rule "// SETTINGS":
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 1)
-    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 2)
-    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Toggle Match End After A Certain Round", false, 3)
-    maxRounds = createWorkshopSetting(int[1:100], "Dodgeball Settings", "Total Rounds Per Match", 5, 4)
+    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 2)
+    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 3)
+    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Toggle Match End After A Certain Round", false, 4)
+    maxRounds = createWorkshopSetting(int[1:100], "Dodgeball Settings", "Total Rounds Per Match", 5, 5)
     torbBall = createWorkshopSetting(enum["Don't touch this rule", "You must of accidently opened this rule, please close it", 
     "Why haven't you closed it?", "Wait, what are you planning?", "No, stop", "Close this, now.", "Don't you dare pick that option", "Please stop", 
     "I'm begging you", "You are putting yourself in grave danger", "Don't scroll, please, whatever you do", "Stop scrolling", "I am warning you.", 
