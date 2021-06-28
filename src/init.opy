@@ -45,7 +45,10 @@ rule "Init global variables":
     ballSpeed = startingBallSpeed
     ballSpawnSpeed = 30
     maxBallSpeed = 1000
-    centerOffLimitsSize = 3.5
+    if arenaType == 2:
+        centerOffLimitsSize = 18
+    else:
+        centerOffLimitsSize = 3.5
     isInFinalDuel = false
     bouncePadCooldownLength = 3
     bouncePadSuperjumpNerf = 6
@@ -138,7 +141,7 @@ rule "Create player HUD elements":
 
 rule "Create bounce pads":
     
-    if arenaType != 1:
+    if arenaType == 0:
         bouncePadDistance = 12
         bouncePadRange = 2.75
 
@@ -158,7 +161,7 @@ rule "Create bounce pads":
         createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad2, 2, EffectReeval.VISIBILITY)
         createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad3, 2, EffectReeval.VISIBILITY)
         createEffect([player for player in getAllPlayers() if player.bouncePadCooldown > 0], Effect.RING, Color.WHITE, bouncePad4, 2, EffectReeval.VISIBILITY)
-    else:
+    elif arenaType == 1:
         bouncePadDistance = 0
         bouncePadRange = 20.75
         
