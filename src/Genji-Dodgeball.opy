@@ -175,7 +175,7 @@ subroutine LongFun 4
 
 
 rule "// SETTINGS":
-    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Firebending", "Waterbending"], "Dodgeball Settings", "Arena Type", 0)
+    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Waterbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 1)
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 2)
     maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Toggle Match End After A Certain Round", false, 3)
@@ -218,7 +218,10 @@ rule "Set Workshop Expanse Center":
     @Condition (getCurrentMap() == Map.WORKSHOP_EXPANSE or getCurrentMap() == Map.WORKSHOP_EXPANSE_NIGHT) == true
     
     circleCenter = vect(0, 1.199, 0)
-    sphereSize = 20
+    if arenaType == 3:
+        sphereSize = 60
+    else:
+        sphereSize = 20
 
 
 rule "Set Workshop Green Screen Center":
@@ -1454,4 +1457,3 @@ rule "Maximum amount of rounds reached":
             declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())
         else:
             declareDraw()
-            
