@@ -46,7 +46,7 @@ rule "Init global variables":
     ballSpawnSpeed = 30
     maxBallSpeed = 1000
     if arenaType == 2:
-        centerOffLimitsSize = 18
+        centerOffLimitsSize = 12.5
     else:
         centerOffLimitsSize = 3.5
     isInFinalDuel = false
