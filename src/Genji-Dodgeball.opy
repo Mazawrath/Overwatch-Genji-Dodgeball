@@ -221,6 +221,8 @@ rule "Set Workshop Expanse Center":
     sphereSize = 20
 
 
+rule "Set Workshop Green Screen Center":
+    @Condition getCurrentMap() == Map.WORKSHOP_GREEN_SCREEN
     
     circleCenter = vect(0, 1.199, 0)
     sphereSize = 20
