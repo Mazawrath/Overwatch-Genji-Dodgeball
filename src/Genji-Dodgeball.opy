@@ -215,7 +215,12 @@ rule "Set Workshop Chamber":
 
 
 rule "Set Workshop Expanse Center":
-    @Condition getCurrentMap() == Map.WORKSHOP_EXPANSE
+    @Condition (getCurrentMap() == Map.WORKSHOP_EXPANSE or getCurrentMap() == Map.WORKSHOP_EXPANSE_NIGHT) == true
+    
+    circleCenter = vect(0, 1.199, 0)
+    sphereSize = 20
+
+
     
     circleCenter = vect(0, 1.199, 0)
     sphereSize = 20
