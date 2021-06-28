@@ -1442,4 +1442,9 @@ rule "Maximum amount of rounds reached":
         elif teamScore(Team.2) > teamScore(Team.1):
             declareTeamVictory(Team.2)
     else:
-        declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())
+        highestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
+        if len([player for player in getAllPlayers() if player.getScore() == highestScore]) == 1:
+            declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())
+        else:
+            declareDraw()
+            
