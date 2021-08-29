@@ -20,6 +20,9 @@ rule "Init player variables":
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
     wait(3)
     smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
+    if (perspectiveMode == 2):
+        wait(3)
+        smallMessage(eventPlayer, "Press reload to toggle 1st/3rd person")
 
 
 rule "Init global variables":

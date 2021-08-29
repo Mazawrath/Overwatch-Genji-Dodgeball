@@ -390,7 +390,10 @@ rule "Player joins game":
     if (ballHero != null):
         waitUntil(isGameInProgress(), 10)
         eventPlayer.stopFacing()
-
+    # Force 3rd person if it's toggled on.
+    if (perspectiveMode == 1):
+        eventPlayer.thirdPerson = true
+        eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
 
 rule "Shorten Deflect Length":
     @Event eachPlayer
@@ -1467,19 +1470,20 @@ rule "Toggle 3rd person":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.RELOAD) == true
     @Condition eventPlayer.isAlive() == true
+    @Condition perspectiveMode == 2
     
-    if eventPlayer.thirdPerson == 0:
-        eventPlayer.thirdPerson = 1
+    if not eventPlayer.thirdPerson:
+        eventPlayer.thirdPerson = true
         wait(0.01)
         eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
     else:
         eventPlayer.stopCamera()
-        eventPlayer.thirdPerson = 0
+        eventPlayer.thirdPerson = false
 
 
 rule "Player dead 3rd person":
     @Event playerDied
-    @Condition eventPlayer.thirdPerson == 1
+    @Condition eventPlayer.thirdPerson
     
     eventPlayer.stopCamera()
 
@@ -1488,6 +1492,6 @@ rule "3rd person respawn":
     @Event eachPlayer
     @Condition eventPlayer.hasSpawned() == true
     @Condition roundInProgress == false
-    @Condition eventPlayer.thirdPerson == 1
+    @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
