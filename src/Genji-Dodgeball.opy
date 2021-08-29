@@ -156,6 +156,7 @@ playervar antiStuckProtection 14
 playervar toggleHUD 15
 playervar dashNerf 16
 playervar passingSignal 17
+playervar thirdPerson 18
 
 
 #Subroutine names
@@ -1459,3 +1460,32 @@ rule "Maximum amount of rounds reached":
             declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())
         else:
             declareDraw()
+
+rule "Toggle 3rd person":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.RELOAD) == true
+    @Condition eventPlayer.isAlive() == true
+    
+    if eventPlayer.thirdPerson == 0:
+        eventPlayer.thirdPerson = 1
+        wait(0.01)
+        eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+    else:
+        eventPlayer.stopCamera()
+        eventPlayer.thirdPerson = 0
+
+
+rule "Player dead 3rd person":
+    @Event playerDied
+    @Condition eventPlayer.thirdPerson == 1
+    
+    eventPlayer.stopCamera()
+
+
+rule "3rd person respawn":
+    @Event eachPlayer
+    @Condition eventPlayer.hasSpawned() == true
+    @Condition roundInProgress == false
+    @Condition eventPlayer.thirdPerson == 1
+    
+    eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
