@@ -789,6 +789,9 @@ rule "Classic ball motion":
     prevBallPos = ballPosition
     chase(ballPosition, targetedPlayer.getEyePosition(), rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+    wait(0.05)
+    if RULE_CONDITION:
+        goto RULE_START
 
 rule "Ball reaches player":
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
