@@ -136,6 +136,7 @@ globalvar maxRounds 76
 globalvar currentRound 77
 globalvar bouncePadToggle 78
 globalvar perspectiveMode 79
+globalvar ballPhysicsType 80
 
 
 #Player variables
@@ -178,13 +179,14 @@ subroutine LongFun 4
 
 
 rule "// SETTINGS":
-    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0)
-    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 1)
-    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 2)
-    perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 3)
-    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 4)
-    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 5)
-    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 6)
+    ballPhysicsType = createWorkshopSetting(enum["Modern", "Classic"], "Dodgeball Settings", "Ball Physics Mode", 0, 0)
+    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 1)
+    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 2)
+    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 3)
+    perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 4)
+    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 5)
+    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 6)
+    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 7)
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Deathmatch Settings", "Torb Ball", 0, 0)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
@@ -766,8 +768,9 @@ rule "Spawn ball":
     ballIsOut = true
 
 
-rule "ball motion (has to be done weird due to chase vector variable bugs)":
+rule "Modern ball motion":
     @Condition ballIsOut == true
+    @Condition ballPhysicsType == 0
     
     prevBallPos2 = prevBallPos
     prevBallPos = ballPosition
@@ -778,6 +781,14 @@ rule "ball motion (has to be done weird due to chase vector variable bugs)":
     if RULE_CONDITION:
         goto RULE_START
 
+rule "Classic ball motion":
+    @Condition ballIsOut == true
+    @Condition ballPhysicsType == 1
+    
+    prevBallPos2 = prevBallPos
+    prevBallPos = ballPosition
+    chase(ballPosition, targetedPlayer.getEyePosition(), rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
 
 rule "Ball reaches player":
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
