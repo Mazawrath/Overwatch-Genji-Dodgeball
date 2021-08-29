@@ -1118,7 +1118,6 @@ rule "Check for last player surviving":
     roundInProgress = false
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
-    targetedPlayer = -1
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
