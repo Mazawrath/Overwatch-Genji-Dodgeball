@@ -930,6 +930,8 @@ def DeflectFailed():
     targetedPlayer.setStatusEffect(previousTargetedPlayer, Status.STUNNED, 1)
     targetedPlayer.bouncePadCooldown = 0
     previousTargetedPlayer.currentUltPercent += 15
+    if ballHero and previousTargetedPlayer == -1:
+        previousTargetedPlayer = ballPlayer
     kill(targetedPlayer, previousTargetedPlayer)
     ballPlayer.stopFacing()
     ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
