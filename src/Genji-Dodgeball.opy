@@ -44,7 +44,7 @@ settings {
                 "enablePrimaryFire": false,
                 "enableMelee": false,
                 "enableSecondaryFire": false,
-                "ability1Cooldown%": 38,
+                "ability1Cooldown%": 30,
                 "combatUltGen%": 0,
                 "passiveUltGen%": 0
             },
