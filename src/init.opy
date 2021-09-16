@@ -56,6 +56,7 @@ rule "Init global variables":
     else:
         centerOffLimitsSize = 3.5
     isInFinalDuel = false
+    bouncePadCooldownLengthStart = 3
     bouncePadCooldownLength = 3
     bouncePadSuperjumpNerf = 6
     ballPosition = vect(0, -1, 0)
