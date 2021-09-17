@@ -180,7 +180,7 @@ subroutine LongFun 4
 
 
 rule "// SETTINGS":
-    ballPhysicsType = createWorkshopSetting(enum["Modern", "Classic"], "Dodgeball Settings", "Ball Physics Mode", 0, 0)
+    ballPhysicsType = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Ball Physics Mode", 0, 0)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 1)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 2)
     bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 3)
@@ -782,7 +782,7 @@ rule "Modern ball motion":
     if RULE_CONDITION:
         goto RULE_START
 
-rule "Classic ball motion":
+rule "Retro ball motion":
     @Condition ballIsOut == true
     @Condition ballPhysicsType == 1
     
