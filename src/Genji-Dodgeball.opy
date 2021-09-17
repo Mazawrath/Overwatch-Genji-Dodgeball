@@ -137,7 +137,7 @@ globalvar maxRounds 76
 globalvar currentRound 77
 globalvar bouncePadToggle 78
 globalvar perspectiveMode 79
-globalvar ballPhysicsType 80
+globalvar rulesetMode 80
 globalvar bouncePadCooldownLengthStart 81
 
 
@@ -181,11 +181,11 @@ subroutine LongFun 4
 
 
 rule "// SETTINGS":
-    ballPhysicsType = createWorkshopSetting(enum["Modern", "Classic"], "Dodgeball Settings", "Ball Physics Mode", 0, 0)
-    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 1)
-    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 2)
-    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 3)
-    perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 4)
+    perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
+    rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
+    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 2)
+    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 3)
+    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 4)
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 5)
     maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 6)
     maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 7)
@@ -772,7 +772,7 @@ rule "Spawn ball":
 
 rule "Modern ball motion":
     @Condition ballIsOut == true
-    @Condition ballPhysicsType == 0
+    @Condition rulesetMode == 0
     
     prevBallPos2 = prevBallPos
     prevBallPos = ballPosition
@@ -783,9 +783,9 @@ rule "Modern ball motion":
     if RULE_CONDITION:
         goto RULE_START
 
-rule "Classic ball motion":
+rule "Retro ball motion":
     @Condition ballIsOut == true
-    @Condition ballPhysicsType == 1
+    @Condition rulesetMode == 1
     
     prevBallPos2 = prevBallPos
     prevBallPos = ballPosition
@@ -805,7 +805,7 @@ rule "Ball reaches player":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
+    if targetedPlayer.isUsingAbility2() or ( targetedPlayer.isUsingAbility1() and rulesetMode == 0):
         goto lbl_0
     DeflectFailed()
     return
@@ -856,7 +856,7 @@ rule "Ball reaches player -TEAMS":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if not targetedPlayer.isUsingAbility2() and not targetedPlayer.isUsingAbility1():
+    if not targetedPlayer.isUsingAbility2() and not (targetedPlayer.isUsingAbility1() and rulesetMode == 0):
         DeflectFailed()
         return
     #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
@@ -890,8 +890,12 @@ rule "Ball reaches player -TEAMS":
             isPassingTeam2 = true
         #If the member is the only one left on their team, self pass
         if len([player for player in getLivingPlayers(previousTargetedPlayer.getTeam()) if true]) == 1:
-            targetedPlayer = previousTargetedPlayer
-            #Pass to another teammate
+            # Check if using modern rules. Self passing is disabled in retro rules so it's basically a failed deflect.
+            if rulesetMode == 0:
+                targetedPlayer = previousTargetedPlayer
+            else:
+                DeflectFailed()
+        #Pass to another teammate
         else:
             passingPlayer = previousTargetedPlayer
             passingPlayer.startGrantingAssistFor(getAllPlayers(), AssistReeval.NONE)
@@ -1178,7 +1182,6 @@ rule "Team 1 Last Surviving":
     roundInProgress = false
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
-    targetedPlayer = -1
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
@@ -1232,7 +1235,6 @@ rule "Team 2 Last Surviving":
     roundInProgress = false
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
-    targetedPlayer = -1
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true

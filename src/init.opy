@@ -71,6 +71,10 @@ rule "Init global variables":
     currentRound = 1
     if getCurrentGamemode() == Gamemode.FFA:
         gameEndEnabled = true
+    # Using passing with retro ruleset DOES NOT work
+    if rulesetMode == 1 and passingEnabled and getCurrentGamemode() == Gamemode.FFA:
+        passingEnabled = false
+        hudSubtext(hostPlayer, "Hi host. Very clever idea but sorry retro rules totally breaks self passing. Like, what do you think it can even do? The ball can only go in a straight direction and self passing sends the ball away from you and then curves around so in this case where would it even go? In your head. That's where it goes. I tested it. So you don't have to.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
 
 
 rule "Create game sphere":
@@ -123,10 +127,17 @@ rule "Create global HUD elements":
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudSubtext(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     createInWorldText([player for player in getAllPlayers() if ballSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
+    if rulesetMode == 1:
+        if getCurrentGamemode() == Gamemode.FFA:
+            hudSubtext(getAllPlayers(), "Retro ruleset. Dash deflecting is disabled.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+        else:
+            hudSubtext(getAllPlayers(), "Retro ruleset. Dash deflecting & self passing are disabled.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+            
     if passingEnabled:
         if getCurrentGamemode() == Gamemode.TDM:
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to pass the ball to another teammate!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
-        elif getCurrentGamemode() == Gamemode.FFA:
+        # Passing only works with the modern ruleset.
+        elif getCurrentGamemode() == Gamemode.FFA and rulesetMode == 0:
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to self pass the ball!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
 
 
