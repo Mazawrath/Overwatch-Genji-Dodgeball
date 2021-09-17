@@ -889,8 +889,12 @@ rule "Ball reaches player -TEAMS":
             isPassingTeam2 = true
         #If the member is the only one left on their team, self pass
         if len([player for player in getLivingPlayers(previousTargetedPlayer.getTeam()) if true]) == 1:
-            targetedPlayer = previousTargetedPlayer
-            #Pass to another teammate
+            # Check if using modern rules. Self passing is disabled in retro rules so it's basically a failed deflect.
+            if rulesetMode == 0:
+                targetedPlayer = previousTargetedPlayer
+            else:
+                DeflectFailed()
+        #Pass to another teammate
         else:
             passingPlayer = previousTargetedPlayer
             passingPlayer.startGrantingAssistFor(getAllPlayers(), AssistReeval.NONE)
