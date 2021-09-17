@@ -44,7 +44,7 @@ settings {
                 "enablePrimaryFire": false,
                 "enableMelee": false,
                 "enableSecondaryFire": false,
-                "ability1Cooldown%": 38,
+                "ability1Cooldown%": 30,
                 "combatUltGen%": 0,
                 "passiveUltGen%": 0
             },
@@ -138,6 +138,7 @@ globalvar currentRound 77
 globalvar bouncePadToggle 78
 globalvar perspectiveMode 79
 globalvar rulesetMode 80
+globalvar bouncePadCooldownLengthStart 81
 
 
 #Player variables
@@ -1127,7 +1128,7 @@ rule "Check for last player surviving":
         return
     roundInProgress = false
     currentRound += 1
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
@@ -1180,7 +1181,7 @@ rule "Team 1 Last Surviving":
         return
     roundInProgress = false
     currentRound += 1
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
@@ -1233,7 +1234,7 @@ rule "Team 2 Last Surviving":
         return
     roundInProgress = false
     currentRound += 1
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
@@ -1273,7 +1274,7 @@ rule "All players dead failsafe":
     getDeadPlayers(Team.ALL).resurrect()
     smallMessage(getAllPlayers(), "All players detected dead! Resetting game.")
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
     wait(1)
     if RULE_CONDITION:

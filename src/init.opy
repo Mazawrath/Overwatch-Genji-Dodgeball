@@ -12,7 +12,7 @@ rule "Init player variables":
     lbl_0:
     eventPlayer.disableRespawn()
     eventPlayer.enableDeathSpectateAllPlayers()
-    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    eventPlayer.bouncePadCooldown = bouncePadCooldownLengthStart
     eventPlayer.antiFloatProtection = false
     eventPlayer.antiStuckProtection = false
     eventPlayer.toggleHUD = true
@@ -56,7 +56,8 @@ rule "Init global variables":
     else:
         centerOffLimitsSize = 3.5
     isInFinalDuel = false
-    bouncePadCooldownLength = 3
+    bouncePadCooldownLengthStart = 3
+    bouncePadCooldownLength = 6.5
     bouncePadSuperjumpNerf = 6
     ballPosition = vect(0, -1, 0)
     explosionSoundVolume = 30
