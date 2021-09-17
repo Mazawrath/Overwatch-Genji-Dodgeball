@@ -70,6 +70,10 @@ rule "Init global variables":
     currentRound = 1
     if getCurrentGamemode() == Gamemode.FFA:
         gameEndEnabled = true
+    # Using passing with retro ruleset DOES NOT work
+    if rulesetMode == 1 and passingEnabled and getCurrentGamemode() == Gamemode.FFA:
+        passingEnabled = false
+        hudSubtext(hostPlayer, "Hi host. Very clever idea but sorry retro rules totally breaks self passing. Like, what do you think it can even do? The ball can only go in a straight direction and self passing sends the ball away from you and then curves around so in this case where would it even go? In your head. That's where it goes. I tested it. So you don't have to.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
 
 
 rule "Create game sphere":
@@ -131,7 +135,8 @@ rule "Create global HUD elements":
     if passingEnabled:
         if getCurrentGamemode() == Gamemode.TDM:
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to pass the ball to another teammate!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
-        elif getCurrentGamemode() == Gamemode.FFA:
+        # Passing only works with the modern ruleset.
+        elif getCurrentGamemode() == Gamemode.FFA and rulesetMode == 0:
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to self pass the ball!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
 
 
