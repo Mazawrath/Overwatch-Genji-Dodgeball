@@ -135,7 +135,6 @@ rule "Create global HUD elements":
     if passingEnabled and rulesetMode == 0:
         if getCurrentGamemode() == Gamemode.TDM:
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to pass the ball to another teammate!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
-        # Passing only works with the modern ruleset.
         elif getCurrentGamemode() == Gamemode.FFA:
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to self pass the ball!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
 
