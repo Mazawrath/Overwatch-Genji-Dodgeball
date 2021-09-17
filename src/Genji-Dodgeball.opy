@@ -1181,7 +1181,6 @@ rule "Team 1 Last Surviving":
     roundInProgress = false
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
-    targetedPlayer = -1
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
@@ -1235,7 +1234,6 @@ rule "Team 2 Last Surviving":
     roundInProgress = false
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
-    targetedPlayer = -1
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
