@@ -137,7 +137,7 @@ globalvar maxRounds 76
 globalvar currentRound 77
 globalvar bouncePadToggle 78
 globalvar perspectiveMode 79
-globalvar ballPhysicsType 80
+globalvar rulesetMode 80
 
 
 #Player variables
@@ -181,7 +181,7 @@ subroutine LongFun 4
 
 rule "// SETTINGS":
     perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
-    ballPhysicsType = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Ball Physics Mode", 0, 1)
+    rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 3)
     bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 4)
@@ -771,7 +771,7 @@ rule "Spawn ball":
 
 rule "Modern ball motion":
     @Condition ballIsOut == true
-    @Condition ballPhysicsType == 0
+    @Condition rulesetMode == 0
     
     prevBallPos2 = prevBallPos
     prevBallPos = ballPosition
@@ -784,7 +784,7 @@ rule "Modern ball motion":
 
 rule "Retro ball motion":
     @Condition ballIsOut == true
-    @Condition ballPhysicsType == 1
+    @Condition rulesetMode == 1
     
     prevBallPos2 = prevBallPos
     prevBallPos = ballPosition
@@ -804,7 +804,7 @@ rule "Ball reaches player":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if targetedPlayer.isUsingAbility2() or ( targetedPlayer.isUsingAbility1() and ballPhysicsType == 0):
+    if targetedPlayer.isUsingAbility2() or ( targetedPlayer.isUsingAbility1() and rulesetMode == 0):
         goto lbl_0
     DeflectFailed()
     return
@@ -855,7 +855,7 @@ rule "Ball reaches player -TEAMS":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if not targetedPlayer.isUsingAbility2() and not (targetedPlayer.isUsingAbility1() and ballPhysicsType == 0):
+    if not targetedPlayer.isUsingAbility2() and not (targetedPlayer.isUsingAbility1() and rulesetMode == 0):
         DeflectFailed()
         return
     #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
