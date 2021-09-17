@@ -804,7 +804,7 @@ rule "Ball reaches player":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
+    if targetedPlayer.isUsingAbility2() or ( targetedPlayer.isUsingAbility1() and ballPhysicsType == 0):
         goto lbl_0
     DeflectFailed()
     return
@@ -855,7 +855,7 @@ rule "Ball reaches player -TEAMS":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if not targetedPlayer.isUsingAbility2() and not targetedPlayer.isUsingAbility1():
+    if not targetedPlayer.isUsingAbility2() and not (targetedPlayer.isUsingAbility1() and ballPhysicsType == 0):
         DeflectFailed()
         return
     #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
