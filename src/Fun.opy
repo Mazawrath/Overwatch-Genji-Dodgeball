@@ -385,3 +385,21 @@ def ShortFun():
         #     destroyEffect(ballHeroRandom)
         #     destroyInWorldText(getLastCreatedText())
         #     break
+        case 11:
+            wait()
+            ballHeroRandom = 1
+            ballHeroRegretText = 1
+            ballPlayer.startScalingSize(ballHeroRandom, true)
+            ballPlayer.startModifyingVoicelinePitch(ballHeroRegretText, true)
+            chase(ballHeroRandom, 0, duration=1.5, ChaseReeval.NONE)
+            chase(ballHeroRegretText, 2, duration=1, ChaseReeval.NONE)
+            ballPlayer.communicate(Comms.GOODBYE)
+            wait(1.5)
+            ballPlayer.setInvisibility(Invis.ALL)
+            waitUntil(not ballPlayerMock, 9999)
+            stopChasingVariable(ballHeroRandom)
+            stopChasingVariable(ballHeroRegretText)
+            ballPlayer.setInvisibility(Invis.NONE)
+            ballPlayer.stopScalingSize()
+            ballPlayer.stopModifyingVoicelinePitch()
+            break
