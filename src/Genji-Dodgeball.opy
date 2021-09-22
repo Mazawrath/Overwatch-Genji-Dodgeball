@@ -155,12 +155,11 @@ playervar isDashEnabled 9
 playervar moveSpeed 10
 playervar maxBallSpeed 11
 playervar antiFloatProtection 12
-playervar antiFloatTimer 13
-playervar antiStuckProtection 14
-playervar toggleHUD 15
-playervar dashNerf 16
-playervar passingSignal 17
-playervar thirdPerson 18
+playervar antiStuckProtection 13
+playervar toggleHUD 14
+playervar dashNerf 15
+playervar passingSignal 16
+playervar thirdPerson 17
 
 
 #Subroutine names
@@ -517,7 +516,6 @@ rule "Anti-Bounce Detection Positive X":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
     eventPlayer.antiFloatProtection = true
@@ -534,7 +532,6 @@ rule "Anti-Bounce Detection Netgative X":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
     eventPlayer.antiFloatProtection = true
@@ -551,7 +548,6 @@ rule "Anti-Bounce Detection Positive Z":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
     eventPlayer.antiFloatProtection = true
@@ -568,7 +564,6 @@ rule "Anti-Bounce Detection Negative Z":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
     eventPlayer.antiFloatProtection = true
