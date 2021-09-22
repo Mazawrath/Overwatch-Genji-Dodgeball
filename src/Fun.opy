@@ -56,7 +56,7 @@ def LongFun():
     # Have an 8.3% chance of doing a fun thing for each player, up to 45%, minus torb
     if random.randint(0, 100) >= min(getNumberOfPlayers(Team.ALL) * 9.5 - 9.5, 60):
         return
-    switch random.randint(1, 10):
+    switch random.randint(1, 11):
         case 1:
             # I think this one is easily my favorite.
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
@@ -226,6 +226,19 @@ def LongFun():
             ballPlayer.applyImpulse(directionTowards(ballPlayer.getPosition(), ballHeroRandom.getEyePosition() + (ballHeroRandom.getFacingDirection() * 20)), 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
             waitUntil(not ballPlayerMock, 4)
             ballPlayer.clearStatusEffect(Status.KNOCKED_DOWN)
+            break
+        case 11:
+            wait()
+            ballPlayer.setGravity(100)
+            ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.RIGHT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.teleport(circleCenter + vect(0,5,0))
+            ballPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            ballPlayer.communicate(Comms.HELLO)
             break
 
 
