@@ -246,7 +246,7 @@ def LongFun():
 def ShortFun():
     @Name "Hero ball do a quick fun thing"
 
-    # Only have a 10% chance of doing a fun thing
+    # Only have a 25% chance of doing a fun thing
     if (random.randint(1, 100) >= 25):
         return
     ballHeroRandom = random.randint(0, 100)
