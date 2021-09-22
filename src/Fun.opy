@@ -250,7 +250,7 @@ def ShortFun():
     if (random.randint(1, 100) >= 10):
         return
     ballHeroRandom = random.randint(0, 100)
-    switch random.randint(1, 10):
+    switch random.randint(1, 11):
         case 1:
             # nice
             if (ballHeroRandom == 69):
