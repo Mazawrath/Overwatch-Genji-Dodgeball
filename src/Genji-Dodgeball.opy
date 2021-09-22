@@ -939,8 +939,9 @@ def DeflectFailed():
     if ballHero and previousTargetedPlayer == -1:
         previousTargetedPlayer = ballPlayer
     kill(targetedPlayer, previousTargetedPlayer)
-    ballPlayer.stopFacing()
-    ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
+    if ballHero and not ballPlayer.hasStatusEffect(Status.FROZEN):
+        ballPlayer.stopFacing()
+        ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
     if improvedExplosions == true:
         UpdatedDeathEffects()
     else:

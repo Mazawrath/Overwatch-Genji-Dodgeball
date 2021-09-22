@@ -113,7 +113,8 @@ rule "Don't move while ball isn't in play":
 
     eventPlayer.setGravity(100)
     waitUntil(not ballPlayerMock, 9999)
-    eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    if not eventPlayer.hasStatusEffect(Status.FROZEN):
+        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     eventPlayer.setGravity(0)
 
 
@@ -127,6 +128,16 @@ rule "Set hero ball outline":
     ballPlayer.startForcingOutlineFor([player for player in getAllPlayers() if player == targetedPlayer], true, Color.RED, OutlineVisibility.DEFAULT)
     wait(0.1)
     goto RULE_START
+
+
+rule "Don't look around while frozen":
+    @Event eachPlayer
+    @Condition ballHero
+    @Condition isGameInProgress()
+    @Condition eventPlayer.getCurrentHero() == ballHero
+    @Condition eventPlayer.hasStatusEffect(Status.FROZEN)
+    
+    ballPlayer.stopFacing()
 
 
 #!include "./Fun.opy"
