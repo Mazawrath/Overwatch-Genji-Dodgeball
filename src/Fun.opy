@@ -12,10 +12,10 @@ rule "Hero ball do funny thing":
         else:
             ballPlayer.communicate(Comms.YOURE_WELCOME)
 
-    if wasFinalDuel or getNumberOfHeroes(playerHero, Team.ALL) <= 2:
+    if wasFinalDuel or getNumberOfHeroes(playerHero, Team.ALL) <= 2 and not eventPlayer.hasStatusEffect(Status.FROZEN):
         wasFinalDuel = false
         LongFun()
-    elif (not isInFinalDuel):
+    elif not isInFinalDuel and not eventPlayer.hasStatusEffect(Status.FROZEN):
         ShortFun()
     else:
         wasFinalDuel = true
