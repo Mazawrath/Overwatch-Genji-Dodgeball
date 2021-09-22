@@ -361,6 +361,17 @@ def ShortFun():
             ballPlayer.stopForcingPosition()
             destroyInWorldText(getLastCreatedText())
             break
+        case 10:
+            ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.RIGHT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.teleport(circleCenter + vect(0,5,0))
+            ballPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            ballPlayer.communicate(Comms.HELLO)
+            break
         # case 9:
         #     wait()
         #     createBeam(getAllPlayers(), Beam.GRAPPLE, updateEveryTick(ballPlayer.getEyePosition()), updateEveryTick(targetedPlayer.getPosition()), null, EffectReeval.POSITION_AND_RADIUS)
