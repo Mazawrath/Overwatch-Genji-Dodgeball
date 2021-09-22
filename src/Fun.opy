@@ -12,11 +12,13 @@ rule "Hero ball do funny thing":
         else:
             ballPlayer.communicate(Comms.YOURE_WELCOME)
 
-    if wasFinalDuel or getNumberOfHeroes(playerHero, Team.ALL) <= 2 and not eventPlayer.hasStatusEffect(Status.FROZEN):
+    if wasFinalDuel or getNumberOfHeroes(playerHero, Team.ALL) <= 2:
         wasFinalDuel = false
-        LongFun()
-    elif not isInFinalDuel and not eventPlayer.hasStatusEffect(Status.FROZEN):
-        ShortFun()
+        if not eventPlayer.hasStatusEffect(Status.FROZEN):
+            LongFun()
+    elif not isInFinalDuel:
+        if not eventPlayer.hasStatusEffect(Status.FROZEN):
+            ShortFun()
     else:
         wasFinalDuel = true
         ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
