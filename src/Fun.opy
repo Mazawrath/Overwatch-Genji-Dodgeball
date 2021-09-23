@@ -35,7 +35,7 @@ rule "Hero ball do funny thing":
     #do a funny thing maybe.
     ballHeroRandom = random.randint(0, 100)
     if (ballHeroRandom <= 3):
-        ballPlayer.setStatusEffect(null, Status.FROZEN, random.randint(5, 15))
+        ballPlayer.setStatusEffect(null, Status.FROZEN, random.randint(10, 60))
     elif (ballHeroRandom >= 5 and ballHeroRandom <= 8):
         ballPlayer.setStatusEffect(null, Status.BURNING, random.randint(10, 60))
     elif (ballHeroRandom >= 10 and ballHeroRandom <= 13):
