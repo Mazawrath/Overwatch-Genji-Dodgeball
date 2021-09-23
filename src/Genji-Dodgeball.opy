@@ -766,15 +766,20 @@ rule "Spawn ball":
     ballIsOut = true
 
 
-rule "Modern ball motion":
+rule "Modern ball calculation":
+    @Condition ballIsOut == true
+    @Condition rulesetMode == 0
+
+    chase(ballPosition, ballPosition + ballDirection * ballSpeed * 1, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+
+rule "Looping modern ball calculation":
     @Condition ballIsOut == true
     @Condition rulesetMode == 0
     
     prevBallPos2 = prevBallPos
     prevBallPos = ballPosition
-    chase(ballPosition, ballPosition + ballDirection * ballSpeed * 1, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
-    chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
     wait(0.05)
     if RULE_CONDITION:
         goto RULE_START
