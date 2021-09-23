@@ -466,6 +466,7 @@ rule "Player dashes too far out of bounds":
     @Event eachPlayer
     @Hero all
     @Condition distance(eventPlayer.getPosition(), vect(circleCenter.x, eventPlayer.getPosition().y, circleCenter.z)) > sphereSize + 1
+    @Condition eventPlayer != ballPlayer
     #Workshop Island Fix
     #@Condition (getCurrentMap() != Map.WORKSHOP_ISLAND and getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT) == true
     
@@ -480,6 +481,7 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
     @Event eachPlayer
     @Hero all
     @Condition eventPlayer.getPosition().y < -0.5
+    @Condition eventPlayer != ballPlayer
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
