@@ -496,16 +496,13 @@ rule "Player falls off Workshop Island":
     @Hero all
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     @Condition eventPlayer.getPosition().y < -0.25
+    @Condition eventPlayer.isDead()
     
     #A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!
-    if not eventPlayer.isAlive():
-        eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
-        if eventPlayer == targetedPlayer:
-            if ballIsOut:
-                ballDeleteRequested = true
-    wait(0.5)
-    if RULE_CONDITION:
-        goto RULE_START
+    eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 0, random.randint(-10, 10)))
+    if eventPlayer == targetedPlayer:
+        if ballIsOut:
+            ballDeleteRequested = true
 
 
 rule "Anti-Bounce Detection Positive X":
