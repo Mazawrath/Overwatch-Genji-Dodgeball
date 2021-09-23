@@ -207,6 +207,7 @@ def LongFun():
             ballPlayer.startScalingSize(1, false)
             stopChasingVariable(ballHeroRandom)
             stopChasingVariable(ballHeroRegretText)
+            stopChasingVariable(ballPlayer.currentUltPercent)
             break
         case 10:
             # Get the chance to let your anger out and yeet torb.
@@ -348,6 +349,7 @@ def ShortFun():
             playEffect(getAllPlayers(), DynamicEffect.GOOD_EXPLOSION, Color.WHITE, ballHeroRandom, 2)
             destroyEffect(ballHeroRegretText)
             destroyInWorldText(getLastCreatedText())
+            stopChasingVariable(ballHeroRandom)
             break
         case 9:
             # Torb horror game.
