@@ -325,7 +325,7 @@ def ShortFun():
             break
         case 7:
             # To the person who keeps telling me to remove the center orb.
-            ballPlayer.startForcingPosition(circleCenter + vect(random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1), -circleCenter.y, random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1)), true)
+            ballPlayer.startForcingPosition(circleCenter + vect(random.uniform(-centerOffLimitsSize + 0.75, centerOffLimitsSize - 0.75), -circleCenter.y, random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1)), true)
             eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
             wait()
             createInWorldText(getAllPlayers(), "Jealous that I can be in here and you can't? :)", ballPlayer.getEyePosition() + vect(0, 0.5, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
