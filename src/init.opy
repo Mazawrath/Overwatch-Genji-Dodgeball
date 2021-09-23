@@ -33,7 +33,7 @@ rule "Init global variables":
     disableGamemodeCompletion()
     disableMusic()
     disableAnnouncer()
-    # disableInspector()
+    disableInspector()
     if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA:
         ballHero = Hero.TORBJORN
         name = ballHero
