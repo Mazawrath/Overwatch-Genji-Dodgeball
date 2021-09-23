@@ -737,10 +737,10 @@ rule "Start round":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.FFA
     
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
     ballPlayerMock = false
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
     ballSpawnCountdown = 5
 
 
@@ -749,9 +749,9 @@ rule "Start round - TEAMS":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.TDM
     
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
     ballSpawnCountdown = 5
 
 
@@ -960,7 +960,7 @@ def CoolDeathEffects():
     deathBeam = getLastCreatedEntity()
     deathSpherePos = targetedPlayer.getPosition()
     deathSphereRad = 30
-    chase(deathSphereRad, 0, duration=0.25, ChaseReeval.DESTINATION_AND_DURATION)
+    chase(deathSphereRad, 0, duration=0.25, ChaseReeval.NONE)
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.SKY_BLUE, deathSpherePos, 40)
     createEffect(getAllPlayers(), Effect.SPHERE, Color.BLACK, deathSpherePos, deathSphereRad, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     deathSphere = getLastCreatedEntity()
@@ -1133,8 +1133,8 @@ rule "Check for last player surviving":
     getAllPlayers().isDashEnabled = false
     getAllPlayers().setAbility1Enabled(false)
     lbl_0:
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
 
 rule "Team 1 Last Surviving":
@@ -1186,8 +1186,8 @@ rule "Team 1 Last Surviving":
     getAllPlayers().isDashEnabled = false
     getAllPlayers().setAbility1Enabled(false)
     lbl_0:
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
 
 rule "Team 2 Last Surviving":
@@ -1239,8 +1239,8 @@ rule "Team 2 Last Surviving":
     getAllPlayers().isDashEnabled = false
     getAllPlayers().setAbility1Enabled(false)
     lbl_0:
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
 
 rule "Player check":
@@ -1278,8 +1278,8 @@ rule "All players dead failsafe":
     wait(2)
     if not isEnoughPlayersToStart:
         return
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
     ballPosition = vect(0, -1, 0)
 
