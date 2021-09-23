@@ -1505,24 +1505,3 @@ rule "3rd person respawn":
     @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
-
-
-rule "TESTING spawn dunni":
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-
-
-rule "TESTING destroy dummi targeted":
-    @Condition hostPlayer.isHoldingButton(Button.CROUCH)
-
-    destroyDummy(Team.ALL, targetedPlayer.getSlot())
-
-
-rule "TESTING add dummn":
-    @Condition hostPlayer.isHoldingButton(Button.RELOAD)
-
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
