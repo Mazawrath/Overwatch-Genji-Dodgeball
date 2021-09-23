@@ -480,7 +480,6 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
     @Event eachPlayer
     @Hero all
     @Condition eventPlayer.getPosition().y < -0.5
-    @Condition eventPlayer.isAlive() == true
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
@@ -493,8 +492,10 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
 
 
 rule "Player falls off Workshop Island":
+    @Disabled
     @Event eachPlayer
     @Hero all
+    # This rule might no longer be needed...but I'll be dammed if I ever get rid of this rule. 
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     @Condition eventPlayer.getPosition().y < -0.25
     @Condition eventPlayer.isDead()
@@ -1504,3 +1505,24 @@ rule "3rd person respawn":
     @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+
+
+rule "TESTING spawn dunni":
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+
+
+rule "TESTING destroy dummi targeted":
+    @Condition hostPlayer.isHoldingButton(Button.CROUCH)
+
+    destroyDummy(Team.ALL, targetedPlayer.getSlot())
+
+
+rule "TESTING add dummn":
+    @Condition hostPlayer.isHoldingButton(Button.RELOAD)
+
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
