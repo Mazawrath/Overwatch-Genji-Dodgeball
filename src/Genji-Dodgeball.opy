@@ -394,6 +394,7 @@ rule "Player joins game":
         eventPlayer.thirdPerson = true
         eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
 
+
 rule "Shorten Deflect Length":
     @Event eachPlayer
     @Hero all
