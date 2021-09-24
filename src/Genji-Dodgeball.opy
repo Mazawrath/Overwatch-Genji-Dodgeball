@@ -771,18 +771,21 @@ rule "Modern ball calculation":
     @Condition rulesetMode == 0
 
     chase(ballPosition, ballPosition + ballDirection * ballSpeed * 1, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
 
-rule "Looping modern ball calculation":
+
+rule "Update ball postiion":
     @Condition ballIsOut == true
     @Condition rulesetMode == 0
-    
+
+    # This is for the ball tail to be updated.
     prevBallPos2 = prevBallPos
     prevBallPos = ballPosition
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
     wait(0.05)
     if RULE_CONDITION:
         goto RULE_START
+
 
 rule "Retro ball motion":
     @Condition ballIsOut == true
@@ -827,7 +830,6 @@ rule "Ball reaches player":
     ballSpeed = min(500, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    stopChasingVariable(ballDirection)
     lbl_1:
     ballDirection = targetedPlayer.getFacingDirection()
     wait(0.001)
@@ -842,7 +844,6 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
     #if RULE_CONDITION:
     #        goto RULE_START
 
@@ -872,7 +873,6 @@ rule "Ball reaches player -TEAMS":
     ballSpeed = min(500, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    stopChasingVariable(ballDirection)
     lbl_1:
     ballDirection = targetedPlayer.getFacingDirection()
     wait(0.001)
@@ -912,7 +912,6 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
     #If deflecting and stuff breaks...disabling this is why.
     #if RULE_CONDITION:
     #        goto RULE_START
