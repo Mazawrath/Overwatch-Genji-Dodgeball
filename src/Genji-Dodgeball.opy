@@ -777,7 +777,6 @@ rule "Modern ball calculation":
 
 rule "Update ball postiion":
     @Condition ballIsOut == true
-    @Condition rulesetMode == 0
 
     # This is for the ball tail to be updated.
     prevBallPos2 = prevBallPos
