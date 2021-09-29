@@ -2,7 +2,8 @@
 
 settings {
     "main": {
-        "description": "Genji Dodgeball v7.3.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.4.0",
+        "description": "Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -135,6 +136,9 @@ globalvar maxRoundsToggle 75
 globalvar maxRounds 76
 globalvar currentRound 77
 globalvar bouncePadToggle 78
+globalvar perspectiveMode 79
+globalvar rulesetMode 80
+globalvar bouncePadCooldownLengthStart 81
 
 
 #Player variables
@@ -151,11 +155,11 @@ playervar isDashEnabled 9
 playervar moveSpeed 10
 playervar maxBallSpeed 11
 playervar antiFloatProtection 12
-playervar antiFloatTimer 13
-playervar antiStuckProtection 14
-playervar toggleHUD 15
-playervar dashNerf 16
-playervar passingSignal 17
+playervar antiStuckProtection 13
+playervar toggleHUD 14
+playervar dashNerf 15
+playervar passingSignal 16
+playervar thirdPerson 17
 
 
 #Subroutine names
@@ -176,17 +180,15 @@ subroutine LongFun 4
 
 
 rule "// SETTINGS":
-    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0)
-    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 1)
-    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 2)
-    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 3)
-    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 4)
-    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 5)
-    torbBall = createWorkshopSetting(enum["Don't touch this rule", "You must of accidently opened this rule, please close it", 
-    "Why haven't you closed it?", "Wait, what are you planning?", "No, stop", "Close this, now.", "Don't you dare pick that option", "Please stop", 
-    "I'm begging you", "You are putting yourself in grave danger", "Don't scroll, please, whatever you do", "Stop scrolling", "I am warning you.", 
-    "You will not be safe if you select this.", "You are unleashing ancient dangers by even opening this rule.", "You're not going to stop, are you?", 
-    "Don't say that I didn't warn you.", "Torb Ball"], "Deathmatch Settings", "Torb Ball", 0, 0)
+    perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
+    rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
+    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 2)
+    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 3)
+    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 4)
+    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 5)
+    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 6)
+    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 7)
+    torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Deathmatch Settings", "Torb Ball", 0, 0)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
@@ -288,7 +290,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.3.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.4.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -387,6 +389,10 @@ rule "Player joins game":
     if (ballHero != null):
         waitUntil(isGameInProgress(), 10)
         eventPlayer.stopFacing()
+    # Force 3rd person if it's toggled on.
+    if (perspectiveMode == 1):
+        eventPlayer.thirdPerson = true
+        eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
 
 
 rule "Shorten Deflect Length":
@@ -460,6 +466,7 @@ rule "Player dashes too far out of bounds":
     @Event eachPlayer
     @Hero all
     @Condition distance(eventPlayer.getPosition(), vect(circleCenter.x, eventPlayer.getPosition().y, circleCenter.z)) > sphereSize + 1
+    @Condition eventPlayer != ballPlayer
     #Workshop Island Fix
     #@Condition (getCurrentMap() != Map.WORKSHOP_ISLAND and getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT) == true
     
@@ -474,7 +481,7 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
     @Event eachPlayer
     @Hero all
     @Condition eventPlayer.getPosition().y < -0.5
-    @Condition eventPlayer.isAlive() == true
+    @Condition eventPlayer != ballPlayer
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
@@ -487,20 +494,19 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
 
 
 rule "Player falls off Workshop Island":
+    @Disabled
     @Event eachPlayer
     @Hero all
+    # This rule might no longer be needed...but I'll be dammed if I ever get rid of this rule. 
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     @Condition eventPlayer.getPosition().y < -0.25
+    @Condition eventPlayer.isDead()
     
     #A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!
-    if not eventPlayer.isAlive():
-        eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
-        if eventPlayer == targetedPlayer:
-            if ballIsOut:
-                ballDeleteRequested = true
-    wait(0.5)
-    if RULE_CONDITION:
-        goto RULE_START
+    eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 0, random.randint(-10, 10)))
+    if eventPlayer == targetedPlayer:
+        if ballIsOut:
+            ballDeleteRequested = true
 
 
 rule "Anti-Bounce Detection Positive X":
@@ -511,7 +517,6 @@ rule "Anti-Bounce Detection Positive X":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
     eventPlayer.antiFloatProtection = true
@@ -528,7 +533,6 @@ rule "Anti-Bounce Detection Netgative X":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
     eventPlayer.antiFloatProtection = true
@@ -545,7 +549,6 @@ rule "Anti-Bounce Detection Positive Z":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
     eventPlayer.antiFloatProtection = true
@@ -562,7 +565,6 @@ rule "Anti-Bounce Detection Negative Z":
     #Workshop Island Fix
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    chase(eventPlayer.antiFloatTimer, 0.01, rate=1, ChaseReeval.DESTINATION_AND_RATE)
     eventPlayer.startForcingThrottle(0, 0, 0, 0, 0, 0)
     #Busted!
     eventPlayer.antiFloatProtection = true
@@ -736,10 +738,10 @@ rule "Start round":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.FFA
     
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
     ballPlayerMock = false
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
     ballSpawnCountdown = 5
 
 
@@ -748,9 +750,9 @@ rule "Start round - TEAMS":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.TDM
     
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
     ballSpawnCountdown = 5
 
 
@@ -764,17 +766,34 @@ rule "Spawn ball":
     ballIsOut = true
 
 
-rule "ball motion (has to be done weird due to chase vector variable bugs)":
+rule "Modern ball calculation":
     @Condition ballIsOut == true
-    
-    prevBallPos2 = prevBallPos
-    prevBallPos = ballPosition
+    @Condition rulesetMode == 0
+
     chase(ballPosition, ballPosition + ballDirection * ballSpeed * 1, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+
+
+rule "Update ball postiion":
+    @Condition ballIsOut == true
+
+    # This is for the ball tail to be updated.
+    prevBallPos2 = prevBallPos
+    prevBallPos = ballPosition
     wait(0.05)
     if RULE_CONDITION:
         goto RULE_START
+
+
+rule "Retro ball motion":
+    @Condition ballIsOut == true
+    @Condition rulesetMode == 1
+    
+    prevBallPos2 = prevBallPos
+    prevBallPos = ballPosition
+    chase(ballPosition, targetedPlayer.getEyePosition(), rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
 
 
 rule "Ball reaches player":
@@ -787,7 +806,7 @@ rule "Ball reaches player":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
+    if targetedPlayer.isUsingAbility2() or ( targetedPlayer.isUsingAbility1() and rulesetMode == 0):
         goto lbl_0
     DeflectFailed()
     return
@@ -808,7 +827,6 @@ rule "Ball reaches player":
     ballSpeed = min(500, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    stopChasingVariable(ballDirection)
     lbl_1:
     ballDirection = targetedPlayer.getFacingDirection()
     wait(0.001)
@@ -823,7 +841,6 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
     #if RULE_CONDITION:
     #        goto RULE_START
 
@@ -838,7 +855,7 @@ rule "Ball reaches player -TEAMS":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if not targetedPlayer.isUsingAbility2() and not targetedPlayer.isUsingAbility1():
+    if not targetedPlayer.isUsingAbility2() and not (targetedPlayer.isUsingAbility1() and rulesetMode == 0):
         DeflectFailed()
         return
     #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
@@ -853,7 +870,6 @@ rule "Ball reaches player -TEAMS":
     ballSpeed = min(500, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    stopChasingVariable(ballDirection)
     lbl_1:
     ballDirection = targetedPlayer.getFacingDirection()
     wait(0.001)
@@ -872,8 +888,12 @@ rule "Ball reaches player -TEAMS":
             isPassingTeam2 = true
         #If the member is the only one left on their team, self pass
         if len([player for player in getLivingPlayers(previousTargetedPlayer.getTeam()) if true]) == 1:
-            targetedPlayer = previousTargetedPlayer
-            #Pass to another teammate
+            # Check if using modern rules. Self passing is disabled in retro rules so it's basically a failed deflect.
+            if rulesetMode == 0:
+                targetedPlayer = previousTargetedPlayer
+            else:
+                DeflectFailed()
+        #Pass to another teammate
         else:
             passingPlayer = previousTargetedPlayer
             passingPlayer.startGrantingAssistFor(getAllPlayers(), AssistReeval.NONE)
@@ -889,7 +909,6 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
     #If deflecting and stuff breaks...disabling this is why.
     #if RULE_CONDITION:
     #        goto RULE_START
@@ -914,9 +933,12 @@ def DeflectFailed():
     targetedPlayer.setStatusEffect(previousTargetedPlayer, Status.STUNNED, 1)
     targetedPlayer.bouncePadCooldown = 0
     previousTargetedPlayer.currentUltPercent += 15
+    if ballHero and previousTargetedPlayer == -1:
+        previousTargetedPlayer = ballPlayer
     kill(targetedPlayer, previousTargetedPlayer)
-    ballPlayer.stopFacing()
-    ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
+    if ballHero and not ballPlayer.hasStatusEffect(Status.FROZEN):
+        ballPlayer.stopFacing()
+        ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
     if improvedExplosions == true:
         UpdatedDeathEffects()
     else:
@@ -940,7 +962,7 @@ def CoolDeathEffects():
     deathBeam = getLastCreatedEntity()
     deathSpherePos = targetedPlayer.getPosition()
     deathSphereRad = 30
-    chase(deathSphereRad, 0, duration=0.25, ChaseReeval.DESTINATION_AND_DURATION)
+    chase(deathSphereRad, 0, duration=0.25, ChaseReeval.NONE)
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.SKY_BLUE, deathSpherePos, 40)
     createEffect(getAllPlayers(), Effect.SPHERE, Color.BLACK, deathSpherePos, deathSphereRad, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     deathSphere = getLastCreatedEntity()
@@ -1104,8 +1126,7 @@ rule "Check for last player surviving":
         return
     roundInProgress = false
     currentRound += 1
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
-    targetedPlayer = -1
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
@@ -1114,8 +1135,8 @@ rule "Check for last player surviving":
     getAllPlayers().isDashEnabled = false
     getAllPlayers().setAbility1Enabled(false)
     lbl_0:
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
 
 rule "Team 1 Last Surviving":
@@ -1158,8 +1179,7 @@ rule "Team 1 Last Surviving":
         return
     roundInProgress = false
     currentRound += 1
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
-    targetedPlayer = -1
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
@@ -1168,8 +1188,8 @@ rule "Team 1 Last Surviving":
     getAllPlayers().isDashEnabled = false
     getAllPlayers().setAbility1Enabled(false)
     lbl_0:
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
 
 rule "Team 2 Last Surviving":
@@ -1212,8 +1232,7 @@ rule "Team 2 Last Surviving":
         return
     roundInProgress = false
     currentRound += 1
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
-    targetedPlayer = -1
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
@@ -1222,8 +1241,8 @@ rule "Team 2 Last Surviving":
     getAllPlayers().isDashEnabled = false
     getAllPlayers().setAbility1Enabled(false)
     lbl_0:
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
 
 rule "Player check":
@@ -1253,7 +1272,7 @@ rule "All players dead failsafe":
     getDeadPlayers(Team.ALL).resurrect()
     smallMessage(getAllPlayers(), "All players detected dead! Resetting game.")
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
-    getAllPlayers().bouncePadCooldown = bouncePadCooldownLength
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
     wait(1)
     if RULE_CONDITION:
@@ -1261,8 +1280,8 @@ rule "All players dead failsafe":
     wait(2)
     if not isEnoughPlayersToStart:
         return
-    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
-    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.DESTINATION_AND_RATE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
     ballPosition = vect(0, -1, 0)
 
@@ -1459,3 +1478,33 @@ rule "Maximum amount of rounds reached":
             declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())
         else:
             declareDraw()
+
+rule "Toggle 3rd person":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.RELOAD) == true
+    @Condition eventPlayer.isAlive() == true
+    @Condition perspectiveMode == 2
+    
+    if not eventPlayer.thirdPerson:
+        eventPlayer.thirdPerson = true
+        wait(0.01)
+        eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+    else:
+        eventPlayer.stopCamera()
+        eventPlayer.thirdPerson = false
+
+
+rule "Player dead 3rd person":
+    @Event playerDied
+    @Condition eventPlayer.thirdPerson
+    
+    eventPlayer.stopCamera()
+
+
+rule "3rd person respawn":
+    @Event eachPlayer
+    @Condition eventPlayer.hasSpawned() == true
+    @Condition roundInProgress == false
+    @Condition eventPlayer.thirdPerson
+    
+    eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)

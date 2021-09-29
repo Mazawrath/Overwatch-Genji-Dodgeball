@@ -14,9 +14,11 @@ rule "Hero ball do funny thing":
 
     if wasFinalDuel or getNumberOfHeroes(playerHero, Team.ALL) <= 2:
         wasFinalDuel = false
-        LongFun()
-    elif (not isInFinalDuel):
-        ShortFun()
+        if not eventPlayer.hasStatusEffect(Status.FROZEN):
+            LongFun()
+    elif not isInFinalDuel:
+        if not eventPlayer.hasStatusEffect(Status.FROZEN):
+            ShortFun()
     else:
         wasFinalDuel = true
         ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
@@ -26,7 +28,8 @@ rule "Hero ball do funny thing":
         ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
         ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
         ballPlayer.teleport(circleCenter + vect(0,5,0))
-        ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+        if not eventPlayer.hasStatusEffect(Status.FROZEN):
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     waitUntil(not ballPlayerMock, 9999)
 
     #do a funny thing maybe.
@@ -51,9 +54,9 @@ def LongFun():
     @Name "Hero ball do a long super fun thing"
     ballHeroRandom = random.randint(0, 100)
     # Have an 8.3% chance of doing a fun thing for each player, up to 45%, minus torb
-    if random.randint(0, 100) >= min(getNumberOfPlayers(Team.ALL) * 8.333 - 8.333, 45):
+    if random.randint(0, 100) >= min(getNumberOfPlayers(Team.ALL) * 9.5 - 9.5, 60):
         return
-    switch random.randint(1, 10):
+    switch random.randint(1, 11):
         case 1:
             # I think this one is easily my favorite.
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
@@ -204,6 +207,7 @@ def LongFun():
             ballPlayer.startScalingSize(1, false)
             stopChasingVariable(ballHeroRandom)
             stopChasingVariable(ballHeroRegretText)
+            stopChasingVariable(ballPlayer.currentUltPercent)
             break
         case 10:
             # Get the chance to let your anger out and yeet torb.
@@ -224,17 +228,30 @@ def LongFun():
             waitUntil(not ballPlayerMock, 4)
             ballPlayer.clearStatusEffect(Status.KNOCKED_DOWN)
             break
+        case 11:
+            wait()
+            ballPlayer.setGravity(100)
+            ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.RIGHT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.teleport(circleCenter + vect(0,5,0))
+            ballPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            ballPlayer.communicate(Comms.HELLO)
+            break
 
 
 
 def ShortFun():
     @Name "Hero ball do a quick fun thing"
 
-    # Only have a 10% chance of doing a fun thing
-    if (random.randint(1, 100) >= 10):
+    # Only have a 25% chance of doing a fun thing
+    if (random.randint(1, 100) >= 25):
         return
     ballHeroRandom = random.randint(0, 100)
-    switch random.randint(1, 10):
+    switch random.randint(1, 11):
         case 1:
             # nice
             if (ballHeroRandom == 69):
@@ -308,7 +325,7 @@ def ShortFun():
             break
         case 7:
             # To the person who keeps telling me to remove the center orb.
-            ballPlayer.startForcingPosition(circleCenter + vect(random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1), -circleCenter.y, random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1)), true)
+            ballPlayer.startForcingPosition(circleCenter + vect(random.uniform(-centerOffLimitsSize + 0.75, centerOffLimitsSize - 0.75), -circleCenter.y, random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1)), true)
             eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
             wait()
             createInWorldText(getAllPlayers(), "Jealous that I can be in here and you can't? :)", ballPlayer.getEyePosition() + vect(0, 0.5, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
@@ -332,6 +349,7 @@ def ShortFun():
             playEffect(getAllPlayers(), DynamicEffect.GOOD_EXPLOSION, Color.WHITE, ballHeroRandom, 2)
             destroyEffect(ballHeroRegretText)
             destroyInWorldText(getLastCreatedText())
+            stopChasingVariable(ballHeroRandom)
             break
         case 9:
             # Torb horror game.
@@ -344,6 +362,17 @@ def ShortFun():
             waitUntil(not ballPlayerMock, 9999)
             ballPlayer.stopForcingPosition()
             destroyInWorldText(getLastCreatedText())
+            break
+        case 10:
+            ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.RIGHT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+            ballPlayer.teleport(circleCenter + vect(0,5,0))
+            ballPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            ballPlayer.communicate(Comms.HELLO)
             break
         # case 9:
         #     wait()
@@ -358,3 +387,21 @@ def ShortFun():
         #     destroyEffect(ballHeroRandom)
         #     destroyInWorldText(getLastCreatedText())
         #     break
+        case 11:
+            wait()
+            ballHeroRandom = 1
+            ballHeroRegretText = 1
+            ballPlayer.startScalingSize(ballHeroRandom, true)
+            ballPlayer.startModifyingVoicelinePitch(ballHeroRegretText, true)
+            chase(ballHeroRandom, 0, duration=1.5, ChaseReeval.NONE)
+            chase(ballHeroRegretText, 2, duration=1, ChaseReeval.NONE)
+            ballPlayer.communicate(Comms.GOODBYE)
+            wait(1.5)
+            ballPlayer.setInvisibility(Invis.ALL)
+            waitUntil(not ballPlayerMock, 9999)
+            stopChasingVariable(ballHeroRandom)
+            stopChasingVariable(ballHeroRegretText)
+            ballPlayer.setInvisibility(Invis.NONE)
+            ballPlayer.stopScalingSize()
+            ballPlayer.stopModifyingVoicelinePitch()
+            break

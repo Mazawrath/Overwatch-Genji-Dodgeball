@@ -12,7 +12,7 @@ rule "Init player variables":
     lbl_0:
     eventPlayer.disableRespawn()
     eventPlayer.enableDeathSpectateAllPlayers()
-    eventPlayer.bouncePadCooldown = bouncePadCooldownLength
+    eventPlayer.bouncePadCooldown = bouncePadCooldownLengthStart
     eventPlayer.antiFloatProtection = false
     eventPlayer.antiStuckProtection = false
     eventPlayer.toggleHUD = true
@@ -20,6 +20,9 @@ rule "Init player variables":
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
     wait(3)
     smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
+    if (perspectiveMode == 2):
+        wait(3)
+        smallMessage(eventPlayer, "Press reload to toggle 1st/3rd person")
 
 
 rule "Init global variables":
@@ -30,8 +33,8 @@ rule "Init global variables":
     disableGamemodeCompletion()
     disableMusic()
     disableAnnouncer()
-    # disableInspector()
-    if torbBall == 17 and getCurrentGamemode() == Gamemode.FFA:
+    disableInspector()
+    if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA:
         ballHero = Hero.TORBJORN
         name = ballHero
     else:
@@ -53,6 +56,7 @@ rule "Init global variables":
     else:
         centerOffLimitsSize = 3.5
     isInFinalDuel = false
+    bouncePadCooldownLengthStart = 3
     bouncePadCooldownLength = 3
     bouncePadSuperjumpNerf = 6
     ballPosition = vect(0, -1, 0)
@@ -67,6 +71,10 @@ rule "Init global variables":
     currentRound = 1
     if getCurrentGamemode() == Gamemode.FFA:
         gameEndEnabled = true
+    # Using passing with retro ruleset DOES NOT work
+    if rulesetMode == 1 and passingEnabled and getCurrentGamemode() == Gamemode.FFA:
+        passingEnabled = false
+        hudSubtext(hostPlayer, "Hi host. Very clever idea but sorry retro rules totally breaks self passing. Like, what do you think it can even do? The ball can only go in a straight direction and self passing sends the ball away from you and then curves around so in this case where would it even go? In your head. That's where it goes. I tested it. So you don't have to.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
 
 
 rule "Create game sphere":
@@ -119,7 +127,13 @@ rule "Create global HUD elements":
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudSubtext(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     createInWorldText([player for player in getAllPlayers() if ballSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
-    if passingEnabled:
+    if rulesetMode == 1:
+        if getCurrentGamemode() == Gamemode.FFA:
+            hudSubtext(getAllPlayers(), "Retro ruleset. Dash deflecting is disabled.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+        else:
+            hudSubtext(getAllPlayers(), "Retro ruleset. Dash deflecting & self passing are disabled.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+            
+    if passingEnabled and rulesetMode == 0:
         if getCurrentGamemode() == Gamemode.TDM:
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to pass the ball to another teammate!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
         elif getCurrentGamemode() == Gamemode.FFA:

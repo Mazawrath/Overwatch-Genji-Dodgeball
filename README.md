@@ -1,13 +1,19 @@
 # Overwatch-Genji-Dodgeball
-**Current Version: v7.3.0**  
-**Deathmatch Code: 6SPW5**  
+**Current Version: v7.4.0**  
+**Deathmatch Code: SY5R9**  
 
 Genji Dodgeball is a minigame inspired by the TF2 game pyro dodgeball.
 When the ball is red it is targeting you! Use your deflect to target someone else. Look at the person you want to target next while deflecting. Use bouncepads to get extra air and style points.
 
 ## Team Deathmatch  
-**Team Deathmatch Code: H5VAE**  
+**Team Deathmatch Code: YSR58**  
 The Team Deathmatch version is a version where passing is enabled by default. To pass, hold the Secondary Fire button. The ball with pass to another teammate or if none are alive, it will pass it to yourself. Each pass will cost 100 health, you can get healed by deflecting the ball to a enemy, or someone on either team dies.  
+
+## Tournement Codes
+#### Do not attempt to look at the code in the Overwatch Workshop! Attempting to open the Workshop panel may freeze and crash your game!
+**Deathmatch Tournament Code: 3MGDY**  
+**Team Deathmatch Tournament Code: REPP4**  
+Tournment codes removes the Workshop Settings and obscurities code to make it more difficult to edit. Checking the code that the lobby uses matches the code here is the only way to confirm the game is unlikely to be modified. While this makes it more difficult, it can still potentially be modified.
 
 ## How to compile  
 `Genji-Dodgeball.opy` is a file format compatable with OverPy, a high-level language for the Overwatch Workshop with support for compilation and decompilation.  
