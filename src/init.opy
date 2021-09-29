@@ -57,7 +57,7 @@ rule "Init global variables":
         centerOffLimitsSize = 3.5
     isInFinalDuel = false
     bouncePadCooldownLengthStart = 3
-    bouncePadCooldownLength = 6.5
+    bouncePadCooldownLength = 3
     bouncePadSuperjumpNerf = 6
     ballPosition = vect(0, -1, 0)
     explosionSoundVolume = 30
