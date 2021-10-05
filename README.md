@@ -16,7 +16,7 @@ The Team Deathmatch version is a version where passing is enabled by default. To
 Tournment codes removes the Workshop Settings and obscurities code to make it more difficult to edit. Checking the code that the lobby uses matches the code here is the only way to confirm the game is unlikely to be modified. While this makes it more difficult, it can still potentially be modified.
 
 ## How to compile  
-`Genji-Dodgeball.opy` is a file format compatable with OverPy, a high-level language for the Overwatch Workshop with support for compilation and decompilation.  
+Any file with a `.opy` ending is a file format compatable with OverPy, a high-level language for the Overwatch Workshop with support for compilation and decompilation.  
 [Follow this tutorial for instructions on how to compile this game.](https://github.com/Zezombye/overpy/wiki/General-usage)
 
 ## A personal note
