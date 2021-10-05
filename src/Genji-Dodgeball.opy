@@ -2,8 +2,8 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.4.0",
-        "description": "Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze,  ELIMINATED#1572, and tumtum9000#1232. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.4.1",
+        "description": "Genji Dodgeball v7.4.1. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -290,7 +290,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.4.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.4.1".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -841,8 +841,10 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    #if RULE_CONDITION:
-    #        goto RULE_START
+    # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
+    if rulesetMode == 1:
+        if RULE_CONDITION:
+            goto RULE_START
 
 
 rule "Ball reaches player -TEAMS":
@@ -909,9 +911,10 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    #If deflecting and stuff breaks...disabling this is why.
-    #if RULE_CONDITION:
-    #        goto RULE_START
+    # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
+    if rulesetMode == 1:
+        if RULE_CONDITION:
+            goto RULE_START
 
 
 rule "End assist after a second":
