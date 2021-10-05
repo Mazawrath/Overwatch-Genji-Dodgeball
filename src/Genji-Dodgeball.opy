@@ -841,8 +841,10 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    #if RULE_CONDITION:
-    #        goto RULE_START
+    # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
+    if rulesetMode == 1:
+        if RULE_CONDITION:
+            goto RULE_START
 
 
 rule "Ball reaches player -TEAMS":
@@ -909,9 +911,10 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    #If deflecting and stuff breaks...disabling this is why.
-    #if RULE_CONDITION:
-    #        goto RULE_START
+    # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
+    if rulesetMode == 1:
+        if RULE_CONDITION:
+            goto RULE_START
 
 
 rule "End assist after a second":
