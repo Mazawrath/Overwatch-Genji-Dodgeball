@@ -17,6 +17,9 @@ rule "Init player variables":
     eventPlayer.antiStuckProtection = false
     eventPlayer.toggleHUD = true
     eventPlayer.dashNerf = false
+    # Add a player to a team if multi teams is on
+    if multiTeam:
+        teamPlayers[eventPlayer.getSlot()] += eventPlayer
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
     wait(3)
     smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
@@ -33,7 +36,7 @@ rule "Init global variables":
     disableGamemodeCompletion()
     disableMusic()
     disableAnnouncer()
-    disableInspector()
+    # disableInspector()
     if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA:
         ballHero = Hero.TORBJORN
         name = ballHero
@@ -75,6 +78,9 @@ rule "Init global variables":
     if rulesetMode == 1 and passingEnabled and getCurrentGamemode() == Gamemode.FFA:
         passingEnabled = false
         hudSubtext(hostPlayer, "Hi host. Very clever idea but sorry retro rules totally breaks self passing. Like, what do you think it can even do? The ball can only go in a straight direction and self passing sends the ball away from you and then curves around so in this case where would it even go? In your head. That's where it goes. I tested it. So you don't have to.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+    if multiTeam:
+        for itt in range(1, 12 / multiTeamSize, 1):
+            teamPlayers[itt] = []
 
 
 rule "Create game sphere":
@@ -84,6 +90,10 @@ rule "Create game sphere":
         createEffect(getAllPlayers(), Effect.LIGHT_SHAFT, Color.ORANGE, vect(circleCenter.x, circleCenter.y - 15, circleCenter.z), sphereSize, EffectReeval.VISIBILITY)
     else:
         createEffect([player for player in getAllPlayers() if distance(player.getPosition(), circleCenter) >= sphereSize - 10], Effect.LIGHT_SHAFT, Color.BLUE, vect(circleCenter.x, circleCenter.y - 15, circleCenter.z), sphereSize, EffectReeval.VISIBILITY)
+
+
+def getPlayerTeam():
+    
 
 
 rule "Create global HUD elements":
