@@ -81,6 +81,8 @@ rule "Init player variables":
                 eventPlayer.teamNum = itt
                 break
         teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].concat(eventPlayer)
+    if invisiblePlayers:
+        getAllPlayers().setInvisibility(Invis.ALL)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
     wait(3)
     smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")

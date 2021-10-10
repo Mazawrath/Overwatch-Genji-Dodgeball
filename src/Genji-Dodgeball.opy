@@ -146,6 +146,7 @@ globalvar itt 85
 globalvar maxTeamSlot 86
 globalvar itt2 87
 globalvar invisibleBall 88
+globalvar invisiblePlayers 89
 
 
 #Player variables
@@ -199,6 +200,7 @@ rule "// SETTINGS":
     maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 7)
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 1)
+    invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 2)
     multiTeamSize =createWorkshopSetting(int[2:10], "Deathmatch Settings", "Total Players Per Team", 2, 1)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
