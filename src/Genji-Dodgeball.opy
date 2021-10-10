@@ -144,6 +144,7 @@ globalvar multiTeamSize 83
 globalvar teamPlayers 84
 globalvar itt 85
 globalvar maxTeamSlot 86
+globalvar itt2 87
 
 
 #Player variables
