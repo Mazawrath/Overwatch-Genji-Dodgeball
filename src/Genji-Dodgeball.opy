@@ -843,7 +843,7 @@ rule "Ball reaches player":
     else:
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
-        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero and not player in teamPlayers[previousTargetedPlayer.teamNum]], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
     # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
     if rulesetMode == 1:
