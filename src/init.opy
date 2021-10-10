@@ -53,6 +53,7 @@ rule "Init global variables":
     if multiTeam:
         for itt in range(0, getNumberOfSlots(Team.ALL) / multiTeamSize, 1):
             maxTeamSlot[itt] = ((itt + 1) * multiTeamSize) - 1
+            teamPlayers[itt] = []
 
 
 rule "Init player variables":
@@ -79,6 +80,7 @@ rule "Init player variables":
             if (eventPlayer.getSlot() < maxTeamSlot[itt]):
                 eventPlayer.teamNum = itt
                 break
+        teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].concat(eventPlayer)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
     wait(3)
     smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
