@@ -107,7 +107,17 @@ rule "Generate outlines":
         # Nice variable naming. I know. It's amazing. You wonder how I have a full time developer position? No idea, honestly ¯\_(ツ)_/¯
         for itt2 in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
             teamPlayers[eventPlayer.teamNum][itt].startForcingOutlineFor(teamPlayers[eventPlayer.teamNum][itt2], true, Color.SKY_BLUE, OutlineVisibility.DEFAULT)
+
+
+rule "Teammate leaves":
+    @Event playerLeft
+    @Condition multiTeam
+
     
+    teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].exclude(eventPlayer)
+    for itt in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
+        for itt2 in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
+            teamPlayers[eventPlayer.teamNum][itt].startForcingOutlineFor(teamPlayers[eventPlayer.teamNum][itt2], true, Color.SKY_BLUE, OutlineVisibility.DEFAULT)
 
 
 rule "Create global HUD elements":
