@@ -1,36 +1,5 @@
 #!mainFile "./Genji-Dodgeball.opy"
 
-rule "Init player variables":
-    @Event eachPlayer
-    @Hero all
-    
-    eventPlayer.isDashEnabled = false
-    eventPlayer.setStatusEffect(null, Status.INVINCIBLE, 9999)
-    if cooldownDashingEnabled:
-        goto lbl_0
-    eventPlayer.setAbility1Enabled(false)
-    lbl_0:
-    eventPlayer.disableRespawn()
-    eventPlayer.enableDeathSpectateAllPlayers()
-    eventPlayer.enableDeathSpectateTargetHud()
-    eventPlayer.bouncePadCooldown = bouncePadCooldownLengthStart
-    eventPlayer.antiFloatProtection = false
-    eventPlayer.antiStuckProtection = false
-    eventPlayer.toggleHUD = true
-    eventPlayer.dashNerf = false
-    # Add a player to a team if multi teams is on
-    if multiTeam:
-        for itt in range(0, multiTeamSize, 1):
-            if (eventPlayer.getSlot() < maxTeamSlot):
-                eventPlayer.teamNum = itt
-    waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
-    wait(3)
-    smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
-    if (perspectiveMode == 2):
-        wait(3)
-        smallMessage(eventPlayer, "Press reload to toggle 1st/3rd person")
-
-
 rule "Init global variables":
     targetedPlayer = -1
     previousTargetedPlayer = -1
@@ -84,6 +53,37 @@ rule "Init global variables":
     if multiTeam:
         for itt in range(0, 12, 1):
             maxTeamSlot[itt] = ((itt + 1) * multiTeamSize) - 1
+
+
+rule "Init player variables":
+    @Event eachPlayer
+    @Hero all
+    
+    eventPlayer.isDashEnabled = false
+    eventPlayer.setStatusEffect(null, Status.INVINCIBLE, 9999)
+    if cooldownDashingEnabled:
+        goto lbl_0
+    eventPlayer.setAbility1Enabled(false)
+    lbl_0:
+    eventPlayer.disableRespawn()
+    eventPlayer.enableDeathSpectateAllPlayers()
+    eventPlayer.enableDeathSpectateTargetHud()
+    eventPlayer.bouncePadCooldown = bouncePadCooldownLengthStart
+    eventPlayer.antiFloatProtection = false
+    eventPlayer.antiStuckProtection = false
+    eventPlayer.toggleHUD = true
+    eventPlayer.dashNerf = false
+    # Add a player to a team if multi teams is on
+    if multiTeam:
+        for itt in range(0, multiTeamSize, 1):
+            if (eventPlayer.getSlot() < maxTeamSlot):
+                eventPlayer.teamNum = itt
+    waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
+    wait(3)
+    smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
+    if (perspectiveMode == 2):
+        wait(3)
+        smallMessage(eventPlayer, "Press reload to toggle 1st/3rd person")
 
 
 rule "Create game sphere":
