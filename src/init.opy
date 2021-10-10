@@ -20,7 +20,9 @@ rule "Init player variables":
     eventPlayer.dashNerf = false
     # Add a player to a team if multi teams is on
     if multiTeam:
-        teamPlayers[eventPlayer.getSlot()] += eventPlayer
+        for itt in range(0, multiTeamSize, 1):
+            if (eventPlayer.getSlot() < maxTeamSlot):
+                eventPlayer.teamNum = itt
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
     wait(3)
     smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
@@ -80,8 +82,8 @@ rule "Init global variables":
         passingEnabled = false
         hudSubtext(hostPlayer, "Hi host. Very clever idea but sorry retro rules totally breaks self passing. Like, what do you think it can even do? The ball can only go in a straight direction and self passing sends the ball away from you and then curves around so in this case where would it even go? In your head. That's where it goes. I tested it. So you don't have to.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     if multiTeam:
-        for itt in range(1, 12 / multiTeamSize, 1):
-            teamPlayers[itt] = []
+        for itt in range(0, 12, 1):
+            maxTeamSlot[itt] = ((itt + 1) * multiTeamSize) - 1
 
 
 rule "Create game sphere":
