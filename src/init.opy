@@ -252,6 +252,8 @@ rule "Create ball & targeted effect":
     #ballTail2 = getLastCreatedEntity()
     createEffect([i for i in [player for player in getAllPlayers() if player != targetedPlayer] if isPassingTeam1 or isPassingTeam2], Effect.GOOD_AURA, Color.SKY_BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
 
 
 rule "Create ball & targeted effect - TEAMS":
@@ -287,3 +289,5 @@ rule "Create ball & targeted effect - TEAMS":
     #ballTail2 = getLastCreatedEntity()
     createEffect([i for i in [player for player in getAllPlayers() if player != targetedPlayer] if isPassingTeam1 or isPassingTeam2], Effect.GOOD_AURA, Color.SKY_BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
