@@ -12,6 +12,7 @@ rule "Init player variables":
     lbl_0:
     eventPlayer.disableRespawn()
     eventPlayer.enableDeathSpectateAllPlayers()
+    eventPlayer.enableDeathSpectateTargetHud()
     eventPlayer.bouncePadCooldown = bouncePadCooldownLengthStart
     eventPlayer.antiFloatProtection = false
     eventPlayer.antiStuckProtection = false

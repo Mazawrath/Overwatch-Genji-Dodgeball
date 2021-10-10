@@ -2,8 +2,8 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.4.1",
-        "description": "Genji Dodgeball v7.4.1. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.5.0",
+        "description": "Genji Dodgeball v7.5.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -290,7 +290,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.4.1".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.5.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -766,21 +766,15 @@ rule "Spawn ball":
     ballIsOut = true
 
 
-rule "Modern ball calculation":
+rule "Modern ball motion":
     @Condition ballIsOut == true
     @Condition rulesetMode == 0
-
+    
+    prevBallPos2 = prevBallPos
+    prevBallPos = ballPosition
     chase(ballPosition, ballPosition + ballDirection * ballSpeed * 1, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
-
-
-rule "Update ball postiion":
-    @Condition ballIsOut == true
-
-    # This is for the ball tail to be updated.
-    prevBallPos2 = prevBallPos
-    prevBallPos = ballPosition
     wait(0.05)
     if RULE_CONDITION:
         goto RULE_START
@@ -841,6 +835,7 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
     # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
     if rulesetMode == 1:
         if RULE_CONDITION:
@@ -911,6 +906,7 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
     # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
     if rulesetMode == 1:
         if RULE_CONDITION:
