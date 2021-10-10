@@ -77,7 +77,7 @@ rule "Init player variables":
     # Add a player to a team if multi teams is on
     if multiTeam:
         for itt in range(0, len(maxTeamSlot), 1):
-            if (eventPlayer.getSlot() < maxTeamSlot[itt]):
+            if (eventPlayer.getSlot() <= maxTeamSlot[itt]):
                 eventPlayer.teamNum = itt
                 break
         teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].concat(eventPlayer)
