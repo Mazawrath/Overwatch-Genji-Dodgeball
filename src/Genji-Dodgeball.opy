@@ -169,6 +169,7 @@ playervar dashNerf 15
 playervar passingSignal 16
 playervar thirdPerson 17
 playervar teamNum 18
+playervar playerSlot 19
 
 
 #Subroutine names
@@ -178,7 +179,7 @@ subroutine UpdatedDeathEffects 1
 subroutine DeflectFailed 2
 subroutine ShortFun 3
 subroutine LongFun 4
-subroutine getPlayerTeam 5
+subroutine drawOutlines 5
 
 
 #Activated extensions

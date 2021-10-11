@@ -81,6 +81,8 @@ rule "Init player variables":
                 eventPlayer.teamNum = itt
                 break
         teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].concat(eventPlayer)
+        eventPlayer.playerSlot = eventPlayer.getSlot()
+        drawOutlines()
     if invisiblePlayers:
         getAllPlayers().setInvisibility(Invis.ALL)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
@@ -100,24 +102,34 @@ rule "Create game sphere":
         createEffect([player for player in getAllPlayers() if distance(player.getPosition(), circleCenter) >= sphereSize - 10], Effect.LIGHT_SHAFT, Color.BLUE, vect(circleCenter.x, circleCenter.y - 15, circleCenter.z), sphereSize, EffectReeval.VISIBILITY)
 
 
-rule "Generate outlines":
-    @Event eachPlayer
-    @Condition multiTeam
-
-    # please give for var in array this needs to be so unnecessarily long because of the range
-    for itt in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
-        # Nice variable naming. I know. It's amazing. You wonder how I have a full time developer position? No idea, honestly ¯\_(ツ)_/¯
-        for itt2 in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
-            teamPlayers[eventPlayer.teamNum][itt].startForcingOutlineFor(teamPlayers[eventPlayer.teamNum][itt2], true, Color.SKY_BLUE, OutlineVisibility.DEFAULT)
-
-
 rule "Teammate leaves":
     @Event playerLeft
     @Condition multiTeam
 
     
     teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].exclude(eventPlayer)
+    drawOutlines()
+
+
+rule "Player changes team":
+    @Event eachPlayer
+    @Condition multiTeam
+    @Condition eventPlayer.playerSlot != eventPlayer.getSlot()
+
+    teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].exclude(eventPlayer)
+    for itt in range(0, len(maxTeamSlot), 1):
+        if (eventPlayer.getSlot() <= maxTeamSlot[itt]):
+            eventPlayer.teamNum = itt
+            break
+    teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].concat(eventPlayer)
+    eventPlayer.playerSlot = eventPlayer.getSlot()
+    drawOutlines()
+
+
+def drawOutlines():
+    # please give for var in array this needs to be so unnecessarily long because of the range
     for itt in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
+        # Nice variable naming. I know. It's amazing. You wonder how I have a full time developer position? No idea, honestly ¯\_(ツ)_/¯
         for itt2 in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
             teamPlayers[eventPlayer.teamNum][itt].startForcingOutlineFor(teamPlayers[eventPlayer.teamNum][itt2], true, Color.SKY_BLUE, OutlineVisibility.DEFAULT)
 
