@@ -171,6 +171,7 @@ playervar passingSignal 16
 playervar thirdPerson 17
 playervar teamNum 18
 playervar playerSlot 19
+playervar playerOutlineArr 20
 
 
 #Subroutine names

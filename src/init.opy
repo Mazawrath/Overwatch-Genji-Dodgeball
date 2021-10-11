@@ -106,7 +106,6 @@ rule "Teammate leaves":
     @Event playerLeft
     @Condition multiTeam
 
-    
     teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].exclude(eventPlayer)
     drawOutlines()
 
@@ -132,6 +131,32 @@ def drawOutlines():
         # Nice variable naming. I know. It's amazing. You wonder how I have a full time developer position? No idea, honestly ¯\_(ツ)_/¯
         for itt2 in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
             teamPlayers[eventPlayer.teamNum][itt].startForcingOutlineFor(teamPlayers[eventPlayer.teamNum][itt2], true, Color.SKY_BLUE, OutlineVisibility.DEFAULT)
+    eventPlayer.playerOutlineArr =  [player for player in getAllPlayers() if player.teamNum != eventPlayer.teamNum]
+    for itt in range (0, len(eventPlayer.playerOutlineArr), 1):
+        switch eventPlayer.playerOutlineArr[itt].teamNum:
+            case 0:
+                eventPlayer.playerOutlineArr[itt].startForcingOutlineFor(eventPlayer, true, Color.LIME_GREEN, OutlineVisibility.DEFAULT)
+                break
+            case 1:
+                eventPlayer.playerOutlineArr[itt].startForcingOutlineFor(eventPlayer, true, Color.TURQUOISE, OutlineVisibility.DEFAULT)
+                break
+            case 2:
+                eventPlayer.playerOutlineArr[itt].startForcingOutlineFor(eventPlayer, true, Color.YELLOW, OutlineVisibility.DEFAULT)
+                break
+            case 3:
+                eventPlayer.playerOutlineArr[itt].startForcingOutlineFor(eventPlayer, true, Color.ORANGE, OutlineVisibility.DEFAULT)
+                break
+            case 4:
+                eventPlayer.playerOutlineArr[itt].startForcingOutlineFor(eventPlayer, true, Color.VIOLET, OutlineVisibility.DEFAULT)
+                break
+            case 5:
+                eventPlayer.playerOutlineArr[itt].startForcingOutlineFor(eventPlayer, true, Color.WHITE, OutlineVisibility.DEFAULT)
+                break
+            case 6:
+                eventPlayer.playerOutlineArr[itt].startForcingOutlineFor(eventPlayer, true, Color.GREEN, OutlineVisibility.DEFAULT)
+                break
+            default:
+                eventPlayer.playerOutlineArr[itt].startForcingOutlineFor(eventPlayer, true, Color.TEAM_2, OutlineVisibility.DEFAULT)
 
 
 rule "Create global HUD elements":
