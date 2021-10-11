@@ -197,8 +197,9 @@ rule "// SETTINGS":
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 3)
     bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 4)
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 5)
-    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 6)
-    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 7)
+    passingAuraToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Aura", true, 6)
+    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 7)
+    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 8)
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 1)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 2)
@@ -206,7 +207,6 @@ rule "// SETTINGS":
     multiTeamSize =createWorkshopSetting(int[2:10], "Deathmatch Settings", "Total Players Per Team", 2, 1)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
-    passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
     #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
     gameEndEnabled = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Time", false, 2)
     watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Enable Watermark", true, 0)
@@ -1094,6 +1094,20 @@ rule "Final duel - TEAMS":
 
 
 rule "Create passing aura":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE)
+    @Condition passingEnabled
+    @Condition passingAuraToggle
+    @Condition multiTeam
+    @Condition getCurrentGamemode() == Gamemode.FFA
+
+    createEffect([player for player in teamPlayers[eventPlayer.teamNum] if player != eventPlayer and not player.isDead()], Effect.BAD_AURA, Color.SKY_BLUE, eventPlayer.getEyePosition(), 1.5, EffectReeval.POSITION_AND_RADIUS)
+    eventPlayer.passingSignal = getLastCreatedEntity()
+    waitUntil(not eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) or eventPlayer.isDead(), 60)
+    destroyEffect(eventPlayer.passingSignal)
+
+
+rule "Create passing aura - TEAMS":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE)
     @Condition passingEnabled
