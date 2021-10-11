@@ -147,6 +147,7 @@ globalvar maxTeamSlot 86
 globalvar itt2 87
 globalvar invisibleBall 88
 globalvar invisiblePlayers 89
+globalvar teamsDead 90
 
 
 #Player variables
@@ -1000,7 +1001,7 @@ def UpdatedDeathEffects():
     if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 1 and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
     elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0) and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
-            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
+            playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, deathSpherePos.y, deathSpherePos.z), 0)
     playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION, Color.WHITE, deathSpherePos, 1)
     if randomExplosionSounds:
         #Pick a random explosion sound
@@ -1121,7 +1122,7 @@ rule "Create passing aura - TEAMS":
 
 rule "Check for last player surviving":
     @Condition isGameInProgress() == true
-    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero and player not in teamPlayers[previousTargetedPlayer.teamNum] and player != previousTargetedPlayer]) == 0
+    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) == 1
     @Condition isEnoughPlayersToStart == true
     @Condition getCurrentGamemode() == Gamemode.FFA
     
@@ -1473,3 +1474,10 @@ rule "3rd person respawn":
     @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+
+rule "h":
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
