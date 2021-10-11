@@ -147,7 +147,7 @@ globalvar maxTeamSlot 86
 globalvar itt2 87
 globalvar invisibleBall 88
 globalvar invisiblePlayers 89
-globalvar teamsDead 90
+globalvar teamsAlive 90
 
 
 #Player variables
@@ -1123,6 +1123,7 @@ rule "Create passing aura - TEAMS":
 rule "Check for last player surviving":
     @Condition isGameInProgress() == true
     @Condition len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) == 1
+    @Condition not multiTeam
     @Condition isEnoughPlayersToStart == true
     @Condition getCurrentGamemode() == Gamemode.FFA
     
@@ -1170,6 +1171,70 @@ rule "Check for last player surviving":
     lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
+
+
+rule "Check for last player surviving - MULTI":
+    @Condition isGameInProgress() == true
+    @Condition isEnoughPlayersToStart == true
+    @Condition multiTeam
+    @Condition getCurrentGamemode() == Gamemode.FFA
+    
+    # If you look at this checking and are disgusted by it: Don't worry, I am too.
+    teamsAlive = 0
+    for itt in range(0, len(teamPlayers), 1):
+        for itt2 in range(0, len(teamPlayers[itt]), 1):
+            if teamPlayers[itt][itt2].isAlive():
+                teamsAlive += 1
+                break
+        if teamsAlive > 1:
+            wait(0.5)
+            if RULE_CONDITION:
+                goto RULE_START
+    isInFinalDuel = false
+    [player for player in getAllPlayers() if player.getCurrentHero() != ballHero and player.teamNum == getLivingPlayers(Team.ALL)[0].teamNum].addToScore(1)
+    wait(0.25)
+    if (getMatchTime() == 0 or tieBreakerActive) and gameEndEnabled:
+        #If there is alredy a tiebreaker, then the tiebreaker has ended.
+        #if tieBreakerActive:
+        #break
+        #__end__()
+        highestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
+        #Check if there is more then 1 person with the highest score
+        if len([player for player in getAllPlayers() if player.getScore() == highestScore]) > 1:
+            #There is more then 1, activate tie breaker
+            tieBreakerActive = true
+        else:
+            tieBreakerActive = false
+    stopChasingVariable(ballSpawnCountdown)
+    stopChasingVariable(getAllPlayers().bouncePadCooldown)
+    bigMessage(getAllPlayers(), "Team {0} has won the round!".format([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero].teamNum + 1))
+    wait(2)
+    if not tieBreakerActive:
+        getDeadPlayers(Team.ALL).resurrect()
+    else:
+        #Kill anyone alive who doesn't have the highest score.
+        kill([player for player in getLivingPlayers(Team.ALL) if player.getScore() != highestScore], null)
+        #During tiebreaker, only revive the people who have the same score as the highest score.
+        ([player for player in getDeadPlayers(Team.ALL) if player.getScore() == highestScore]).resurrect()
+        wait(0.25)
+        targetedPlayer = -1
+        bigMessage(getAllPlayers(), "Tiebreaker!")
+    if not isEnoughPlayersToStart:
+        return
+    roundInProgress = false
+    currentRound += 1
+    getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
+    ballSpawnCountdown = 5
+    wait(1)
+    roundInProgress = true
+    if not bouncepadDashingEnabled:
+        goto lbl_0
+    getAllPlayers().isDashEnabled = false
+    getAllPlayers().setAbility1Enabled(false)
+    lbl_0:
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
+    goto RULE_START
 
 
 rule "Team 1 Last Surviving":
