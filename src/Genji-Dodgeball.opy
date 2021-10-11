@@ -1474,10 +1474,3 @@ rule "3rd person respawn":
     @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
-
-rule "h":
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
