@@ -844,7 +844,11 @@ rule "Ball reaches player":
         playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
         previousTargetedPlayer.setHealth(passingDamage)
-        targetedPlayer = previousTargetedPlayer
+        if multiTeam:
+            if (len([player for player in teamPlayers[previousTargetedPlayer.teamNum] if player.isAlive()]) > 1):
+                targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero and player in teamPlayers[previousTargetedPlayer.teamNum]], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])        
+        else:
+            targetedPlayer = previousTargetedPlayer
     else:
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
