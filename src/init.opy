@@ -106,8 +106,11 @@ rule "Teammate leaves":
     @Event playerLeft
     @Condition multiTeam
 
-    teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].exclude(eventPlayer)
-    drawOutlines()
+    # WHY DOES playerLeft KEEP THE EVENTPLAYER BUT STRIP THEIR VARIABLES I LITERALLY WOULDN'T HAVE TO DO THIS O(N*K) SEARCH PLOUHVWREAQRKHJ
+    for itt in range(0, len(getAllPlayers()), 1):
+        for itt2 in range(0, len(teamPlayers[itt]), 1):
+            if eventPlayer == teamPlayers[itt][itt2]:
+                teamPlayers[itt] = teamPlayers[itt].exclude(eventPlayer)
 
 
 rule "Player changes team":
