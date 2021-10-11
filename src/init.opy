@@ -131,6 +131,7 @@ def drawOutlines():
         # Nice variable naming. I know. It's amazing. You wonder how I have a full time developer position? No idea, honestly ¯\_(ツ)_/¯
         for itt2 in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
             teamPlayers[eventPlayer.teamNum][itt].startForcingOutlineFor(teamPlayers[eventPlayer.teamNum][itt2], true, Color.SKY_BLUE, OutlineVisibility.DEFAULT)
+    createIcon([player for player in teamPlayers[eventPlayer.teamNum] if eventPlayer.isAlive() and player != eventPlayer and player.toggleHUD], updateEveryTick(eventPlayer.getEyePosition()), Icon.DIAMOND, IconReeval.VISIBILITY_AND_POSITION, Color.LIME_GREEN, false)
     eventPlayer.playerOutlineArr =  [player for player in getAllPlayers() if player.teamNum != eventPlayer.teamNum]
     for itt in range (0, len(eventPlayer.playerOutlineArr), 1):
         switch eventPlayer.playerOutlineArr[itt].teamNum:
