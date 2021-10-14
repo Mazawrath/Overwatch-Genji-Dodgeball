@@ -74,6 +74,7 @@ rule "Init player variables":
     eventPlayer.antiStuckProtection = false
     eventPlayer.toggleHUD = true
     eventPlayer.dashNerf = false
+    eventPlayer.disallowButton(Button.PRIMARY_FIRE)
     # Add a player to a team if multi teams is on
     if multiTeam:
         for itt in range(0, len(maxTeamSlot), 1):
