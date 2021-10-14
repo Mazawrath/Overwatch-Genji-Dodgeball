@@ -1530,3 +1530,15 @@ rule "3rd person respawn":
     @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+
+
+rule "Tell player controls":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.ABILITY_1)
+
+    smallMessage(eventPlayer, "Here's a tip:")
+    wait(1)
+    smallMessage(eventPlayer, "Primary fire aka swing hammer = deflect")
+    wait(2)
+    smallMessage(eventPlayer, "Ability 2 aka overload = dash")
+    wait(3)
