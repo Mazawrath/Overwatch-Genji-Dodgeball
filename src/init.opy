@@ -9,7 +9,7 @@ rule "Init global variables":
     disableMusic()
     disableAnnouncer()
     # disableInspector()
-    if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA:
+    if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA and not multiTeam:
         ballHero = Hero.TORBJORN
         name = ballHero
     else:
