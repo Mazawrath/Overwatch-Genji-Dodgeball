@@ -52,7 +52,7 @@ settings {
                 "ability2Duration%": 300
             },
             "enabledHeroes": [
-                "genji"
+                "torbjorn"
             ]
         }
     }
