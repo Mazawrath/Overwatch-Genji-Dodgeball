@@ -201,7 +201,7 @@ rule "// SETTINGS":
     passingAuraToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Aura", true, 6)
     maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 7)
     maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 8)
-    torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
+    torbBall = true
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 1)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 2)
     multiTeam = createWorkshopSetting(bool, "Deathmatch Settings", "Multi-Teams", false, 0)
