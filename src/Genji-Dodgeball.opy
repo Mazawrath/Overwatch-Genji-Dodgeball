@@ -206,10 +206,6 @@ rule "// SETTINGS":
     maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 7)
     maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 8)
     torbBall = true
-    invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 1)
-    invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 2)
-    multiTeam = createWorkshopSetting(bool, "Deathmatch Settings", "Multi-Teams", false, 0)
-    multiTeamSize =createWorkshopSetting(int[2:10], "Deathmatch Settings", "Total Players Per Team", 2, 1)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
@@ -217,7 +213,6 @@ rule "// SETTINGS":
     watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Enable Watermark", true, 0)
     cooldownDashingEnabled = true
     redGreenColorblindMode = createWorkshopSetting(bool, "Visual Settings", "Red/Green Colorblind Mode", false, 2)
-    finalDuelNuke = createWorkshopSetting(bool, "Visual Settings", "Final Duel Explosion", true, 3)
 
 
 rule "// MAP ZONES":
