@@ -725,26 +725,6 @@ rule "Only end game when there isn't a round in progress":
     enableGamemodeCompletion()
 
 
-rule "primary = dash":
-    @Event eachPlayer
-    @Hero all
-    @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) == true
-    @Condition "{0}".format(eventPlayer) != "bytestats"
-    @Condition eventPlayer.getCurrentHero() != ballHero
-    
-    eventPlayer.forceButtonPress(Button.ABILITY_1)
-
-
-rule "secondary = deflect":
-    @Event eachPlayer
-    @Hero all
-    @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) == true
-    @Condition "{0}".format(eventPlayer) != "bytestats"
-    @Condition passingEnabled == false
-    @Condition eventPlayer.getCurrentHero() != ballHero
-    
-    eventPlayer.forceButtonPress(Button.ABILITY_2)
-
 
 rule "// ACTIVE GAME":
 
