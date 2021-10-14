@@ -172,6 +172,7 @@ playervar thirdPerson 17
 playervar teamNum 18
 playervar playerSlot 19
 playervar playerOutlineArr 20
+playervar canDeflect 21
 
 
 #Subroutine names
@@ -796,7 +797,7 @@ rule "Ball reaches player":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if targetedPlayer.isUsingAbility2() or ( targetedPlayer.isUsingAbility1() and rulesetMode == 0):
+    if targetedPlayer.canDeflect or ( targetedPlayer.isUsingAbility1() and rulesetMode == 0):
         goto lbl_0
     DeflectFailed()
     return
@@ -1362,6 +1363,19 @@ rule "All players dead failsafe":
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
     ballPosition = vect(0, -1, 0)
+
+
+rule "Allow one melee":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE)
+
+    eventPlayer.canDeflect = true
+    eventPlayer.allowButton(Button.PRIMARY_FIRE)
+    eventPlayer.forceButtonPress(Button.PRIMARY_FIRE)
+    eventPlayer.disallowButton(Button.PRIMARY_FIRE)
+    wait(0.5)
+    eventPlayer.canDeflect = false
+    waitUntil(not eventPlayer.isHoldingButton(Button.PRIMARY_FIRE), 9999)
 
 
 rule "dash slow":
