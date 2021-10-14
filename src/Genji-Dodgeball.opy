@@ -50,7 +50,7 @@ settings {
             },
             "torbjorn": {
                 "enableAbility1": false,
-                "ability2Cooldown%": 0,
+                "ability2Cooldown%": 30,
                 "ability2Duration%": 8,
                 "weaponsEnabled": "hammer"
             },
