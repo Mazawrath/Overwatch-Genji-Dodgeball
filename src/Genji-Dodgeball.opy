@@ -50,7 +50,8 @@ settings {
             },
             "torbjorn": {
                 "enableAbility1": false,
-                "ability2Duration%": 300,
+                "ability2Cooldown%": 0,
+                "ability2Duration%": 8,
                 "weaponsEnabled": "hammer"
             },
             "enabledHeroes": [
@@ -422,10 +423,8 @@ rule "Shorten Deflect Length":
     
     wait(0.3)
     eventPlayer.setAbility2Enabled(false)
-    eventPlayer.setAbility1Enabled(false)
     wait(0.5)
     eventPlayer.setAbility2Enabled(true)
-    eventPlayer.setAbility1Enabled(true)
 
 
 rule "Unlock dash after using jumppad":
@@ -434,7 +433,6 @@ rule "Unlock dash after using jumppad":
     @Condition bouncepadDashingEnabled == true
     @Condition eventPlayer.isDashEnabled == true
     
-    eventPlayer.setAbility1Enabled(true)
 
 
 rule "Disable dash after using":
@@ -443,7 +441,6 @@ rule "Disable dash after using":
     @Condition bouncepadDashingEnabled == true
     @Condition eventPlayer.isUsingAbility1() == true
     
-    eventPlayer.setAbility1Enabled(false)
     eventPlayer.isDashEnabled = false
 
 
@@ -799,7 +796,7 @@ rule "Ball reaches player":
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if targetedPlayer.canDeflect or ( targetedPlayer.isUsingAbility1() and rulesetMode == 0):
+    if targetedPlayer.canDeflect or ( targetedPlayer.isUsingAbility2() and rulesetMode == 0):
         goto lbl_0
     DeflectFailed()
     return
@@ -810,7 +807,7 @@ rule "Ball reaches player":
         ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 0.5)
     #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
     #        goto lbl_1
-    if targetedPlayer.isUsingAbility1():
+    if targetedPlayer.isUsingAbility2():
         targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
         targetedPlayer.teleport(ballPosition)
     targetedPlayer.currentUltPercent += 5
@@ -1150,7 +1147,6 @@ rule "Check for last player surviving":
     if not bouncepadDashingEnabled:
         goto lbl_0
     getAllPlayers().isDashEnabled = false
-    getAllPlayers().setAbility1Enabled(false)
     lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
@@ -1267,7 +1263,6 @@ rule "Team 1 Last Surviving":
     if not bouncepadDashingEnabled:
         goto lbl_0
     getAllPlayers().isDashEnabled = false
-    getAllPlayers().setAbility1Enabled(false)
     lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
@@ -1320,7 +1315,6 @@ rule "Team 2 Last Surviving":
     if not bouncepadDashingEnabled:
         goto lbl_0
     getAllPlayers().isDashEnabled = false
-    getAllPlayers().setAbility1Enabled(false)
     lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
@@ -1383,8 +1377,9 @@ rule "Allow one melee":
 rule "dash slow":
     @Event eachPlayer
     @Hero all
-    @Condition eventPlayer.isUsingAbility1() == true
+    @Condition eventPlayer.isUsingAbility2() == true
     
+    eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 40, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
     eventPlayer.dashNerf = true
     eventPlayer.moveSpeed = 0
     chase(eventPlayer.moveSpeed, 100, rate=max(eventPlayer.moveSpeed, 16) ** 1.25, ChaseReeval.DESTINATION_AND_RATE)
