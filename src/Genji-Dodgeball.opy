@@ -49,7 +49,9 @@ settings {
                 "passiveUltGen%": 0
             },
             "torbjorn": {
-                "ability2Duration%": 300
+                "enableAbility1": false,
+                "ability2Duration%": 300,
+                "weaponsEnabled": "hammer"
             },
             "enabledHeroes": [
                 "torbjorn"
