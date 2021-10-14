@@ -1380,17 +1380,10 @@ rule "dash slow":
     @Hero all
     @Condition eventPlayer.isUsingAbility2() == true
     
-    eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 40, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
-    eventPlayer.dashNerf = true
-    eventPlayer.moveSpeed = 0
-    chase(eventPlayer.moveSpeed, 100, rate=max(eventPlayer.moveSpeed, 16) ** 1.25, ChaseReeval.DESTINATION_AND_RATE)
-    while eventPlayer.moveSpeed != 100:
-        eventPlayer.setMoveSpeed(eventPlayer.moveSpeed)
-        eventPlayer.setGravity(eventPlayer.moveSpeed)
-        wait(0.1)
-    eventPlayer.setMoveSpeed(100)
-    eventPlayer.setGravity(100)
-    eventPlayer.dashNerf = false
+    if eventPlayer.isOnGround():
+        eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+        wait()
+    eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
 
 
 rule "Ball bounce off surface":
