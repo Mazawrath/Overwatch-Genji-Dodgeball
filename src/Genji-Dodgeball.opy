@@ -413,7 +413,7 @@ rule "Player joins game":
 rule "Shorten Deflect Length":
     @Event eachPlayer
     @Hero all
-    @Condition eventPlayer.isUsingAbility2() == true
+    @Condition eventPlayer.canDeflect == true
     @Condition eventPlayer.isUsingUltimate() == false
     
     wait(0.3)
