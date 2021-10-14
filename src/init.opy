@@ -82,7 +82,6 @@ rule "Init player variables":
                 break
         teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].concat(eventPlayer)
         eventPlayer.playerSlot = eventPlayer.getSlot()
-        drawOutlines()
     if invisiblePlayers:
         getAllPlayers().setInvisibility(Invis.ALL)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
@@ -125,10 +124,12 @@ rule "Player changes team":
             break
     teamPlayers[eventPlayer.teamNum] = teamPlayers[eventPlayer.teamNum].concat(eventPlayer)
     eventPlayer.playerSlot = eventPlayer.getSlot()
-    drawOutlines()
 
 
-def drawOutlines():
+rule "Draw outlines":
+    @Event eachPlayer
+    @Hero all
+
     # please give for var in array this needs to be so unnecessarily long because of the range
     for itt in range(0, len(teamPlayers[eventPlayer.teamNum]), 1):
         # Nice variable naming. I know. It's amazing. You wonder how I have a full time developer position? No idea, honestly ¯\_(ツ)_/¯
@@ -161,6 +162,12 @@ def drawOutlines():
                 break
             default:
                 eventPlayer.playerOutlineArr[itt].startForcingOutlineFor(eventPlayer, true, Color.TEAM_2, OutlineVisibility.DEFAULT)
+    # Okay I gotta do this super weird but hopefully this should only loop if someone joins or switches a team. Yeah it's pretty inefficent, but what are you going to do about it? Fix this? pfft, nobody even reads this code! Except you that is...okay please do fix it please i don't know how much longer i can do this
+    eventPlayer.playerOutlineArr = teamPlayers
+    # so apparently Overwatch has a comment character limit that OverPy doesn't care about so if you want to read the rest of that you need to go to my GitHub repository. Go do that and fork the game
+    waitUntil(eventPlayer.playerOutlineArr != teamPlayers, 9999)
+    # https://github.com/Mazawrath/Overwatch-Genji-Dodgeball
+    goto RULE_START
 
 
 rule "Create global HUD elements":
