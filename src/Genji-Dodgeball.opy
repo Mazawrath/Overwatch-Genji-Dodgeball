@@ -1536,3 +1536,17 @@ rule "Tell player controls":
     wait(2)
     smallMessage(eventPlayer, "Ability 2 aka overload = dash")
     wait(3)
+
+
+rule "Randomly teleport ball":
+
+    waitUntil(ballIsOut, 9999)
+    wait(random.uniform(2, 5))
+    if random.randint(1, 100) <= 10:
+        if not ballIsOut:
+            goto RULE_START
+        playEffect(getAllPlayers(), DynamicEffect.SOMBRA_LOGO_SOUND, Color.WHITE, ballPosition, 500)
+        smallMessage(getAllPlayers(), "Too much skill detected: Randomizing ball location")
+        ballPosition = vect(random.uniform(-35, 35), random.uniform(1, 15), random.uniform(-35, 35))
+    wait(random.uniform(20, 120))
+    goto RULE_START
