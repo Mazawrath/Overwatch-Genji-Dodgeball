@@ -10,7 +10,7 @@ rule "Init global variables":
     disableAnnouncer()
     # disableInspector()
     if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA and not multiTeam:
-        ballHero = Hero.TORBJORN
+        ballHero = Hero.GENJI
         name = ballHero
     else:
         # No touchy. I'm talking to you, person thinking it's funny to put your name here. Only Torbjörn can steal credit for making my game.
@@ -18,7 +18,7 @@ rule "Init global variables":
         ballHero = null
     # TODO get this working
     # playerHero = [hero for hero in getAllHeroes() if hero != ballHero]
-    playerHero = Hero.GENJI
+    playerHero = Hero.TORBJORN
     bouncePadStrength = 30
     ballSpeed = startingBallSpeed
     ballSpawnSpeed = 30
