@@ -8,22 +8,22 @@ rule "Create hero ball":
     waitUntil(hostPlayer.hasSpawned(), 9999)
     getPlayersOnHero(ballHero, Team.ALL).startFacing(directionTowards(getPlayersOnHero(ballHero, Team.ALL).getEyePosition(), hostPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     ballPlayer = getPlayersOnHero(ballHero, Team.ALL)[0]
-    if ballHero == Hero.TORBJORN:
-        switch random.randint(1, 21):
+    if ballHero == Hero.GENJI:
+        switch random.randint(1, 5):
             case 1:
-                startingText = "People always underestimate the engineers!"
+                startingText = "The FitnessGram™ Pacer Test is a multistage aerobic capacity test that progressively gets more difficult as it continues. The 20 meter pacer test will begin in 30 seconds. Line up at the start. The running speed starts slowly, but gets faster each minute after you hear this signal. [beep] A single lap should be completed each time you hear this sound. [ding] Remember to run in a straight line, and run as long as possible. The second time you fail to complete a lap before the sound, your test is over. The test will begin on the word start. On your mark, get ready, start."
                 break
             case 2:
-                startingText = "I'm giving it all I've got!"
+                startingText = "sup"
                 break
             case 3:
-                startingText = "I'd rather be the hammer, than the nail."
+                startingText = "drag me into edating"
                 break
             case 4:
-                startingText = "My baby!"
+                startingText = "h"
                 break
             case 5:
-                startingText = "Build 'em up, break 'em down!"
+                startingText = "Edge is consistent"
                 break
             case 6:
                 startingText = "Heh, time to roll up my sleeves!"

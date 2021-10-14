@@ -62,7 +62,7 @@ def LongFun():
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 1000, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
             wait(1.5)
-            createInWorldText(getAllPlayers(), "Torbcopter, ready for takeoff.", ballPlayer.getPosition(), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
+            createInWorldText(getAllPlayers(), "Genjicopter, ready for takeoff.", ballPlayer.getPosition(), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
             ballHeroRegretText = getLastCreatedText()
             while ballPlayerMock:
                 ballPlayer.applyImpulse(Vector.UP, 5.5, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
