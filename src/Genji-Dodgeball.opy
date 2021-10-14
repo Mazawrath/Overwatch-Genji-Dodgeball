@@ -804,6 +804,12 @@ rule "Ball reaches player":
     #        goto lbl_1
     if targetedPlayer.isUsingAbility2():
         targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+        targetedPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+        targetedPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+        targetedPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+        targetedPlayer.applyImpulse(Vector.FORWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+        targetedPlayer.applyImpulse(Vector.RIGHT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+        targetedPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
         targetedPlayer.teleport(ballPosition)
     targetedPlayer.currentUltPercent += 5
     playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, targetedPlayer.getPosition(), 200)
