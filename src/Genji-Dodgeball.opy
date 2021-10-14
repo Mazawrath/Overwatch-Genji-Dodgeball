@@ -1366,11 +1366,12 @@ rule "Allow one melee":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE)
 
+    wait()
     eventPlayer.canDeflect = true
     eventPlayer.allowButton(Button.PRIMARY_FIRE)
     eventPlayer.forceButtonPress(Button.PRIMARY_FIRE)
     eventPlayer.disallowButton(Button.PRIMARY_FIRE)
-    wait(0.5)
+    wait(0.4)
     eventPlayer.canDeflect = false
     waitUntil(not eventPlayer.isHoldingButton(Button.PRIMARY_FIRE), 9999)
 
