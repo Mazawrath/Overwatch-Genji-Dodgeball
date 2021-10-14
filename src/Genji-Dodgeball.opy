@@ -2,8 +2,8 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.5.0",
-        "description": "Genji Dodgeball v7.5.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball 2",
+        "description": "Genji Dodgeball 2. Obviously the sequel is always better then the original."
     },
     "lobby": {
         "allowPlayersInQueue": true,
