@@ -18,6 +18,8 @@ rule "Init player variables":
     eventPlayer.antiStuckProtection = false
     eventPlayer.toggleHUD = true
     eventPlayer.dashNerf = false
+    if invisiblePlayers:
+        getAllPlayers().setInvisibility(Invis.ALL)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
     wait(3)
     smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
