@@ -1331,6 +1331,8 @@ rule "Ball no down when y < -0.5":
 
 
 rule "Ball change color":
+    @Condition not invisibleBall
+
     #if ballColor != 0 and ballSpeed < 20 and true:
     #destroyEffect(ballSmoke)
     #destroyEffect(ballTail1)
