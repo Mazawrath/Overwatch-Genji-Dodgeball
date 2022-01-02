@@ -139,6 +139,8 @@ globalvar bouncePadToggle 78
 globalvar perspectiveMode 79
 globalvar rulesetMode 80
 globalvar bouncePadCooldownLengthStart 81
+globalvar invisibleBall 82
+globalvar invisiblePlayers 83
 
 
 #Player variables
@@ -184,17 +186,19 @@ rule "// SETTINGS":
     rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 3)
-    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads Enabled", true, 4)
-    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing Enabled", false, 5)
+    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 4)
+    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 5)
     maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 6)
     maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 7)
-    torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Deathmatch Settings", "Torb Ball", 0, 0)
+    torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
+    invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 1)
+    invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 2)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
     #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
     gameEndEnabled = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Time", false, 2)
-    watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Enable Watermark", true, 0)
+    watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Watermark", true, 0)
     cooldownDashingEnabled = true
     redGreenColorblindMode = createWorkshopSetting(bool, "Visual Settings", "Red/Green Colorblind Mode", false, 2)
     finalDuelNuke = createWorkshopSetting(bool, "Visual Settings", "Final Duel Explosion", true, 3)
