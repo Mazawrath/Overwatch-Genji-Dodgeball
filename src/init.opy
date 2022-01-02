@@ -196,6 +196,7 @@ rule "Create bounce pads":
 rule "Create ball & targeted effect":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.FFA
+    @Condition not invisibleBall
     
     if not ballHero:
         #Orb for when ball is not getting passed
@@ -224,6 +225,7 @@ rule "Create ball & targeted effect":
 rule "Create ball & targeted effect - TEAMS":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition not invisibleBall
     
     #Team 1 standard targeting Team 2 ball
     createEffect([player for player in getPlayers(Team.1) if player != targetedPlayer and targetedPlayer.getTeam() != Team.1], Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
