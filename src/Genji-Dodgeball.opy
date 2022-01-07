@@ -767,26 +767,22 @@ rule "Retro ball motion":
 
 
 rule "Ball reaches player":
+    @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
-    @Condition getCurrentGamemode() == Gamemode.FFA
     
+    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode == 0)):
+        DeflectFailed()
+        return
     if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
         #If they don't have enough health, kill em
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if targetedPlayer.isUsingAbility2() or ( targetedPlayer.isUsingAbility1() and rulesetMode == 0):
-        goto lbl_0
-    DeflectFailed()
-    return
-    lbl_0:
     if targetedPlayer.isUsingAbility2():
         ballPlayer.setStatusEffect(null, Status.STUNNED, 0.5)
     else:
         ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 0.5)
-    #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
-    #        goto lbl_1
     if targetedPlayer.isUsingAbility1():
         targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
         targetedPlayer.teleport(ballPosition)
@@ -797,7 +793,6 @@ rule "Ball reaches player":
     ballSpeed = min(500, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    lbl_1:
     ballDirection = targetedPlayer.getFacingDirection()
     wait(0.001)
     # Check if player is passing and if passing is enabled
@@ -819,20 +814,18 @@ rule "Ball reaches player":
 
 
 rule "Ball reaches player -TEAMS":
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
     
+    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode == 0)):
+        DeflectFailed()
+        return
     if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
         #If they don't have enough health, kill em
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
             return
-    if not targetedPlayer.isUsingAbility2() and not (targetedPlayer.isUsingAbility1() and rulesetMode == 0):
-        DeflectFailed()
-        return
-    #if targetedPlayer.isUsingAbility2() or targetedPlayer.isUsingAbility1():
-    #        goto lbl_1
     if targetedPlayer.isUsingAbility1():
         targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
         targetedPlayer.teleport(ballPosition)
@@ -843,7 +836,6 @@ rule "Ball reaches player -TEAMS":
     ballSpeed = min(500, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    lbl_1:
     ballDirection = targetedPlayer.getFacingDirection()
     wait(0.001)
     # Check if player is passing and if passing is enabled
