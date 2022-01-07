@@ -299,9 +299,9 @@ rule "// Not enough players testing":
 
 
 rule "Check for <2 players":
+    @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isGameInProgress() == true
     @Condition getNumberOfHeroes(playerHero, Team.ALL) == 1
-    @Condition getCurrentGamemode() == Gamemode.FFA
     
     isInFinalDuel = false
     hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
@@ -318,10 +318,10 @@ rule "Check for <2 players":
 
 
 rule "Check for <2 players - TEAMS":
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition isGameInProgress() == true
     #@Condition getNumberOfHeroes(playerHero, Team.ALL) == 1
     @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
     
     isInFinalDuel = false
     hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
@@ -337,9 +337,9 @@ rule "Check for <2 players - TEAMS":
 
 
 rule "Wait for more players":
+    @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition getNumberOfHeroes(playerHero, Team.ALL) > 1
     @Condition isEnoughPlayersToStart == false
-    @Condition getCurrentGamemode() == Gamemode.FFA
     
     destroyHudText(waitingForPlayersHUD)
     bigMessage(getAllPlayers(), "Starting game in 5 seconds!")
@@ -353,9 +353,9 @@ rule "Wait for more players":
 
 
 rule "Wait for more players - TEAMS":
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition (getNumberOfPlayers(Team.1) and getNumberOfPlayers(Team.2)) == true
     @Condition isEnoughPlayersToStart == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
     
     destroyHudText(waitingForPlayersHUD)
     bigMessage(getAllPlayers(), "Starting game in 5 seconds!")
@@ -710,9 +710,9 @@ rule "// ACTIVE GAME":
 
 
 rule "Start round":
+    @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isEnoughPlayersToStart == true
     @Condition isGameInProgress() == true
-    @Condition getCurrentGamemode() == Gamemode.FFA
     
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
@@ -722,9 +722,9 @@ rule "Start round":
 
 
 rule "Start round - TEAMS":
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition isEnoughPlayersToStart == true
     @Condition isGameInProgress() == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
     
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
@@ -881,9 +881,9 @@ rule "Ball reaches player -TEAMS":
             goto RULE_START
 
 
-rule "End assist after a second":
-    @Condition passingPlayer != null
+rule "End assist after a second - TEAMS":
     @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition passingPlayer != null
 
     waitUntil(previousTargetedPlayer != passingPlayer, 10)
     wait(1)
@@ -970,11 +970,11 @@ def UpdatedDeathEffects():
 
 
 rule "Final duel":
+    @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isGameInProgress() == true
     @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() != ballHero]) == 2
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
-    @Condition getCurrentGamemode() == Gamemode.FFA
     
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
@@ -1006,12 +1006,12 @@ rule "Final duel":
 
 
 rule "Final duel - TEAMS":
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition isGameInProgress() == true
     #@Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved]) == 2
     @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
-    @Condition getCurrentGamemode() == Gamemode.TDM
     
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
@@ -1042,12 +1042,12 @@ rule "Final duel - TEAMS":
     getLivingPlayers(Team.ALL)[1].setFacing(directionTowards(getLivingPlayers(Team.ALL)[1].getPosition(), circleCenter), Relativity.TO_WORLD)
 
 
-rule "Create passing aura":
+rule "Create passing aura - TEAMS":
     @Event eachPlayer
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE)
     @Condition passingEnabled
     @Condition passingAuraToggle
-    @Condition getCurrentGamemode() == Gamemode.TDM
 
     createEffect([player for player in getPlayers(eventPlayer.getTeam()) if player != eventPlayer and not player.isDead()], Effect.BAD_AURA, Color.SKY_BLUE, eventPlayer.getEyePosition(), 1.5, EffectReeval.POSITION_AND_RADIUS)
     eventPlayer.passingSignal = getLastCreatedEntity()
@@ -1055,10 +1055,10 @@ rule "Create passing aura":
     destroyEffect(eventPlayer.passingSignal)
 
 rule "Check for last player surviving":
+    @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isGameInProgress() == true
     @Condition len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) == 1
     @Condition isEnoughPlayersToStart == true
-    @Condition getCurrentGamemode() == Gamemode.FFA
     
     isInFinalDuel = false
     [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero].addToScore(1)
@@ -1106,11 +1106,11 @@ rule "Check for last player surviving":
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
 
-rule "Team 1 Last Surviving":
+rule "Team 1 Last Surviving - TEAMS":
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition isGameInProgress() == true
     @Condition getNumberOfLivingPlayers(Team.2) == 0
     @Condition isEnoughPlayersToStart == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
     
     isInFinalDuel = false
     addToTeamScore(Team.1, 1)
@@ -1159,11 +1159,11 @@ rule "Team 1 Last Surviving":
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
 
-rule "Team 2 Last Surviving":
+rule "Team 2 Last Surviving - TEAMS":
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition isGameInProgress() == true
     @Condition getNumberOfLivingPlayers(Team.1) == 0
     @Condition isEnoughPlayersToStart == true
-    @Condition getCurrentGamemode() == Gamemode.TDM
     
     isInFinalDuel = false
     addToTeamScore(Team.2, 1)
@@ -1413,19 +1413,19 @@ rule "No Undermaps":
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.WHITE, ballPosition, 2)
 
 
-rule "Team 1 Win":
+rule "Team 1 Win - TEAMS":
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition allowMatchEnd == true
     @Condition teamScore(Team.1) == scoreToWin
-    @Condition getCurrentGamemode() == Gamemode.TDM
     
     enableAnnouncer()
     declareTeamVictory(Team.1)
 
 
-rule "Team 2 Win":
+rule "Team 2 Win - TEAMS":
+    @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition allowMatchEnd == true
     @Condition teamScore(Team.2) == scoreToWin
-    @Condition getCurrentGamemode() == Gamemode.TDM
     
     enableAnnouncer()
     declareTeamVictory(Team.2)
