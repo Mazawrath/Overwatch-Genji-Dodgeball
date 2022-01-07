@@ -371,34 +371,6 @@ rule "Wait for more players - TEAMS":
 rule "// GAME RULES":
 
 
-rule "Player joins game":
-    @Event eachPlayer
-    @Hero all
-    @Condition eventPlayer.hasMoved == false
-    #@Condition isGameInProgress() == true
-    @Condition eventPlayer.hasSpawned() == true
-    
-    if roundInProgress and isGameInProgress():
-        eventPlayer.teleport(circleCenter + vect(0, 500, 0))
-        eventPlayer.setInvisibility(Invis.ALL)
-        wait(0.05)
-        kill(eventPlayer, null)
-        wait(0.25)
-    eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
-    eventPlayer.hasMoved = true
-    if (ballHero != null  and not isGameInProgress()):
-        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), ballPlayer.getEyePosition()), 100, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
-    eventPlayer.setInvisibility(Invis.NONE)
-    if (ballHero != null):
-        waitUntil(isGameInProgress(), 10)
-        eventPlayer.stopFacing()
-    # Force 3rd person if it's toggled on.
-    if (perspectiveMode == 1):
-        eventPlayer.thirdPerson = true
-        eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
-
-
 rule "Shorten Deflect Length":
     @Event eachPlayer
     @Hero all
