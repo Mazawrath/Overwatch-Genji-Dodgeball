@@ -9,12 +9,6 @@ When the ball is red it is targeting you! Use your deflect to target someone els
 **Team Deathmatch Code: 9BZQ1**  
 The Team Deathmatch version is a version where passing is enabled by default. To pass, hold the Secondary Fire button. The ball with pass to another teammate or if none are alive, it will pass it to yourself. Each pass will cost 100 health, you can get healed by deflecting the ball to a enemy, or someone on either team dies.  
 
-## Tournement Codes
-#### Do not attempt to look at the code in the Overwatch Workshop! Attempting to open the Workshop panel may freeze and crash your game!
-**Deathmatch Tournament Code: BN1NP**  
-**Team Deathmatch Tournament Code: M6EBRF**  
-Tournment codes removes the Workshop Settings and obscurities code to make it more difficult to edit. Checking the code that the lobby uses matches the code here is the only way to confirm the game is unlikely to be modified. While this makes it more difficult, it can still potentially be modified.
-
 ## How to compile  
 Any file with a `.opy` ending is a file format compatable with OverPy, a high-level language for the Overwatch Workshop with support for compilation and decompilation.  
 [Follow this tutorial for instructions on how to compile this game.](https://github.com/Zezombye/overpy/wiki/General-usage)
