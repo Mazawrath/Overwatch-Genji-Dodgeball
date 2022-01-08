@@ -408,7 +408,7 @@ rule "Target random player":
     @Condition isGameInProgress() == true
     @Condition targetedPlayer == -1
     
-    targetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and previousTargetedPlayer != getPlayersInSlot(player, Team.ALL) and player != ballPlayer]))
+    targetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player != ballPlayer]))
 
 
 rule "Push to circle":
