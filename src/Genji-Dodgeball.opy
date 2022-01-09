@@ -141,6 +141,7 @@ globalvar rulesetMode 80
 globalvar bouncePadCooldownLengthStart 81
 globalvar invisibleBall 82
 globalvar invisiblePlayers 83
+globalvar ballNeverDespawns 84
 
 
 #Player variables
@@ -193,6 +194,7 @@ rule "// SETTINGS":
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 1)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 2)
+    ballNeverDespawns = createWorkshopSetting(bool, "Fun Settings", "Ball Never Despawns", false, 3)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
@@ -783,11 +785,19 @@ rule "Ball reaches player":
     
     if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode == 0)):
         DeflectFailed()
+        if rulesetMode == 1:
+            wait()
+            if RULE_CONDITION:
+                goto RULE_START
         return
     if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
         #If they don't have enough health, kill em
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
+            if rulesetMode == 1:
+                wait()
+                if RULE_CONDITION:
+                    goto RULE_START
             return
     if targetedPlayer.isUsingAbility2():
         ballPlayer.setStatusEffect(null, Status.STUNNED, 0.5)
@@ -830,11 +840,19 @@ rule "Ball reaches player -TEAMS":
     
     if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode == 0)):
         DeflectFailed()
+        if rulesetMode == 1:
+            wait()
+            if RULE_CONDITION:
+                goto RULE_START
         return
     if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
         #If they don't have enough health, kill em
         if targetedPlayer.getHealth() <= 100:
             DeflectFailed()
+            if rulesetMode == 1:
+                wait()
+                if RULE_CONDITION:
+                    goto RULE_START
             return
     if targetedPlayer.isUsingAbility1():
         targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
@@ -928,8 +946,11 @@ def DeflectFailed():
     passingPlayer = null
     targetedPlayer.playerDeaths += 1
     previousTargetedPlayer.playerKills += 1
-    ballDeleteRequested = true
-    return
+    if ballNeverDespawns and len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) != 1:
+        ballSpeed = max(startingBallSpeed, ballSpeed * 0.925)
+        targetedPlayer = (sorted([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player != ballPlayer], lambda i: angleBetweenVectors(ballDirection, directionTowards(ballPosition, i.getPosition()))))[0]
+    else:
+        ballDeleteRequested = true
 
 
 def CoolDeathEffects():
@@ -985,6 +1006,7 @@ rule "Final duel":
     @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() != ballHero]) == 2
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
+    @Condition not ballNeverDespawns
     
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
@@ -1022,6 +1044,7 @@ rule "Final duel - TEAMS":
     @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
+    @Condition not ballNeverDespawns
     
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
