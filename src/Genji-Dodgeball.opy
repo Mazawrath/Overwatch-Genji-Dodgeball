@@ -141,7 +141,7 @@ globalvar rulesetMode 80
 globalvar bouncePadCooldownLengthStart 81
 globalvar invisibleBall 82
 globalvar invisiblePlayers 83
-globalvar ballNeverDespawns 84
+globalvar endlessBall 84
 
 
 #Player variables
@@ -194,7 +194,7 @@ rule "// SETTINGS":
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 1)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 2)
-    ballNeverDespawns = createWorkshopSetting(bool, "Fun Settings", "Ball Never Despawns", false, 3)
+    endlessBall = createWorkshopSetting(bool, "Fun Settings", "Endless Ball", false, 3)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
@@ -946,7 +946,7 @@ def DeflectFailed():
     passingPlayer = null
     targetedPlayer.playerDeaths += 1
     previousTargetedPlayer.playerKills += 1
-    if ballNeverDespawns:
+    if endlessBall:
         # Does this if statement look scary to you? Good. Tremble in fear at my might of writing unnecessarily complex if statements. 
         if (getCurrentGamemode() == Gamemode.FFA and len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) != 1) or (getCurrentGamemode() == Gamemode.TDM and not(getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0)):
             ballSpeed = max(startingBallSpeed, ballSpeed * 0.925)
@@ -1011,7 +1011,7 @@ rule "Final duel":
     @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() != ballHero]) == 2
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
-    @Condition not ballNeverDespawns
+    @Condition not endlessBall
     
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
@@ -1049,7 +1049,7 @@ rule "Final duel - TEAMS":
     @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
-    @Condition not ballNeverDespawns
+    @Condition not endlessBall
     
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
