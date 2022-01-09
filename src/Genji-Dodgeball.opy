@@ -1140,6 +1140,10 @@ rule "Check for last player surviving":
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
+    if random.randint(1, 100) <= 20:
+        getAllPlayers().setStatusEffect(null, Status.ASLEEP, 10)
+        smallMessage(getAllPlayers(), "Don't forget to take breaks!")
+        wait(12)
     wait(1)
     roundInProgress = true
     if not bouncepadDashingEnabled:
