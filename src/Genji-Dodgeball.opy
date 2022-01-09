@@ -743,8 +743,8 @@ rule "Spawn ball":
 
 
 rule "Modern ball motion":
-    @Condition ballIsOut == true
     @Condition rulesetMode == 0
+    @Condition ballIsOut == true
     
     prevBallPos2 = prevBallPos
     prevBallPos = ballPosition
@@ -756,12 +756,22 @@ rule "Modern ball motion":
         goto RULE_START
 
 
-rule "Retro ball motion":
-    @Condition ballIsOut == true
+rule "Update ball postiion":
     @Condition rulesetMode == 1
-    
+    @Condition ballIsOut == true
+
+    # This is for the ball tail to be updated.
     prevBallPos2 = prevBallPos
     prevBallPos = ballPosition
+    wait(0.05)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Retro ball motion":
+    @Condition rulesetMode == 1
+    @Condition ballIsOut == true
+
     chase(ballPosition, targetedPlayer.getEyePosition(), rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
 
