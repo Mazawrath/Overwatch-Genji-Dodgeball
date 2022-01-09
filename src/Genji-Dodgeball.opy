@@ -946,9 +946,14 @@ def DeflectFailed():
     passingPlayer = null
     targetedPlayer.playerDeaths += 1
     previousTargetedPlayer.playerKills += 1
-    if ballNeverDespawns and len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) != 1:
-        ballSpeed = max(startingBallSpeed, ballSpeed * 0.925)
-        targetedPlayer = (sorted([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player != ballPlayer], lambda i: angleBetweenVectors(ballDirection, directionTowards(ballPosition, i.getPosition()))))[0]
+    if ballNeverDespawns:
+        # Does this if statement look scary to you? Good. Tremble in fear at my might of writing unnecessarily complex if statements. 
+        if (getCurrentGamemode() == Gamemode.FFA and len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) != 1) or (getCurrentGamemode() == Gamemode.TDM and not(getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0)):
+            ballSpeed = max(startingBallSpeed, ballSpeed * 0.925)
+            # Massive shoutout to DazNachbarzkind#2265 from the GDB EU Discord for making this intelligent targeting logic. You alone made this mode awesome.
+            targetedPlayer = (sorted([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player != ballPlayer], lambda i: angleBetweenVectors(ballDirection, directionTowards(ballPosition, i.getPosition()))))[0]
+        else:
+            ballDeleteRequested = true
     else:
         ballDeleteRequested = true
 
