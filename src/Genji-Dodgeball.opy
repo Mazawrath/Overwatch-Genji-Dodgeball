@@ -448,6 +448,8 @@ rule "Player dashes too far out of bounds":
     @Hero all
     @Condition distance(eventPlayer.getPosition(), vect(circleCenter.x, eventPlayer.getPosition().y, circleCenter.z)) > sphereSize + 1
     @Condition eventPlayer != ballPlayer
+    # No need for a knockdown in Workshop Expanse.
+    @Condition not(getCurrentMap() == Map.WORKSHOP_EXPANSE or getCurrentMap() == Map.WORKSHOP_EXPANSE_NIGHT)
     #Workshop Island Fix
     #@Condition (getCurrentMap() != Map.WORKSHOP_ISLAND and getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT) == true
     
