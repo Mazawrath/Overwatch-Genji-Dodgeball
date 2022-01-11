@@ -1421,8 +1421,9 @@ rule "Chamber x collision":
         goto RULE_START
 
 
-rule "Chamber y collision":
-    @Condition getCurrentMap() == Map.WORKSHOP_CHAMBER
+rule "Chamber & Expanse y collision":
+    # Hey, it works for one ground why won't it work for another ¯\_(ツ)_/¯
+    @Condition getCurrentMap() == Map.WORKSHOP_CHAMBER or getCurrentMap() == Map.WORKSHOP_EXPANSE or getCurrentMap() == Map.WORKSHOP_EXPANSE_NIGHT
     @Condition ballIsOut == true
     @Condition (ballPosition.y + 0.4 >= 40) - (ballPosition.y - 0.4 <= 0) == true
     
