@@ -1447,7 +1447,7 @@ rule "Chamber z collision":
 
 
 rule "No Undermaps":
-    @Condition getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT
+    @Condition getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT
     @Condition ballIsOut == true
     @Condition ballPosition.y < -2.85
     @Condition ballDirection.y < 0
