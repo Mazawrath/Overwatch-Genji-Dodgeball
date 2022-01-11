@@ -421,7 +421,10 @@ rule "Push to circle":
     @Condition getCurrentMap() != Map.WORKSHOP_ISLAND
     @Condition getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT
     
-    eventPlayer.applyImpulse(vect(directionTowards(eventPlayer.getPosition(), circleCenter).x, 0, directionTowards(eventPlayer.getPosition(), circleCenter).z), 6, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    if distance(eventPlayer.getPosition(), vect(circleCenter.x, eventPlayer.getPosition().y, circleCenter.z)) > sphereSize - 1.5 + 2:
+        eventPlayer.applyImpulse(vect(directionTowards(eventPlayer.getPosition(), circleCenter).x, 0, directionTowards(eventPlayer.getPosition(), circleCenter).z), 25, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    else: 
+        eventPlayer.applyImpulse(vect(directionTowards(eventPlayer.getPosition(), circleCenter).x, 0, directionTowards(eventPlayer.getPosition(), circleCenter).z), 6, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
     wait(0.25)
     if RULE_CONDITION:
