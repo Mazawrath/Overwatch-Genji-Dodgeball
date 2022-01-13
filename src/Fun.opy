@@ -1,9 +1,7 @@
 #!mainFile "./Genji-Dodgeball.opy"
 
 rule "Hero ball do funny thing":
-    @Event eachPlayer
     @Condition ballHero
-    @Condition eventPlayer.getCurrentHero() == ballHero
     @Condition ballPlayerMock == true
 
     if (random.randint(0, 100) <= 80):
@@ -14,10 +12,10 @@ rule "Hero ball do funny thing":
 
     if wasFinalDuel or getNumberOfHeroes(playerHero, Team.ALL) <= 2:
         wasFinalDuel = false
-        if not eventPlayer.hasStatusEffect(Status.FROZEN):
+        if not ballPlayer.hasStatusEffect(Status.FROZEN):
             LongFun()
     elif not isInFinalDuel:
-        if not eventPlayer.hasStatusEffect(Status.FROZEN):
+        if not ballPlayer.hasStatusEffect(Status.FROZEN):
             ShortFun()
     else:
         wasFinalDuel = true
@@ -28,7 +26,7 @@ rule "Hero ball do funny thing":
         ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
         ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
         ballPlayer.teleport(circleCenter + vect(0,5,0))
-        if not eventPlayer.hasStatusEffect(Status.FROZEN):
+        if not ballPlayer.hasStatusEffect(Status.FROZEN):
             ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     waitUntil(not ballPlayerMock, 9999)
 
@@ -238,7 +236,7 @@ def LongFun():
             ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
             ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
             ballPlayer.teleport(circleCenter + vect(0,5,0))
-            ballPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
             ballPlayer.communicate(Comms.HELLO)
             break
 
@@ -326,7 +324,7 @@ def ShortFun():
         case 7:
             # To the person who keeps telling me to remove the center orb.
             ballPlayer.startForcingPosition(circleCenter + vect(random.uniform(-centerOffLimitsSize + 0.75, centerOffLimitsSize - 0.75), -circleCenter.y, random.uniform(-centerOffLimitsSize + 1, centerOffLimitsSize - 1)), true)
-            eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
             wait()
             createInWorldText(getAllPlayers(), "Jealous that I can be in here and you can't? :)", ballPlayer.getEyePosition() + vect(0, 0.5, 0), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
             ballHeroRegretText = getLastCreatedText()
@@ -371,7 +369,7 @@ def ShortFun():
             ballPlayer.applyImpulse(Vector.LEFT, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
             ballPlayer.applyImpulse(Vector.DOWN, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
             ballPlayer.teleport(circleCenter + vect(0,5,0))
-            ballPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
             ballPlayer.communicate(Comms.HELLO)
             break
         # case 9:

@@ -80,52 +80,44 @@ rule "Create hero ball":
 
 
 rule "Init hero ball":
-    @Event eachPlayer
     @Condition ballHero
     @Condition isGameInProgress()
-    @Condition eventPlayer.getCurrentHero() == ballHero
 
     destroyInWorldText(ballHeroRegretText)
-    eventPlayer.stopFacing()
-    eventPlayer.setGravity(0)
-    eventPlayer.disablePlayerCollision()
-    # eventPlayer.startForcingPosition(updateEveryTick(ballPosition) + vect(0, -1, 0) , true)
+    ballPlayer.stopFacing()
+    ballPlayer.setGravity(0)
+    ballPlayer.disablePlayerCollision()
+    # ballPlayer.startForcingPosition(updateEveryTick(ballPosition) + vect(0, -1, 0) , true)
     wait(0.5)
-    eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
 
 
 rule "Teleport hero ball":
-    @Event eachPlayer
     @Condition ballHero
     @Condition isGameInProgress()
-    @Condition eventPlayer.getCurrentHero() == ballHero
     @Condition not ballPlayerMock
 
-    eventPlayer.teleport(ballPosition - vect(0, 1, 0))
+    ballPlayer.teleport(ballPosition - vect(0, 1, 0))
     wait(0.001)
     if RULE_CONDITION:
         goto RULE_START
 
 
 rule "Don't move while ball isn't in play":
-    @Event eachPlayer
     @Condition ballHero
     @Condition isGameInProgress()
-    @Condition eventPlayer.getCurrentHero() == ballHero
     @Condition ballPlayerMock
 
-    eventPlayer.setGravity(100)
+    ballPlayer.setGravity(100)
     waitUntil(not ballPlayerMock, 9999)
-    if not eventPlayer.hasStatusEffect(Status.FROZEN):
-        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    eventPlayer.setGravity(0)
+    if not ballPlayer.hasStatusEffect(Status.FROZEN):
+        ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    ballPlayer.setGravity(0)
 
 
 rule "Set hero ball outline":
-    @Event eachPlayer
     @Condition ballHero
     @Condition isGameInProgress()
-    @Condition eventPlayer.getCurrentHero() == ballHero
 
     ballPlayer.startForcingOutlineFor([player for player in getAllPlayers() if player != targetedPlayer], true, Color.WHITE, OutlineVisibility.DEFAULT)
     ballPlayer.startForcingOutlineFor([player for player in getAllPlayers() if player == targetedPlayer], true, Color.RED, OutlineVisibility.DEFAULT)
@@ -134,11 +126,9 @@ rule "Set hero ball outline":
 
 
 rule "Don't look around while frozen":
-    @Event eachPlayer
     @Condition ballHero
     @Condition isGameInProgress()
-    @Condition eventPlayer.getCurrentHero() == ballHero
-    @Condition eventPlayer.hasStatusEffect(Status.FROZEN)
+    @Condition ballPlayer.hasStatusEffect(Status.FROZEN)
     
     ballPlayer.stopFacing()
 

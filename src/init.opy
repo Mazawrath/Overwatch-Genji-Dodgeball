@@ -3,7 +3,19 @@
 rule "Init player variables":
     @Event eachPlayer
     @Hero all
-    
+
+    waitUntil(eventPlayer.hasSpawned(), 20)
+    if roundInProgress and isGameInProgress():
+        eventPlayer.teleport(circleCenter + vect(0, 500, 0))
+        eventPlayer.setInvisibility(Invis.ALL)
+        wait(0.05)
+        kill(eventPlayer, null)
+        wait(0.25)
+    eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
+    wait()
+    eventPlayer.hasMoved = true
+    if (ballHero != null and not isGameInProgress()):
+        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), ballPlayer.getEyePosition()), 100, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     eventPlayer.isDashEnabled = false
     eventPlayer.setStatusEffect(null, Status.INVINCIBLE, 9999)
     if cooldownDashingEnabled:
@@ -18,7 +30,17 @@ rule "Init player variables":
     eventPlayer.antiStuckProtection = false
     eventPlayer.toggleHUD = true
     eventPlayer.dashNerf = false
+    waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
+    eventPlayer.setInvisibility(Invis.NONE)
+    if invisiblePlayers:
+        getAllPlayers().setInvisibility(Invis.ALL)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
+    if (ballHero != null):
+        eventPlayer.stopFacing()
+    # Force 3rd person if it's toggled on.
+    if (perspectiveMode == 1):
+        eventPlayer.thirdPerson = true
+        eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
     wait(3)
     smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
     if (perspectiveMode == 2):
@@ -82,7 +104,7 @@ rule "Create game sphere":
     createEffect(getAllPlayers(), Effect.SPHERE, Color.BLACK, vect(circleCenter.x, circleCenter.y - 0, circleCenter.z), centerOffLimitsSize, EffectReeval.VISIBILITY)
     #Workshop Island doesn't need a circle.
     if getCurrentMap() != Map.WORKSHOP_ISLAND and getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT:
-        createEffect(getAllPlayers(), Effect.LIGHT_SHAFT, Color.ORANGE, vect(circleCenter.x, circleCenter.y - 15, circleCenter.z), sphereSize, EffectReeval.VISIBILITY)
+        createEffect(getAllPlayers(), Effect.LIGHT_SHAFT, Color.ORANGE, vect(circleCenter.x, circleCenter.y - 25, circleCenter.z), sphereSize, EffectReeval.VISIBILITY)
     else:
         createEffect([player for player in getAllPlayers() if distance(player.getPosition(), circleCenter) >= sphereSize - 10], Effect.LIGHT_SHAFT, Color.BLUE, vect(circleCenter.x, circleCenter.y - 15, circleCenter.z), sphereSize, EffectReeval.VISIBILITY)
 
@@ -196,6 +218,7 @@ rule "Create bounce pads":
 rule "Create ball & targeted effect":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.FFA
+    @Condition not invisibleBall
     
     if not ballHero:
         #Orb for when ball is not getting passed
@@ -224,6 +247,7 @@ rule "Create ball & targeted effect":
 rule "Create ball & targeted effect - TEAMS":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition not invisibleBall
     
     #Team 1 standard targeting Team 2 ball
     createEffect([player for player in getPlayers(Team.1) if player != targetedPlayer and targetedPlayer.getTeam() != Team.1], Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
