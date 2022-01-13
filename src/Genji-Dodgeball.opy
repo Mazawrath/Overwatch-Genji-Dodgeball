@@ -1421,9 +1421,8 @@ rule "Chamber x collision":
         goto RULE_START
 
 
-rule "Chamber & Expanse y collision":
-    # Hey, it works for one ground why won't it work for another ¯\_(ツ)_/¯
-    @Condition getCurrentMap() == Map.WORKSHOP_CHAMBER or getCurrentMap() == Map.WORKSHOP_EXPANSE or getCurrentMap() == Map.WORKSHOP_EXPANSE_NIGHT
+rule "Chamber y collision":
+    @Condition getCurrentMap() == Map.WORKSHOP_CHAMBER
     @Condition ballIsOut == true
     @Condition (ballPosition.y + 0.4 >= 40) - (ballPosition.y - 0.4 <= 0) == true
     
@@ -1442,6 +1441,19 @@ rule "Chamber z collision":
     
     if ballPosition.z + 0.4 >= 20 and ballDirection.z > 0 or ballPosition.z - 0.4 <= -20 and ballDirection.z < 0:
         ballDirection = vect(ballDirection.x, ballDirection.y, ballDirection.z * -1)
+        playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.WHITE, ballPosition, 1)
+    wait()
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Expanse y collision":
+    @Condition getCurrentMap() == Map.WORKSHOP_EXPANSE or getCurrentMap() == Map.WORKSHOP_EXPANSE_NIGHT
+    @Condition ballIsOut == true
+    @Condition ballPosition.y - 0.4 <= 0
+
+    if ballPosition.y - 0.4 <= 0 and ballDirection.y < 0:
+        ballDirection = vect(ballDirection.x, ballDirection.y * -1, ballDirection.z)
         playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.WHITE, ballPosition, 1)
     wait()
     if RULE_CONDITION:
