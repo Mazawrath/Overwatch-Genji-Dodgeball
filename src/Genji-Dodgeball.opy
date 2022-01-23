@@ -142,6 +142,7 @@ globalvar bouncePadCooldownLengthStart 81
 globalvar invisibleBall 82
 globalvar invisiblePlayers 83
 globalvar endlessBall 84
+globalvar ballTailColor 85
 
 
 #Player variables
@@ -191,6 +192,7 @@ rule "// SETTINGS":
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 5)
     maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 6)
     maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 7)
+    ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Dodgeball Settings", "Ball Tail Color", 0, 8)
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 1)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 2)
@@ -1369,8 +1371,23 @@ rule "Ball change color":
     # destroyEffect(ballTail2)
     #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.YELLOW, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #ballSmoke = getLastCreatedEntity()
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    switch ballTailColor:
+        case 0:
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            break
+        case 1:
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.YELLOW, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.YELLOW, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            break
+        case 2:
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, ballTail1, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, ballTail2, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+            break
+        default:
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+
     #elif ballColor != 3 and ballSpeed >= 30 and ballSpeed < 35:
     #destroyEffect(ballSmoke)
     #destroyEffect(ballTail1)
@@ -1406,6 +1423,16 @@ rule "Ball change color":
     #ballColor = 5
     #__end__()
 
+
+rule "RGB Ball Mode":
+    @Condition ballTailColor == 2
+    @Condition ballIsOut
+
+    ballTail1 = rgb(random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
+    ballTail2 = rgb(random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
+    wait(0.1)
+    if RULE_CONDITION:
+        goto RULE_START
 
 rule "Chamber x collision":
     #This collision is the lazy way but its only for chamber so who cares
