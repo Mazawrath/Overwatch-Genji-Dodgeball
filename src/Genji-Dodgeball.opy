@@ -2,8 +2,8 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.6.0",
-        "description": "Genji Dodgeball v7.6.0. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.6.1",
+        "description": "Genji Dodgeball v7.6.1. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -142,6 +142,7 @@ globalvar bouncePadCooldownLengthStart 81
 globalvar invisibleBall 82
 globalvar invisiblePlayers 83
 globalvar endlessBall 84
+globalvar ballTailColor 85
 
 
 #Player variables
@@ -187,14 +188,15 @@ rule "// SETTINGS":
     rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 3)
-    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 4)
-    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 5)
-    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 6)
-    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 7)
+    endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 4)
+    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 5)
+    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 6)
+    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 7)
+    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 8)
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
-    invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 1)
-    invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 2)
-    endlessBall = createWorkshopSetting(bool, "Fun Settings", "Endless Ball", false, 3)
+    ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Fun Settings", "Ball Tail Color", 0, 1)
+    invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 2)
+    invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 3)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
@@ -296,7 +298,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.6.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.6.1".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -955,7 +957,7 @@ def DeflectFailed():
     if endlessBall:
         # Does this if statement look scary to you? Good. Tremble in fear at my might of writing unnecessarily complex if statements. 
         if (getCurrentGamemode() == Gamemode.FFA and len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) != 1) or (getCurrentGamemode() == Gamemode.TDM and not(getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0)):
-            ballSpeed = max(startingBallSpeed, ballSpeed * 0.925)
+            ballSpeed = min(500, ballSpeed * 1.05)
             # Massive shoutout to DazNachbarzkind#2265 from the GDB EU Discord for making this intelligent targeting logic. You alone made this mode awesome.
             targetedPlayer = (sorted([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player != ballPlayer], lambda i: angleBetweenVectors(ballDirection, directionTowards(ballPosition, i.getPosition()))))[0]
         else:
@@ -1369,8 +1371,23 @@ rule "Ball change color":
     # destroyEffect(ballTail2)
     #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.YELLOW, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #ballSmoke = getLastCreatedEntity()
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    switch ballTailColor:
+        case 0:
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            break
+        case 1:
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.YELLOW, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.YELLOW, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            break
+        case 2:
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, ballTail1, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, ballTail2, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+            break
+        default:
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+
     #elif ballColor != 3 and ballSpeed >= 30 and ballSpeed < 35:
     #destroyEffect(ballSmoke)
     #destroyEffect(ballTail1)
@@ -1406,6 +1423,16 @@ rule "Ball change color":
     #ballColor = 5
     #__end__()
 
+
+rule "RGB Ball Mode":
+    @Condition ballTailColor == 2
+    @Condition ballIsOut
+
+    ballTail1 = rgb(random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
+    ballTail2 = rgb(random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
+    wait(0.1)
+    if RULE_CONDITION:
+        goto RULE_START
 
 rule "Chamber x collision":
     #This collision is the lazy way but its only for chamber so who cares
