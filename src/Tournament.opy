@@ -38,7 +38,7 @@ rule "Stress relief Torbs join":
     eventPlayer.clearStatusEffect(Status.INVINCIBLE)
     eventPlayer.setStatusEffect(null, Status.UNKILLABLE, 9999)
     # eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), sorted([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() == playerHero]).getEyePosition()), 200, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), getClosestPlayer(eventPlayer, Team.ALL)[0].getEyePosition()), 350, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(eventPlayer, player))[0].getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     wait(random.uniform(1, 2))
     eventPlayer.communicate(Comms.NO)
     
@@ -48,16 +48,26 @@ rule "Torb must die":
     @Hero torbjorn
 
     @Condition eventPlayer.getHealth() == 1
-
     if random.randint(1, 4) == 1:
         eventPlayer.communicate(Comms.GOODBYE)
         wait(random.uniform(0.016, 0.5))
     else:
         wait()
+    eventPlayer.detach()
     eventPlayer.clearStatusEffect(Status.UNKILLABLE)
     kill(eventPlayer, null)
     eventPlayer.setStatusEffect(null, Status.UNKILLABLE, 9999)
     waitUntil(eventPlayer.isAlive(), 9999)
-    eventPlayer.teleport(vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
+    eventPlayer.teleport(vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
     wait(0.25)
     eventPlayer.communicate(Comms.HELLO)
+
+
+rule "Pick up Torb":
+    @Event eachPlayer
+
+    @Condition breakInProgress
+    @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs], lambda player: distance(eventPlayer, player))[0] < 0.5
+    @Condition eventPlayer.isHoldingButton(Button.RELOAD)
+
+    sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs], lambda player: distance(eventPlayer, player))[0].attachTo(eventPlayer, vect(0,0.5,1))
