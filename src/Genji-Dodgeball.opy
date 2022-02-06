@@ -712,6 +712,7 @@ rule "Only end game when there isn't a round in progress":
 rule "primary = dash":
     @Event eachPlayer
     @Hero all
+    @Condition not breakInProgress
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) == true
     @Condition "{0}".format(eventPlayer) != "bytestats"
     @Condition eventPlayer.getCurrentHero() != ballHero
@@ -722,6 +723,7 @@ rule "primary = dash":
 rule "secondary = deflect":
     @Event eachPlayer
     @Hero all
+    @Condition not breakInProgress
     @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) == true
     @Condition "{0}".format(eventPlayer) != "bytestats"
     @Condition passingEnabled == false
