@@ -92,7 +92,10 @@ rule "Init global variables":
     passingPlayer = null
     currentRound = 1
     if getCurrentGamemode() == Gamemode.FFA:
-        gameEndEnabled = true
+        if tournamentMode:
+            gameEndEnabled = false
+        else:    
+            gameEndEnabled = true
     # Using passing with retro ruleset DOES NOT work
     if rulesetMode == 1 and passingEnabled and getCurrentGamemode() == Gamemode.FFA:
         passingEnabled = false

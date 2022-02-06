@@ -143,6 +143,9 @@ globalvar invisibleBall 82
 globalvar invisiblePlayers 83
 globalvar endlessBall 84
 globalvar ballTailColor 85
+globalvar tournamentMode 86
+globalvar breaksEnabled 87
+globalvar breakFrequency 88
 
 
 #Player variables
@@ -198,6 +201,9 @@ rule "// SETTINGS":
     ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Fun Settings", "Ball Tail Color", 0, 1)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 2)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 3)
+    tournamentMode = createWorkshopSetting(bool, "Tournament Settings", "Tournament Mode", false, 0)
+    breaksEnabled = createWorkshopSetting(bool, "Tournament Settings", "Breaks", true, 1)
+    breakFrequency = createWorkshopSetting(int[1:10], "Tournament Settings", "Run Break Every __ Rounds", 5, 2)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
@@ -269,6 +275,9 @@ rule "// INITIALIZATION":
 
 
 #!include "./init.opy"
+
+
+#!include "./Tournament.opy"
 
 
 rule "Enable Scoreboard":
@@ -1139,9 +1148,17 @@ rule "Check for last player surviving":
     if not isEnoughPlayersToStart:
         return
     roundInProgress = false
-    currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
-    ballSpawnCountdown = 5
+    if (tournamentMode and breaksEnabled and currentRound % breakFrequency == 0):
+        wait(1)
+        ballSpawnCountdown = 120
+        enableAnnouncer()
+        setMatchTime(120)
+        bigMessage(getAllPlayers(), "Break Time!")
+        setObjectiveDescription(getAllPlayers(), "Relax", HudReeval.NONE)
+    else:
+        ballSpawnCountdown = 5
+    currentRound += 1
     wait(1)
     roundInProgress = true
     if not bouncepadDashingEnabled:
