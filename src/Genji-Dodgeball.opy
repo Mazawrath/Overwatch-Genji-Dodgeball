@@ -188,11 +188,12 @@ rule "// SETTINGS":
     rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 3)
-    endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 4)
-    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 5)
-    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 6)
-    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 7)
-    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 8)
+    maxBallSpeed = createWorkshopSetting(int[100:500], "Dodgeball Settings", "Maximum Ball Speed", 500, 4)
+    endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 5)
+    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 6)
+    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 7)
+    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 8)
+    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 9)
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Fun Settings", "Ball Tail Color", 0, 1)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 2)
@@ -818,7 +819,7 @@ rule "Ball reaches player":
     playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, targetedPlayer.getPosition(), 200)
     targetedPlayer.playerDeflects += 1
     previousTargetedPlayer = targetedPlayer
-    ballSpeed = min(500, ballSpeed * 1.05)
+    ballSpeed = min(maxBallSpeed, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
     ballDirection = targetedPlayer.getFacingDirection()

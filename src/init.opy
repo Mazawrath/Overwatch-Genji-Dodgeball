@@ -70,7 +70,6 @@ rule "Init global variables":
     bouncePadStrength = 30
     ballSpeed = startingBallSpeed
     ballSpawnSpeed = 30
-    maxBallSpeed = 1000
     if arenaType == 2:
         if (getCurrentMap() == Map.WORKSHOP_EXPANSE or getCurrentMap() == Map.WORKSHOP_EXPANSE_NIGHT) == true:
             centerOffLimitsSize = 20
