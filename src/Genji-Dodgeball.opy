@@ -170,6 +170,7 @@ playervar toggleHUD 14
 playervar dashNerf 15
 playervar passingSignal 16
 playervar thirdPerson 17
+playervar yeetPlayer 18
 
 
 #Subroutine names
