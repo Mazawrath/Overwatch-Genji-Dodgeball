@@ -147,6 +147,8 @@ globalvar tournamentMode 86
 globalvar breaksEnabled 87
 globalvar breakFrequency 88
 globalvar breakLength 89
+globalvar stressTorbs 90
+globalvar breakInProgress 91
 
 
 #Player variables
