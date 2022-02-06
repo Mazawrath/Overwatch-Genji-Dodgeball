@@ -481,6 +481,7 @@ rule "Player dashes too far out of bounds":
 rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
     @Event eachPlayer
     @Hero all
+    @Condition eventPlayer not in stressTorbs
     @Condition eventPlayer.getPosition().y < -0.5
     @Condition eventPlayer != ballPlayer
     #Workshop Island Fix
@@ -589,6 +590,7 @@ rule "Disable Anti-Bounce":
 rule "Anti-Stuck Activation":
     @Event eachPlayer
     @Hero all
+    @Condition eventPlayer not in stressTorbs
     @Condition eventPlayer.getPosition().y < -4
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
