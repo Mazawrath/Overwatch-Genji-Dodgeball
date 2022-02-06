@@ -146,6 +146,7 @@ globalvar ballTailColor 85
 globalvar tournamentMode 86
 globalvar breaksEnabled 87
 globalvar breakFrequency 88
+globalvar breakLength 89
 
 
 #Player variables
@@ -176,6 +177,7 @@ subroutine UpdatedDeathEffects 1
 subroutine DeflectFailed 2
 subroutine ShortFun 3
 subroutine LongFun 4
+subroutine StartBreak 5
 
 
 #Activated extensions
@@ -1150,12 +1152,7 @@ rule "Check for last player surviving":
     roundInProgress = false
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     if (tournamentMode and breaksEnabled and currentRound % breakFrequency == 0):
-        wait(1)
-        ballSpawnCountdown = 120
-        enableAnnouncer()
-        setMatchTime(120)
-        bigMessage(getAllPlayers(), "Break Time!")
-        setObjectiveDescription(getAllPlayers(), "Relax", HudReeval.NONE)
+        StartBreak()
     else:
         ballSpawnCountdown = 5
     currentRound += 1
