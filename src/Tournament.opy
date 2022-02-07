@@ -70,15 +70,16 @@ rule "Torb must die":
 rule "Yeet Stress relief Torb":
     @Event eachPlayer
     @Condition breakInProgress
-    @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs], lambda player: distance(eventPlayer, player))[0] < 0.5
+    @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer, player))[0] < 0.25
     @Condition eventPlayer.isHoldingButton(Button.RELOAD)
 
-    eventPlayer.yeetPlayer = sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs], lambda player: distance(eventPlayer, player))[0]
-    sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs], lambda player: distance(eventPlayer, player))[0].attachTo(eventPlayer, vect(0,0.5,1))
+    eventPlayer.yeetPlayer = sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer, player))[0]
+    eventPlayer.yeetPlayer.attachTo(eventPlayer, vect(0,0.5,1))
     eventPlayer.yeetPlayer.communicate(Comms.HELLO)
     wait(0.5)
     waitUntil(eventPlayer.isHoldingButton(Button.RELOAD), 9999)
     eventPlayer.yeetPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 4)
     eventPlayer.yeetPlayer.detach()
-    eventPlayer.yeetPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.yeetPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     eventPlayer.yeetPlayer = null
+    wait(3)
