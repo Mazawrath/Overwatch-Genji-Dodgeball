@@ -96,7 +96,7 @@ rule "Yeet Stress relief Torb":
     eventPlayer.yeetPlayer.attachTo(eventPlayer, vect(0,0.5,1))
     eventPlayer.yeetPlayer.communicate(Comms.HELLO)
     wait(0.5)
-    waitUntil(eventPlayer.isHoldingButton(Button.RELOAD) or !breakInProgress, 9999)
+    waitUntil(eventPlayer.isHoldingButton(Button.RELOAD) or not breakInProgress, 9999)
     eventPlayer.yeetPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 4)
     eventPlayer.yeetPlayer.detach()
     eventPlayer.yeetPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
