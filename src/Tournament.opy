@@ -101,4 +101,4 @@ rule "Yeet Stress relief Torb":
     eventPlayer.yeetPlayer.detach()
     eventPlayer.yeetPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     eventPlayer.yeetPlayer = null
-    wait(3)
+    wait(1)
