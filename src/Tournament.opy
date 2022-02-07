@@ -38,6 +38,8 @@ def StartBreak():
     destroyDummy(Team.ALL, 14)
     destroyDummy(Team.ALL, 15)
     destroyDummy(Team.ALL, 16)
+    getAllPlayers().setPrimaryFireEnabled(false)
+    getAllPlayers().setSecondaryFireEnabled(false)
 
 
 rule "Stress relief Torbs join":
