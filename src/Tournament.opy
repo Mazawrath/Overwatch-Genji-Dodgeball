@@ -78,7 +78,7 @@ rule "Torb must die":
 rule "Yeet Stress relief Torb":
     @Event eachPlayer
     @Condition breakInProgress
-    @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer, player))[0] < 0.25
+    @Condition distance(eventPlayer, sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer, player))[0].getPosition()) <= 2
     @Condition eventPlayer.isHoldingButton(Button.RELOAD)
 
     eventPlayer.yeetPlayer = sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer, player))[0]
