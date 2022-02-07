@@ -103,3 +103,15 @@ rule "Yeet Stress relief Torb":
     eventPlayer.yeetPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     eventPlayer.yeetPlayer = null
     wait(1)
+
+
+rule "Get knocked down by yeeted Torb":
+    @Event eachPlayer
+    @Condition breakInProgress
+    # Only knock the player down if the stress torb is in the air (hopefully only when getting yeeted)
+    @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0].isInAir()
+    @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0].hasStatusEffect(Status.KNOCKED_DOWN)
+    # Chceck for the nearest stress torb
+    @Condition distance(eventPlayer, sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0].getPosition()) <= 0.75
+
+    eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1.5)
