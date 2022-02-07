@@ -426,6 +426,7 @@ rule "Target random player":
     @Condition isGameInProgress() == true
     @Condition targetedPlayer == -1
     
+    wait()
     targetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player != ballPlayer]))
 
 
