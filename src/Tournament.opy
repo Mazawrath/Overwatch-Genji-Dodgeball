@@ -14,7 +14,9 @@ def StartBreak():
     breakInProgress = true
     wait(1)
     ballSpawnCountdown = breakLength
-    setMatchTime(breakLength - 5)
+    chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
+    chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
+    setMatchTime(breakLength)
     bigMessage(getAllPlayers(), "Break Time!")
     chase(getAllPlayers().bouncePadCooldown, 0, rate=2, ChaseReeval.NONE)
     disableScoring()
