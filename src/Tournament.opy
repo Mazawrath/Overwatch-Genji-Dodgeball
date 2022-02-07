@@ -35,9 +35,9 @@ def StartBreak():
     smallMessage(getAllPlayers(), "Press reload again to yeet them!")
     waitUntil(ballSpawnCountdown <= 10, 9999)
     breakInProgress = false
-    destroyDummy(Team.ALL, 14)
-    destroyDummy(Team.ALL, 15)
-    destroyDummy(Team.ALL, 16)
+    destroyDummy(Team.ALL, stressTorbs[0].getSlot())
+    destroyDummy(Team.ALL, stressTorbs[1].getSlot())
+    destroyDummy(Team.ALL, stressTorbs[2].getSlot())
     getAllPlayers().setPrimaryFireEnabled(false)
     getAllPlayers().setSecondaryFireEnabled(false)
 
