@@ -91,7 +91,7 @@ rule "Init global variables":
     isPassingTeam2 = false
     passingPlayer = null
     currentRound = 1
-    breakLength = 120
+    breakLength = 60
     maxRoundsToggle = false
     if getCurrentGamemode() == Gamemode.FFA:
         if tournamentMode:
