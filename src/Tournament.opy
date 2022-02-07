@@ -53,6 +53,14 @@ rule "Torb must die":
 
     @Condition eventPlayer.getHealth() == 1
     if random.randint(1, 4) == 1:
+        if (random.randint(0,1):)
+            switch random.randint(1,2):
+                case 1:
+                    eventPlayer.applyImpulse(Vector.UP, 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+                    break
+                case 2:
+                    eventPlayer.applyImpulse(directionTowards(eventPlayer.getEyePosition(), vect(circleCenter.x, circleCenter.y + 4, circleCenter.z)), 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+                    break
         eventPlayer.communicate(Comms.GOODBYE)
         wait(random.uniform(0.016, 0.5))
     else:
