@@ -53,7 +53,7 @@ rule "Torb must die":
 
     @Condition eventPlayer.getHealth() == 1
     if random.randint(1, 4) == 1:
-        if (random.randint(0,1):)
+        if random.randint(0,1):
             switch random.randint(1,2):
                 case 1:
                     eventPlayer.applyImpulse(Vector.UP, 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
