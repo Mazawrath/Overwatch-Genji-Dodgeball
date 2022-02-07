@@ -207,7 +207,7 @@ rule "// SETTINGS":
     tournamentMode = createWorkshopSetting(bool, "Tournament Settings", "Tournament Mode", false, 0)
     maxRounds = createWorkshopSetting(int[1:50], "Tournament Settings", "Total Rounds", 30, 1)
     breaksEnabled = createWorkshopSetting(bool, "Tournament Settings", "Breaks", true, 2)
-    breakFrequency = createWorkshopSetting(int[1:10], "Tournament Settings", "Run Break Every __ Rounds", 5, 3)
+    breakFrequency = createWorkshopSetting(int[1:25], "Tournament Settings", "Run Break Every __ Rounds", 10, 3)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
