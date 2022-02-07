@@ -25,6 +25,7 @@ def StartBreak():
     createDummy(Hero.TORBJORN, Team.ALL, 15, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
     createDummy(Hero.TORBJORN, Team.ALL, 16, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
     stressTorbs = getPlayersOnHero(Hero.TORBJORN, Team.ALL)
+    stressTorbs.startForcingName("Stress Relief Torb")
     getAllPlayers().setPrimaryFireEnabled(true)
     getAllPlayers().setSecondaryFireEnabled(true)
     wait(1)
