@@ -1540,19 +1540,7 @@ rule "Maximum amount of rounds reached":
     @Condition maxRoundsToggle
     @Condition currentRound > maxRounds
     
-    if getCurrentGamemode() == Gamemode.TDM:
-        if teamScore(Team.1) == teamScore(Team.2):
-            declareDraw()
-        elif teamScore(Team.1) > teamScore(Team.2):
-            declareTeamVictory(Team.1)
-        elif teamScore(Team.2) > teamScore(Team.1):
-            declareTeamVictory(Team.2)
-    else:
-        highestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
-        if len([player for player in getAllPlayers() if player.getScore() == highestScore]) == 1:
-            declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())
-        else:
-            declareDraw()
+    enableGamemodeCompletion()
 
 rule "Toggle 3rd person":
     @Event eachPlayer
