@@ -149,6 +149,7 @@ globalvar breakFrequency 88
 globalvar breakLength 89
 globalvar stressTorbs 90
 globalvar breakInProgress 91
+globalvar spawnPoints 92
 
 
 #Player variables
