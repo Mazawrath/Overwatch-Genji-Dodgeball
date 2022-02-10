@@ -11,7 +11,10 @@ rule "Init player variables":
         wait(0.05)
         kill(eventPlayer, null)
         wait(0.25)
-    eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
+    if eventPlayer.getSlot() <= len(spawnPoints):
+        eventPlayer.teleport(spawnPoints[eventPlayer.getSlot()])
+    else:
+        eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
     wait()
     eventPlayer.hasMoved = true
     if (ballHero != null and not isGameInProgress()):
@@ -77,6 +80,7 @@ rule "Init global variables":
             centerOffLimitsSize = 12.5
     else:
         centerOffLimitsSize = 3.5
+    spawnPoints = [vect(circleCenter.x + 12, circleCenter.y, 0), vect(circleCenter.x - 12, circleCenter.y, 0), vect(0, circleCenter.y, circleCenter.z + 12), vect(0, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z + 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z + 12), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z + 6), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z - 6), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z - 6), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z + 6)]
     isInFinalDuel = false
     bouncePadCooldownLengthStart = 3
     bouncePadCooldownLength = 3
