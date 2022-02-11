@@ -20,10 +20,17 @@ def StartBreak():
     bigMessage(getAllPlayers(), "Break Time!")
     chase(getAllPlayers().bouncePadCooldown, 0, rate=2, ChaseReeval.NONE)
     disableScoring()
-    # Spawn the stress relief Torbs 
-    createDummy(Hero.TORBJORN, Team.ALL, 14, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, 15, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, 16, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
+    # Spawn the stress relief Torbs
+    if getCurrentGamemode() == Gamemode.FFA:
+        createDummy(Hero.TORBJORN, Team.ALL, 14, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
+        createDummy(Hero.TORBJORN, Team.ALL, 15, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
+        createDummy(Hero.TORBJORN, Team.ALL, 16, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
+        createDummy(Hero.TORBJORN, Team.ALL, 17, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
+    elif getCurrentGamemode() == Gamemode.TDM:
+        createDummy(Hero.TORBJORN, Team.1, 14, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
+        createDummy(Hero.TORBJORN, Team.1, 15, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
+        createDummy(Hero.TORBJORN, Team.2, 16, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
+        createDummy(Hero.TORBJORN, Team.2, 17, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
     stressTorbs = [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player != ballHero]
     stressTorbs.startForcingName("Stress Relief Torb")
     getAllPlayers().setPrimaryFireEnabled(true)
@@ -36,9 +43,16 @@ def StartBreak():
     smallMessage(getAllPlayers(), "Press reload again to yeet them!")
     waitUntil(ballSpawnCountdown <= 10, 9999)
     breakInProgress = false
-    destroyDummy(Team.ALL, stressTorbs[0].getSlot())
-    destroyDummy(Team.ALL, stressTorbs[1].getSlot())
-    destroyDummy(Team.ALL, stressTorbs[2].getSlot())
+    if getCurrentGamemode() == Gamemode.FFA:
+        destroyDummy(Team.ALL, stressTorbs[0].getSlot())
+        destroyDummy(Team.ALL, stressTorbs[1].getSlot())
+        destroyDummy(Team.ALL, stressTorbs[2].getSlot())
+        destroyDummy(Team.ALL, stressTorbs[3].getSlot())
+    elif getCurrentGamemode() == Gamemode.TDM:
+        destroyDummy(Team.1, stressTorbs[0].getSlot())
+        destroyDummy(Team.1, stressTorbs[1].getSlot())
+        destroyDummy(Team.2, stressTorbs[2].getSlot())
+        destroyDummy(Team.2, stressTorbs[3].getSlot())
     getAllPlayers().setPrimaryFireEnabled(false)
     getAllPlayers().setSecondaryFireEnabled(false)
 
