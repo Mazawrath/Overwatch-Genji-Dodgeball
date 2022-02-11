@@ -1160,7 +1160,7 @@ rule "Check for last player surviving":
     roundInProgress = false
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     currentRound += 1
-    if currentRound < maxRounds and (tournamentMode and breaksEnabled and (currentRound - 1) % breakFrequency == 0):
+    if currentRound - 1 < maxRounds and (tournamentMode and breaksEnabled and (currentRound - 1) % breakFrequency == 0):
         StartBreak()
     else:
         ballSpawnCountdown = 5
