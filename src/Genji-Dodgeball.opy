@@ -1011,9 +1011,15 @@ def UpdatedDeathEffects():
     deathSpherePos = targetedPlayer.getPosition()
     #Make sure it is final duel AND there are at least 3 or more players
     if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 1 and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
+        if targetedPlayer.getAltitude() < 5:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
+        else:
+            playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_RIP_TIRE_EXPLOSION, Color.WHITE, deathSpherePos, 0)
     elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0) and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
+        if targetedPlayer.getAltitude() < 5:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
+        else:
+            playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_RIP_TIRE_EXPLOSION, Color.WHITE, deathSpherePos, 0)
     playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION, Color.WHITE, deathSpherePos, 1)
     if randomExplosionSounds:
         #Pick a random explosion sound
