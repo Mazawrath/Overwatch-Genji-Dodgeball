@@ -60,6 +60,8 @@ rule "Init global variables":
     disableMusic()
     disableAnnouncer()
     disableInspector()
+    # Set the countdown to be a bit longer to let players who haven't loaded the map yet load in
+    setMatchTime(10)
     if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA:
         ballHero = Hero.TORBJORN
         name = ballHero
