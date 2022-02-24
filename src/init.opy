@@ -67,7 +67,7 @@ rule "Init global variables":
         name = ballHero
     else:
         # No touchy. I'm talking to you, person thinking it's funny to put your name here. Only Torbjörn can steal credit for making my game.
-        name = "u/Mazawrath"
+        name = "Mazawrath"
         ballHero = null
     # TODO get this working
     # playerHero = [hero for hero in getAllHeroes() if hero != ballHero]
