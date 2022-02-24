@@ -54,7 +54,7 @@ rule "Init player variables":
 rule "Init global variables":
     targetedPlayer = -1
     previousTargetedPlayer = -1
-    ballSpawnCountdown = 3
+    ballSpawnCountdown = 5
     disableScoring()
     disableGamemodeCompletion()
     disableMusic()
