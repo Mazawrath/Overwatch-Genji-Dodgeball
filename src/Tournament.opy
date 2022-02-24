@@ -25,7 +25,6 @@ def StartBreak():
         createDummy(Hero.TORBJORN, Team.ALL, 15, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
         createDummy(Hero.TORBJORN, Team.ALL, 16, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
         createDummy(Hero.TORBJORN, Team.ALL, 17, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
-        createDummy(Hero.TORBJORN, Team.ALL, 18, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
     elif getCurrentGamemode() == Gamemode.TDM:
         createDummy(Hero.TORBJORN, Team.1, 15, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
         createDummy(Hero.TORBJORN, Team.1, 16, circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)), vect(0,0,0))
@@ -47,7 +46,6 @@ def StartBreak():
         destroyDummy(Team.ALL, stressTorbs[0].getSlot())
         destroyDummy(Team.ALL, stressTorbs[1].getSlot())
         destroyDummy(Team.ALL, stressTorbs[2].getSlot())
-        destroyDummy(Team.ALL, stressTorbs[3].getSlot())
     elif getCurrentGamemode() == Gamemode.TDM:
         destroyDummy(Team.1, stressTorbs[0].getSlot())
         destroyDummy(Team.1, stressTorbs[1].getSlot())
