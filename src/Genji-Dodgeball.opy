@@ -1047,6 +1047,7 @@ rule "Final duel":
     @Condition isInFinalDuel == false
     @Condition not endlessBall
     
+    ballSpawnCountdown = 5
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
         goto lbl_0
@@ -1085,6 +1086,7 @@ rule "Final duel - TEAMS":
     @Condition isInFinalDuel == false
     @Condition not endlessBall
     
+    ballSpawnCountdown = 5
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
         goto lbl_0
