@@ -58,6 +58,9 @@ rule "Init global variables":
         ballSpawnCountdown = 69
     else:    
         ballSpawnCountdown = 5
+    if tournamentMode and getCurrentGamemode() != Gamemode.FFA:
+        tournamentMode = false
+        hudText(hostPlayer, null, null, "Tournament mode is only supported in FFA", HudPosition.LEFT, -20, null, null, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     disableScoring()
     disableGamemodeCompletion()
     disableMusic()
