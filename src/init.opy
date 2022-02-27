@@ -54,7 +54,10 @@ rule "Init player variables":
 rule "Init global variables":
     targetedPlayer = -1
     previousTargetedPlayer = -1
-    ballSpawnCountdown = 5
+    if (random.randint(1, 100) == 69):
+        ballSpawnCountdown = 69
+    else:    
+        ballSpawnCountdown = 5
     disableScoring()
     disableGamemodeCompletion()
     disableMusic()
