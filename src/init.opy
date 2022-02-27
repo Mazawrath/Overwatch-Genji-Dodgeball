@@ -11,7 +11,7 @@ rule "Init player variables":
         wait(0.05)
         kill(eventPlayer, null)
         wait(0.25)
-    if eventPlayer.getSlot() <= len(spawnPoints):
+    if eventPlayer.getSlot() <= len(spawnPoints) and getCurrentGamemode() == Gamemode.FFA:
         eventPlayer.teleport(spawnPoints[eventPlayer.getSlot()])
     else:
         eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
