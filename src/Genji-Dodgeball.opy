@@ -196,7 +196,7 @@ rule "// SETTINGS":
     perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
     rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earth/waterbending", "Firebending"], "Dodgeball Settings", "Arena Type", 0, 2)
-    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 3)
+    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 40, 3)
     maxBallSpeed = createWorkshopSetting(int[100:500], "Dodgeball Settings", "Maximum Ball Speed", 500, 4)
     endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 5)
     bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 6)
