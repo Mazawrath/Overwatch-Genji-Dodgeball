@@ -8,7 +8,7 @@ rule "Set Time To 0 in Tourney Mode":
 
 
 def StartBreak():
-    @Name "Start Break"
+    @Name "Tournament Break"
 
     breakInProgress = true
     wait(1)
