@@ -5,7 +5,6 @@ rule "Set Time To 0 in Tourney Mode":
     @Condition tournamentMode
 
     setMatchTime(0)
-    enableAnnouncer()
 
 
 def StartBreak():
@@ -16,6 +15,7 @@ def StartBreak():
     ballSpawnCountdown = breakLength
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
+    enableAnnouncer()
     setMatchTime(breakLength)
     bigMessage(getAllPlayers(), "Break Time!")
     chase(getAllPlayers().bouncePadCooldown, 0, rate=2, ChaseReeval.NONE)
@@ -53,6 +53,7 @@ def StartBreak():
         destroyDummy(Team.2, stressTorbs[3].getSlot())
     getAllPlayers().setPrimaryFireEnabled(false)
     getAllPlayers().setSecondaryFireEnabled(false)
+    disableAnnouncer()
 
 
 rule "Stress relief Torbs join":
