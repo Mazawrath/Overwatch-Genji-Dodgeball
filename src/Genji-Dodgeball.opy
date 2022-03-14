@@ -497,14 +497,20 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
 
 
 rule "Player falls off Workshop Island":
-    @Disabled
     @Event eachPlayer
     @Hero all
     # This rule might no longer be needed...but I'll be dammed if I ever get rid of this rule. 
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
-    @Condition eventPlayer.getPosition().y < -0.25
-    @Condition eventPlayer.isDead()
+    # Ayy nevermind on that last comment it back baby
+    @Condition eventPlayer.getPosition().y < -1.5
     
+    wait(5)
+    if not RULE_CONDITION:
+        return
+    smallMessage(getAllPlayers(), "{0} has glitched themselves under the map!".format(eventPlayer))
+    if tournamentMode:
+        hudSubtext(hostPlayer, "{0} has undermapped themself".format(eventPlayer), HudPosition.RIGHT, -1, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    kill(eventPlayer, null)
     #A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!
     eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 0, random.randint(-10, 10)))
     if eventPlayer == targetedPlayer:
