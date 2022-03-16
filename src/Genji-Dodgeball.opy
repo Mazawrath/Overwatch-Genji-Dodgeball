@@ -497,6 +497,7 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
 
 
 rule "Player falls off Workshop Island":
+    @Disabled
     @Event eachPlayer
     @Hero all
     # This rule might no longer be needed...but I'll be dammed if I ever get rid of this rule. 
