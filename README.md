@@ -1,12 +1,12 @@
 # Overwatch-Genji-Dodgeball
-**Current Version: v7.6.1**  
-**Deathmatch Code: SPA2K**  
+**Current Version: v7.7.0**  
+**Deathmatch Code: FY385**
 
 Genji Dodgeball is a minigame inspired by the TF2 game pyro dodgeball.
 When the ball is red it is targeting you! Use your deflect to target someone else. Look at the person you want to target next while deflecting. Use bouncepads to get extra air and style points.
 
 ## Team Deathmatch  
-**Team Deathmatch Code: V3H9Y**  
+**Team Deathmatch Code: AED5N**  
 The Team Deathmatch version is a version where passing is enabled by default. To pass, hold the Secondary Fire button. The ball with pass to another teammate or if none are alive, it will pass it to yourself. Each pass will cost 100 health, you can get healed by deflecting the ball to a enemy, or someone on either team dies.  
 
 ## How to compile  
