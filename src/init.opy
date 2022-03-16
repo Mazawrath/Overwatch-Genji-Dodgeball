@@ -11,7 +11,10 @@ rule "Init player variables":
         wait(0.05)
         kill(eventPlayer, null)
         wait(0.25)
-    eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
+    if eventPlayer.getSlot() <= len(spawnPoints) and getCurrentGamemode() == Gamemode.FFA:
+        eventPlayer.teleport(spawnPoints[eventPlayer.getSlot()])
+    else:
+        eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
     wait()
     eventPlayer.hasMoved = true
     if (ballHero != null and not isGameInProgress()):
@@ -51,18 +54,26 @@ rule "Init player variables":
 rule "Init global variables":
     targetedPlayer = -1
     previousTargetedPlayer = -1
-    ballSpawnCountdown = 3
+    if (random.randint(1, 100) == 69):
+        ballSpawnCountdown = 69
+    else:    
+        ballSpawnCountdown = 5
+    if tournamentMode and getCurrentGamemode() != Gamemode.FFA:
+        tournamentMode = false
+        hudText(hostPlayer, null, null, "Tournament mode is only supported in FFA", HudPosition.LEFT, -20, null, null, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     disableScoring()
     disableGamemodeCompletion()
     disableMusic()
     disableAnnouncer()
     disableInspector()
+    # Set the countdown to be a bit longer to let players who haven't loaded the map yet load in
+    setMatchTime(10)
     if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA:
         ballHero = Hero.TORBJORN
         name = ballHero
     else:
         # No touchy. I'm talking to you, person thinking it's funny to put your name here. Only Torbjörn can steal credit for making my game.
-        name = "u/Mazawrath"
+        name = "Mazawrath"
         ballHero = null
     # TODO get this working
     # playerHero = [hero for hero in getAllHeroes() if hero != ballHero]
@@ -70,7 +81,6 @@ rule "Init global variables":
     bouncePadStrength = 30
     ballSpeed = startingBallSpeed
     ballSpawnSpeed = 30
-    maxBallSpeed = 1000
     if arenaType == 2:
         if (getCurrentMap() == Map.WORKSHOP_EXPANSE or getCurrentMap() == Map.WORKSHOP_EXPANSE_NIGHT) == true:
             centerOffLimitsSize = 20
@@ -78,6 +88,7 @@ rule "Init global variables":
             centerOffLimitsSize = 12.5
     else:
         centerOffLimitsSize = 3.5
+    spawnPoints = [vect(circleCenter.x + 12, circleCenter.y, 0), vect(circleCenter.x - 12, circleCenter.y, 0), vect(0, circleCenter.y, circleCenter.z + 12), vect(0, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z + 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z + 12), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z + 6), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z - 6), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z - 6), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z + 6)]
     isInFinalDuel = false
     bouncePadCooldownLengthStart = 3
     bouncePadCooldownLength = 3
@@ -92,8 +103,14 @@ rule "Init global variables":
     isPassingTeam2 = false
     passingPlayer = null
     currentRound = 1
+    breakLength = 120
+    maxRoundsToggle = false
     if getCurrentGamemode() == Gamemode.FFA:
-        gameEndEnabled = true
+        if tournamentMode:
+            maxRoundsToggle = true
+            gameEndEnabled = false
+        else:    
+            gameEndEnabled = true
     # Using passing with retro ruleset DOES NOT work
     if rulesetMode == 1 and passingEnabled and getCurrentGamemode() == Gamemode.FFA:
         passingEnabled = false
@@ -161,6 +178,8 @@ rule "Create global HUD elements":
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to pass the ball to another teammate!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
         elif getCurrentGamemode() == Gamemode.FFA:
             hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to self pass the ball!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+    if tournamentMode:
+        hudSubtext(getAllPlayers(), "Tourney Mode. Rounds Remaining: {0}".format(maxRounds - currentRound + 1), HudPosition.LEFT, -10, Color.AQUA, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
 
 
 rule "Create player HUD elements":
@@ -278,3 +297,11 @@ rule "Create ball & targeted effect - TEAMS":
     #ballTail2 = getLastCreatedEntity()
     createEffect([i for i in [player for player in getAllPlayers() if player != targetedPlayer] if isPassingTeam1 or isPassingTeam2], Effect.GOOD_AURA, Color.SKY_BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+
+
+rule "Set time to 0 if teams and game end disabled":
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition not gameEndEnabled
+    @Condition isGameInProgress()
+
+    setMatchTime(0)

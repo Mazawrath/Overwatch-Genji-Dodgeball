@@ -2,8 +2,8 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.6.1",
-        "description": "Genji Dodgeball v7.6.1. Developed by u/Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.7.0",
+        "description": "Genji Dodgeball v7.7.0. Developed by Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -143,6 +143,13 @@ globalvar invisibleBall 82
 globalvar invisiblePlayers 83
 globalvar endlessBall 84
 globalvar ballTailColor 85
+globalvar tournamentMode 86
+globalvar breaksEnabled 87
+globalvar breakFrequency 88
+globalvar breakLength 89
+globalvar stressTorbs 90
+globalvar breakInProgress 91
+globalvar spawnPoints 92
 
 
 #Player variables
@@ -164,6 +171,7 @@ playervar toggleHUD 14
 playervar dashNerf 15
 playervar passingSignal 16
 playervar thirdPerson 17
+playervar yeetPlayer 18
 
 
 #Subroutine names
@@ -173,6 +181,7 @@ subroutine UpdatedDeathEffects 1
 subroutine DeflectFailed 2
 subroutine ShortFun 3
 subroutine LongFun 4
+subroutine StartBreak 5
 
 
 #Activated extensions
@@ -186,17 +195,20 @@ subroutine LongFun 4
 rule "// SETTINGS":
     perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
     rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
-    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earthbending"], "Dodgeball Settings", "Arena Type", 0, 2)
-    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 30, 3)
-    endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 4)
-    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 5)
-    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 6)
-    maxRoundsToggle = createWorkshopSetting(bool, "Dodgeball Settings", "End Match After A Certain Round", false, 7)
-    maxRounds = createWorkshopSetting(int[1:25], "Dodgeball Settings", "Total Rounds Per Match", 5, 8)
+    arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earth/waterbending", "Firebending"], "Dodgeball Settings", "Arena Type", 0, 2)
+    startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 40, 3)
+    maxBallSpeed = createWorkshopSetting(int[100:500], "Dodgeball Settings", "Maximum Ball Speed", 500, 4)
+    endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 5)
+    bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 6)
+    passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 7)
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Fun Settings", "Ball Tail Color", 0, 1)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 2)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 3)
+    tournamentMode = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Tournament Mode", false, 0)
+    maxRounds = createWorkshopSetting(int[1:50], "Tournament Settings (FFA Only)", "Total Rounds", 30, 1)
+    breaksEnabled = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Breaks", true, 2)
+    breakFrequency = createWorkshopSetting(int[1:25], "Tournament Settings (FFA Only)", "Run Break Every __ Rounds", 10, 3)
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
@@ -270,6 +282,9 @@ rule "// INITIALIZATION":
 #!include "./init.opy"
 
 
+#!include "./Tournament.opy"
+
+
 rule "Enable Scoreboard":
     @Event eachPlayer
     @Hero all
@@ -298,7 +313,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.6.1".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.7.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -412,6 +427,7 @@ rule "Target random player":
     @Condition isGameInProgress() == true
     @Condition targetedPlayer == -1
     
+    wait()
     targetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player != ballPlayer]))
 
 
@@ -466,6 +482,7 @@ rule "Player dashes too far out of bounds":
 rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
     @Event eachPlayer
     @Hero all
+    @Condition eventPlayer not in stressTorbs
     @Condition eventPlayer.getPosition().y < -0.5
     @Condition eventPlayer != ballPlayer
     #Workshop Island Fix
@@ -485,9 +502,16 @@ rule "Player falls off Workshop Island":
     @Hero all
     # This rule might no longer be needed...but I'll be dammed if I ever get rid of this rule. 
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
-    @Condition eventPlayer.getPosition().y < -0.25
-    @Condition eventPlayer.isDead()
+    # Ayy nevermind on that last comment it back baby
+    @Condition eventPlayer.getPosition().y < -1.5
     
+    wait(5)
+    if not RULE_CONDITION:
+        return
+    smallMessage(getAllPlayers(), "{0} has glitched themselves under the map!".format(eventPlayer))
+    if tournamentMode:
+        hudSubtext(hostPlayer, "{0} has undermapped themself".format(eventPlayer), HudPosition.RIGHT, -1, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    kill(eventPlayer, null)
     #A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!
     eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 0, random.randint(-10, 10)))
     if eventPlayer == targetedPlayer:
@@ -574,6 +598,7 @@ rule "Disable Anti-Bounce":
 rule "Anti-Stuck Activation":
     @Event eachPlayer
     @Hero all
+    @Condition eventPlayer not in stressTorbs
     @Condition eventPlayer.getPosition().y < -4
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
@@ -698,6 +723,7 @@ rule "Only end game when there isn't a round in progress":
 rule "primary = dash":
     @Event eachPlayer
     @Hero all
+    @Condition not breakInProgress
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) == true
     @Condition "{0}".format(eventPlayer) != "bytestats"
     @Condition eventPlayer.getCurrentHero() != ballHero
@@ -708,6 +734,7 @@ rule "primary = dash":
 rule "secondary = deflect":
     @Event eachPlayer
     @Hero all
+    @Condition not breakInProgress
     @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) == true
     @Condition "{0}".format(eventPlayer) != "bytestats"
     @Condition passingEnabled == false
@@ -818,7 +845,7 @@ rule "Ball reaches player":
     playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, targetedPlayer.getPosition(), 200)
     targetedPlayer.playerDeflects += 1
     previousTargetedPlayer = targetedPlayer
-    ballSpeed = min(500, ballSpeed * 1.05)
+    ballSpeed = min(maxBallSpeed, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
     ballDirection = targetedPlayer.getFacingDirection()
@@ -991,9 +1018,15 @@ def UpdatedDeathEffects():
     deathSpherePos = targetedPlayer.getPosition()
     #Make sure it is final duel AND there are at least 3 or more players
     if getCurrentGamemode() == Gamemode.FFA and getNumberOfLivingPlayers(Team.ALL) == 1 and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
+        if targetedPlayer.getAltitude() < 5:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
+        else:
+            playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_RIP_TIRE_EXPLOSION, Color.WHITE, deathSpherePos, 0)
     elif getCurrentGamemode() == Gamemode.TDM and (getNumberOfLivingPlayers(Team.1) == 0 or getNumberOfLivingPlayers(Team.2) == 0) and getNumberOfHeroes(playerHero, Team.ALL) != 2 and finalDuelNuke:
+        if targetedPlayer.getAltitude() < 5:
             playEffect(getAllPlayers(), DynamicEffect.DOOMFIST_METEOR_STRIKE_IMPACT, Color.WHITE, vect(deathSpherePos.x, 0, deathSpherePos.z), 0)
+        else:
+            playEffect(getAllPlayers(), DynamicEffect.JUNKRAT_RIP_TIRE_EXPLOSION, Color.WHITE, deathSpherePos, 0)
     playEffect(getAllPlayers(), DynamicEffect.BASTION_TANK_CANNON_EXPLOSION, Color.WHITE, deathSpherePos, 1)
     if randomExplosionSounds:
         #Pick a random explosion sound
@@ -1021,6 +1054,7 @@ rule "Final duel":
     @Condition isInFinalDuel == false
     @Condition not endlessBall
     
+    ballSpawnCountdown = 5
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
         goto lbl_0
@@ -1059,6 +1093,7 @@ rule "Final duel - TEAMS":
     @Condition isInFinalDuel == false
     @Condition not endlessBall
     
+    ballSpawnCountdown = 5
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
         goto lbl_0
@@ -1138,9 +1173,12 @@ rule "Check for last player surviving":
     if not isEnoughPlayersToStart:
         return
     roundInProgress = false
-    currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
-    ballSpawnCountdown = 5
+    currentRound += 1
+    if currentRound - 1 < maxRounds and (tournamentMode and breaksEnabled and (currentRound - 1) % breakFrequency == 0):
+        StartBreak()
+    else:
+        ballSpawnCountdown = 5
     wait(1)
     roundInProgress = true
     if not bouncepadDashingEnabled:
@@ -1518,19 +1556,7 @@ rule "Maximum amount of rounds reached":
     @Condition maxRoundsToggle
     @Condition currentRound > maxRounds
     
-    if getCurrentGamemode() == Gamemode.TDM:
-        if teamScore(Team.1) == teamScore(Team.2):
-            declareDraw()
-        elif teamScore(Team.1) > teamScore(Team.2):
-            declareTeamVictory(Team.1)
-        elif teamScore(Team.2) > teamScore(Team.1):
-            declareTeamVictory(Team.2)
-    else:
-        highestScore = sorted(getAllPlayers(), lambda player: player.getScore()).last().getScore()
-        if len([player for player in getAllPlayers() if player.getScore() == highestScore]) == 1:
-            declarePlayerVictory(sorted(getAllPlayers(), lambda player: player.getScore()).last())
-        else:
-            declareDraw()
+    enableGamemodeCompletion()
 
 rule "Toggle 3rd person":
     @Event eachPlayer
