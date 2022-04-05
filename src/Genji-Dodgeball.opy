@@ -783,18 +783,12 @@ rule "Modern ball motion":
     @Condition rulesetMode == 0
     @Condition ballIsOut == true
     
-    prevBallPos2 = prevBallPos
-    prevBallPos = ballPosition
-    chase(ballPosition, ballPosition + ballDirection * ballSpeed * 1, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballPosition, ballPosition + ballDirection * ballSpeed, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
-    wait(0.05)
-    if RULE_CONDITION:
-        goto RULE_START
 
 
 rule "Update ball postiion":
-    @Condition rulesetMode == 1
     @Condition ballIsOut == true
 
     # This is for the ball tail to be updated.
@@ -862,6 +856,8 @@ rule "Ball reaches player":
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+    wait(0.032)
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
     # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
     if rulesetMode == 1:
         if RULE_CONDITION:
@@ -938,6 +934,8 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+    wait(0.032)
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
     # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
     if rulesetMode == 1:
         if RULE_CONDITION:
