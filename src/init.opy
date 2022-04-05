@@ -241,25 +241,11 @@ rule "Create ball & targeted effect":
     
     if not ballHero:
         #Orb for when ball is not getting passed
-        createEffect([player for player in getAllPlayers() if player != targetedPlayer], Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    if not redGreenColorblindMode:
-        if not ballHero:
-            createEffect([i for i in targetedPlayer], Effect.ORB, Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect([player for player in getAllPlayers() if player != targetedPlayer], Effect.GOOD_AURA, Color.RED, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(targetedPlayer, Effect.GOOD_AURA, Color.RED, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(targetedPlayer, Effect.GOOD_AURA, Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    else:
-        createEffect(targetedPlayer, Effect.ORB, Color.YELLOW, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(targetedPlayer, Effect.GOOD_AURA, Color.YELLOW, targetedPlayer.getEyePosition(), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ball trail change color with speed
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    createEffect([i for i in [player for player in getAllPlayers() if player != targetedPlayer] if isPassingTeam1 or isPassingTeam2], Effect.GOOD_AURA, Color.SKY_BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(getAllPlayers().exclude(targetedPlayer), Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(targetedPlayer, Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * ballDirection * localPlayer.latency + ((((min(ballSpeed + 0.25, maxBallSpeed)) * (ballDirection + min(1.75, distance(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) * directionTowards(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) - ballSpeed * ballDirection) * localPlayer.latency ** 2) / 2)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(targetedPlayer, Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * ballDirection * localPlayer.latency + ((((min(ballSpeed + 0.25, maxBallSpeed)) * (ballDirection + min(1.75, distance(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) * directionTowards(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) - ballSpeed * ballDirection) * localPlayer.latency ** 2) / 2)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(getAllPlayers().exclude(targetedPlayer) if isPassingTeam1 or isPassingTeam2 else [], Effect.GOOD_AURA, Color.SKY_BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
 
 
@@ -268,36 +254,15 @@ rule "Create ball & targeted effect - TEAMS":
     @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition not invisibleBall
     
-    #Team 1 standard targeting Team 2 ball
-    createEffect([player for player in getPlayers(Team.1) if player != targetedPlayer and targetedPlayer.getTeam() != Team.1], Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #Team 1 standard targeting Team 1 ball
-    createEffect([player for player in getPlayers(Team.1) if player != targetedPlayer and targetedPlayer.getTeam() == Team.1], Effect.ORB, Color.SKY_BLUE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-     #Team 2 standard targeting Team 1 ball
-    createEffect([player for player in getPlayers(Team.2) if player != targetedPlayer and targetedPlayer.getTeam() != Team.2], Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-     #Team 2 standard targeting Team 2 ball
-    createEffect([player for player in getPlayers(Team.2) if player != targetedPlayer and targetedPlayer.getTeam() == Team.2], Effect.ORB, Color.SKY_BLUE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    if not redGreenColorblindMode:
-        #Team 1 Targeted Ball
-        createEffect([i for i in targetedPlayer], Effect.ORB, Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        #Team 2 Targeted Ball
-        #createEffect([i for i in targetedPlayer if not isPassingTeam2], Effect.ORB, Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect([player for player in getAllPlayers() if player != targetedPlayer], Effect.GOOD_AURA, Color.RED, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(targetedPlayer, Effect.GOOD_AURA, Color.RED, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(targetedPlayer, Effect.GOOD_AURA, Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    else:
-        createEffect(targetedPlayer, Effect.ORB, Color.YELLOW, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(targetedPlayer, Effect.GOOD_AURA, Color.YELLOW, targetedPlayer.getEyePosition(), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ball trail change color with speed
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    createEffect([i for i in [player for player in getAllPlayers() if player != targetedPlayer] if isPassingTeam1 or isPassingTeam2], Effect.GOOD_AURA, Color.SKY_BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-
+    #Team A standard targeting Team B ball
+    createEffect([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() != player.getTeam()], Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    #Team A standard targeting Team A ball
+    createEffect([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() == player.getTeam()], Effect.ORB, Color.SKY_BLUE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(targetedPlayer, Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * ballDirection * localPlayer.latency + ((((min(ballSpeed + 0.25, maxBallSpeed)) * (ballDirection + min(1.75, distance(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) * directionTowards(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) - ballSpeed * ballDirection) * localPlayer.latency ** 2) / 2)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(targetedPlayer, Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * ballDirection * localPlayer.latency + ((((min(ballSpeed + 0.25, maxBallSpeed)) * (ballDirection + min(1.75, distance(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) * directionTowards(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) - ballSpeed * ballDirection) * localPlayer.latency ** 2) / 2)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(getAllPlayers().exclude(targetedPlayer) if isPassingTeam1 or isPassingTeam2 else [], Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(targetedPlayer + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
 
 rule "Set time to 0 if teams and game end disabled":
     @Condition getCurrentGamemode() == Gamemode.TDM

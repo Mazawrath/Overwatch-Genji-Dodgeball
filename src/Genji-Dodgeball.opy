@@ -172,6 +172,8 @@ playervar dashNerf 15
 playervar passingSignal 16
 playervar thirdPerson 17
 playervar yeetPlayer 18
+playervar latency 19
+playervar latencyToggle 20
 
 
 #Subroutine names
@@ -1585,3 +1587,32 @@ rule "3rd person respawn":
     @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+
+
+rule "Measure Latency":
+    @Event eachPlayer
+    @Condition roundInProgress == true
+    
+    if not eventPlayer.latencyToggle:
+        eventPlayer.latency = 0
+        return
+    eventPlayer.latency = [angleToDirection(eventPlayer.getHorizontalFacingAngle() + 0.5, eventPlayer.getVerticalFacingAngle()), getTotalTimeElapsed()]
+    eventPlayer.startFacing(eventPlayer.latency[0], 100000, Relativity.TO_PLAYER, FacingReeval.NONE)
+    waitUntil(eventPlayer.latency[0] == updateEveryTick(eventPlayer.getFacingDirection()), 99999)
+    eventPlayer.stopFacing()
+    eventPlayer.latency = ((getTotalTimeElapsed() - eventPlayer.latency.last()) * 0.5) * createWorkshopSetting(float[0:1], "Visual Settings", "Client Prediction Amount", 1, 4)
+    wait()
+    eventPlayer.stopFacing()
+
+
+rule "Toggle Latency":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.ULTIMATE) == true
+
+    if eventPlayer.latencyToggle:
+        eventPlayer.latencyToggle = false
+        smallMessage(eventPlayer, "Lag compensation disabled for next round")
+    else:
+        eventPlayer.latencyToggle = true
+        smallMessage(eventPlayer, "Lag compensation enabled for next round")
+    wait(0.5)
