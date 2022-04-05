@@ -45,7 +45,7 @@ rule "Init player variables":
         eventPlayer.thirdPerson = true
         eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
     wait(3)
-    smallMessage(eventPlayer, "Press interact to enable/disable the scoreboard")
+    smallMessage(eventPlayer, "Press {0} to enable/disable the scoreboard".format(buttonString(Button.INTERACT)))
     if (perspectiveMode == 2):
         wait(3)
         smallMessage(eventPlayer, "Press reload to toggle 1st/3rd person")
@@ -176,9 +176,9 @@ rule "Create global HUD elements":
             
     if passingEnabled and rulesetMode == 0:
         if getCurrentGamemode() == Gamemode.TDM:
-            hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to pass the ball to another teammate!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+            hudSubtext(getAllPlayers(), "Hold {0} while deflecting to pass the ball to another teammate!".format(buttonString(Button.SECONDARY_FIRE)), HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
         elif getCurrentGamemode() == Gamemode.FFA:
-            hudSubtext(getAllPlayers(), "Hold secondary fire while deflecting to self pass the ball!", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+            hudSubtext(getAllPlayers(), "Hold {0} while deflecting to self pass the ball!".format(buttonString(Button.SECONDARY_FIRE)), HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     if tournamentMode:
         hudSubtext(getAllPlayers(), "Tourney Mode. Rounds Remaining: {0}".format(maxRounds - currentRound + 1), HudPosition.LEFT, -10, Color.AQUA, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
 
