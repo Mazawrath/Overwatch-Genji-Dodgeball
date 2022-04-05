@@ -1362,7 +1362,7 @@ rule "Ball bounce off surface":
     #normal of the plane of the surface with which the ball collides, n
     ballCollisionSurfaceNormal = raycast(ballPosition, ballPosition + ballDirection * ballSpeed * 0.066, null, getAllPlayers(), false).getNormal()
     #reflected vector formula --- new v = v - 2 * (v•n)/(n•n) * n
-    ballDirection = ballDirection - 2 * ballDirection * ballCollisionSurfaceNormal / dotProduct(ballCollisionSurfaceNormal, ballCollisionSurfaceNormal) * ballCollisionSurfaceNormal
+    ballDirection -= 2 * ballDirection * ballCollisionSurfaceNormal / dotProduct(ballCollisionSurfaceNormal, ballCollisionSurfaceNormal) * ballCollisionSurfaceNormal
     playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.WHITE, ballPosition, 1)
     wait(0.02)
     if RULE_CONDITION:
