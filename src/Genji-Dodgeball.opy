@@ -1356,7 +1356,7 @@ rule "dash slow":
 
 rule "Ball bounce off surface":
     @Condition ballIsOut == true
-    @Condition raycast(ballPosition, ballPosition + ballDirection * ballSpeed * 0.033, null, getAllPlayers(), false).getHitPosition() != ballPosition + ballDirection * ballSpeed * 0.033
+    @Condition isInLoS(ballPosition, ballPosition + ballDirection * ballSpeed * 0.033, BarrierLos.PASS_THROUGH_BARRIERS) == false
     @Condition getCurrentMap() != Map.WORKSHOP_CHAMBER
     
     #normal of the plane of the surface with which the ball collides, n
