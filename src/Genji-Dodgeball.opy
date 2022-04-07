@@ -1378,88 +1378,11 @@ rule "Ball no down when y < -0.5":
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.WHITE, ballPosition, 2)
 
 
-rule "Ball change color":
+rule "Ball tail effects":
     @Condition not invisibleBall
 
-    #if ballColor != 0 and ballSpeed < 20 and true:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 0
-    #elif ballColor != 1 and ballSpeed >= 20 and ballSpeed < 25:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.GREEN, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.GREEN, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.GREEN, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 1
-    #elif ballColor != 2 and ballSpeed >= 25 and ballSpeed < 30:
-    # destroyEffect(ballSmoke)
-    # destroyEffect(ballTail1)
-    # destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.YELLOW, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    switch ballTailColor:
-        case 0:
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            break
-        case 1:
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.YELLOW, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.YELLOW, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            break
-        case 2:
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, ballTail1, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, ballTail2, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
-            break
-        default:
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-
-    #elif ballColor != 3 and ballSpeed >= 30 and ballSpeed < 35:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.ORANGE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.ORANGE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.ORANGE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 3
-    #elif ballColor != 4 and ballSpeed >= 35 and ballSpeed < 55:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.RED, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.RED, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 4
-    #elif ballColor != 5 and ballSpeed >= 55 and true:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.PURPLE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.PURPLE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.PURPLE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 5
-    #__end__()
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, updateEveryTick(ballPosition + ballSpeed * ballDirection * localPlayer.latency + ((((min(ballSpeed + 0.25, maxBallSpeed)) * (ballDirection + min(1.75, distance(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) * directionTowards(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) - ballSpeed * ballDirection) * localPlayer.latency ** 2) / 2) if targetedPlayer == localPlayer else ballPosition), [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
 
 
 rule "RGB Ball Mode":
