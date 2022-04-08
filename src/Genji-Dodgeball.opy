@@ -499,7 +499,6 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
 
 
 rule "Player falls off Workshop Island":
-    @Disabled
     @Event eachPlayer
     @Hero all
     # This rule might no longer be needed...but I'll be dammed if I ever get rid of this rule. 
@@ -507,7 +506,7 @@ rule "Player falls off Workshop Island":
     # Ayy nevermind on that last comment it back baby
     @Condition eventPlayer.getPosition().y < -1.5
     
-    wait(5)
+    waitUntil(eventPlayer.getPosition().y >= 1.5 ,5)
     if not RULE_CONDITION:
         return
     smallMessage(getAllPlayers(), "{0} has glitched themselves under the map!".format(eventPlayer))
