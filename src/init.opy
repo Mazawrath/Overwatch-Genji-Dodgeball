@@ -49,7 +49,7 @@ rule "Init player variables":
     smallMessage(eventPlayer, "Press {0} to enable/disable the scoreboard".format(buttonString(Button.INTERACT)))
     if (perspectiveMode == 2):
         wait(3)
-        smallMessage(eventPlayer, "Press reload to toggle 1st/3rd person")
+        smallMessage(eventPlayer, "Press {0} to toggle 1st/3rd person".format(buttonString(Button.RELOAD)))
 
 
 rule "Init global variables":

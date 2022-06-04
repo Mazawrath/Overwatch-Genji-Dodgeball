@@ -37,9 +37,9 @@ def StartBreak():
     wait(1)
     bigMessage(getAllPlayers(), "Weapons activated")
     wait(2)
-    smallMessage(getAllPlayers(), "Press reload to pick up a torb")
+    smallMessage(getAllPlayers(), "Press {0} to pick up a torb".format(buttonString(Button.RELOAD)))
     wait(2)
-    smallMessage(getAllPlayers(), "Press reload again to yeet them!")
+    smallMessage(getAllPlayers(), "Press {0} again to yeet them!".format(buttonString(Button.RELOAD)))
     waitUntil(ballSpawnCountdown <= 10, 9999)
     breakInProgress = false
     if getCurrentGamemode() == Gamemode.FFA:
