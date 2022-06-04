@@ -1518,7 +1518,7 @@ rule "Measure Latency":
     if not eventPlayer.latencyToggle:
         eventPlayer.latency = 0
         return
-    eventPlayer.latency = [angleToDirection(eventPlayer.getHorizontalFacingAngle() + 0.5, eventPlayer.getVerticalFacingAngle()), getTotalTimeElapsed()]
+    eventPlayer.latency = [angleToDirection(eventPlayer.getHorizontalFacingAngle(), eventPlayer.getVerticalFacingAngle() + (eventPlayer.getVerticalFacingAngle() < 0) - 0.5), getTotalTimeElapsed()]
     eventPlayer.startFacing(eventPlayer.latency[0], 100000, Relativity.TO_PLAYER, FacingReeval.NONE)
     waitUntil(eventPlayer.latency[0] == updateEveryTick(eventPlayer.getFacingDirection()), 99999)
     eventPlayer.stopFacing()
