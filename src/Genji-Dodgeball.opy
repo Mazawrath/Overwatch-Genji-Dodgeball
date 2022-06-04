@@ -501,6 +501,7 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
 rule "Player falls off Workshop Island":
     @Event eachPlayer
     @Hero all
+    @Condition not eventPlayer.isDummy()
     # This rule might no longer be needed...but I'll be dammed if I ever get rid of this rule. 
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     # Ayy nevermind on that last comment it back baby
