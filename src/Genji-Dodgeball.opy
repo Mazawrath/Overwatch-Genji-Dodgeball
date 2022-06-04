@@ -1523,8 +1523,6 @@ rule "Measure Latency":
     waitUntil(eventPlayer.latency[0] == updateEveryTick(eventPlayer.getFacingDirection()), 99999)
     eventPlayer.stopFacing()
     eventPlayer.latency = ((getTotalTimeElapsed() - eventPlayer.latency.last()) * 0.5) * createWorkshopSetting(float[0:1], "Visual Settings", "Client Prediction Amount", 1, 4)
-    wait()
-    eventPlayer.stopFacing()
 
 
 rule "Toggle Latency":
@@ -1538,3 +1536,14 @@ rule "Toggle Latency":
         eventPlayer.latencyToggle = true
         smallMessage(eventPlayer, "Lag compensation enabled for next round")
     wait(0.5)
+
+rule "Rule 103":
+    @Condition hostPlayer.isHoldingButton(Button.CROUCH) == true
+    
+    createDummy(Hero.GENJI, Team.ALL, -1, vect(0, 0, 0), vect(0, 0, 0))
+
+
+rule "Rule 104":
+    @Condition hostPlayer.isHoldingButton(Button.RELOAD) == true
+    
+    destroyDummy(Team.ALL, random.randint(0, 12))
