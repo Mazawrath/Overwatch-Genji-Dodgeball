@@ -1381,7 +1381,7 @@ rule "Ball no down when y < -0.5":
 rule "Ball tail effects":
     @Condition not invisibleBall
 
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, updateEveryTick(ballPosition + ballSpeed * ballDirection * localPlayer.latency + ((((min(ballSpeed + 0.25, maxBallSpeed)) * (ballDirection + min(1.75, distance(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) * directionTowards(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) - ballSpeed * ballDirection) * localPlayer.latency ** 2) / 2) if targetedPlayer == localPlayer else ballPosition), [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 else i for i in (ballPosition + ballSpeed * ballDirection * localPlayer.latency + ((((min(ballSpeed + 0.25, maxBallSpeed)) * (ballDirection + min(1.75, distance(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) * directionTowards(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) - ballSpeed * ballDirection) * localPlayer.latency ** 2) / 2) if targetedPlayer == localPlayer else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
     createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
 
 
