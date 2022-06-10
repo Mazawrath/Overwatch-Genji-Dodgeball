@@ -33,7 +33,7 @@ rule "Init player variables":
     eventPlayer.antiStuckProtection = false
     eventPlayer.toggleHUD = true
     eventPlayer.dashNerf = false
-    eventPlayer.latencyToggle = true
+    eventPlayer.latencyToggle = (rulesetMode != 2)
     waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
     eventPlayer.setInvisibility(Invis.NONE)
     if invisiblePlayers:
@@ -188,6 +188,7 @@ rule "Create global HUD elements":
 rule "Create player HUD elements":
     @Event eachPlayer
     @Hero all
+    @Condition rulesetMode != 2
 
     hudSubheader(eventPlayer, "Lag compensation [{0}]: {1}".format(buttonString(Button.ULTIMATE), "On" if eventPlayer.latencyToggle else "Off"), HudPosition.LEFT, 1, Color.WHITE, HudReeval.STRING, SpecVisibility.NEVER)
     #hudText(eventPlayer, eventPlayer.playerDeflects, "Deflects", null, HudPosition.LEFT, 1, Color.YELLOW, Color.WHITE, Color.YELLOW, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
