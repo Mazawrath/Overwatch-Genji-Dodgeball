@@ -883,7 +883,7 @@ rule "Ball reaches player -TEAMS":
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
     
-    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode != 0)):
+    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode != 1)):
         DeflectFailed()
         if rulesetMode == 1:
             wait()
