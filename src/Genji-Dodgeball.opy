@@ -1,9 +1,11 @@
 #!mainFile "./Genji-Dodgeball.opy"
+#debug macro so don't need to time deflect:
+##!defineMember isUsingAbility2 isOnGround
 
 settings {
     "main": {
         "modeName": "Genji Dodgeball v7.8.0",
-        "description": "Genji Dodgeball v7.8.0. Developed by Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "description": "Genji Dodgeball v7.8.0. Developed by Mazawrath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -804,7 +806,7 @@ rule "Astro ball motion":
 
     chase(ballPosition, updateEveryTick(ballPosition + ballDirection), rate=updateEveryTick(magnitude(ballDirection)), ChaseReeval.DESTINATION_AND_RATE)
     #ballDirection is the ball's velocity
-    chase(ballDirection, updateEveryTick(ballDirection * 0.85 + targetedPlayer.getEyePosition() - ballPosition), rate=updateEveryTick(sqrt((ballSpeed - magnitude(ballDirection)) * ballSpeed) * 3), ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballDirection, updateEveryTick(ballDirection * 0.93 + targetedPlayer.getEyePosition() - ballPosition), rate=updateEveryTick(sqrt((ballSpeed - max(dotProduct(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition())), 0)) * ballSpeed) * 3), ChaseReeval.DESTINATION_AND_RATE)
     #ballSpeed is the ball's acceleration coefficient
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
 
@@ -855,7 +857,7 @@ rule "Ball reaches player":
     ballSpeed = min(maxBallSpeed, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    ballDirection = targetedPlayer.getFacingDirection() * (magnitude(ballDirection) if rulesetMode == 2 else 1)
+    ballDirection = targetedPlayer.getFacingDirection() * (ballSpeed if rulesetMode == 2 else 1)
     wait(0.001)
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
@@ -909,7 +911,7 @@ rule "Ball reaches player -TEAMS":
     ballSpeed = min(500, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    ballDirection = targetedPlayer.getFacingDirection() * (magnitude(ballDirection) if rulesetMode == 2 else 1)
+    ballDirection = targetedPlayer.getFacingDirection() * (ballSpeed if rulesetMode == 2 else 1)
     wait(0.001)
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
