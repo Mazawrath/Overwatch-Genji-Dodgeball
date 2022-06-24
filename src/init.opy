@@ -33,7 +33,7 @@ rule "Init player variables":
     eventPlayer.antiStuckProtection = false
     eventPlayer.toggleHUD = true
     eventPlayer.dashNerf = false
-    eventPlayer.latencyToggle = true
+    eventPlayer.latencyToggle = false
     waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
     eventPlayer.setInvisibility(Invis.NONE)
     if invisiblePlayers:
