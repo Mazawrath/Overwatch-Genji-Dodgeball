@@ -1516,7 +1516,7 @@ rule "Measure Latency":
     @Event eachPlayer
     @Condition roundInProgress == true
     
-    if not eventPlayer.latencyToggle:
+    if not eventPlayer.latencyToggle or eventPlayer.isCommunicatingEmote():
         eventPlayer.latency = 0
         return
     eventPlayer.latency = [angleToDirection(eventPlayer.getHorizontalFacingAngle(), eventPlayer.getVerticalFacingAngle() + (eventPlayer.getVerticalFacingAngle() < 0) - 0.5), getTotalTimeElapsed()]
