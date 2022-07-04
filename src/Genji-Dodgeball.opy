@@ -110,6 +110,7 @@ globalvar explosionSoundVolume 44
 globalvar improvedExplosions 45
 globalvar randomExplosionSounds 46
 globalvar finalDuelNuke 47
+globalvar ballDirectionRate 48
 globalvar allowMatchEnd 51
 globalvar passingDamage 52
 globalvar isPassingTeam1 53
@@ -778,6 +779,7 @@ rule "Spawn ball":
     
     ballPosition = circleCenter
     ballDirection = directionTowards(ballPosition, targetedPlayer.getEyePosition())
+    ballDirectionRate = 1.75
     ballSpeed = startingBallSpeed
     ballPlayerMock = false
     ballIsOut = true
@@ -788,8 +790,12 @@ rule "Modern ball motion":
     @Condition ballIsOut == true
     
     chase(ballPosition, ballPosition + ballDirection * ballSpeed, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=ballDirectionRate, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+    #This should remove the terrible client prediction chases have
+    wait(0.016)
+    if RULE_CONDITION:
+        goto RULE_START
 
 
 rule "Retro ball motion":
@@ -809,6 +815,10 @@ rule "Astro ball motion":
     chase(ballDirection, updateEveryTick(ballDirection * 0.93 + targetedPlayer.getEyePosition() - ballPosition), rate=updateEveryTick(sqrt((ballSpeed - max(dotProduct(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition())), 0)) * ballSpeed) * 3), ChaseReeval.DESTINATION_AND_RATE)
     #ballSpeed is the ball's acceleration coefficient
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+    #Chase client prediction fix
+    wait(0.016)
+    if RULE_CONDITION:
+        goto RULE_START
 
 
 rule "Update ball postiion":
@@ -870,10 +880,10 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    if rulesetMode != 2:
-        chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+    if rulesetMode == 0:
+        ballDirectionRate = 6
         wait(0.032)
-        chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
+        ballDirectionRate = 1.75
     # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
     if rulesetMode == 1:
         if RULE_CONDITION:
@@ -949,10 +959,10 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    if rulesetMode != 2:
-        chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+    if rulesetMode == 0:
+        ballDirectionRate = 6
         wait(0.032)
-        chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
+        ballDirectionRate = 1.75
     # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
     if rulesetMode == 1:
         if RULE_CONDITION:
@@ -1396,7 +1406,7 @@ rule "Ball no down when y < -0.5":
 rule "Ball tail effects":
     @Condition not invisibleBall
 
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 else i for i in (ballPosition + ballSpeed * ballDirection * localPlayer.latency + ((((min(ballSpeed + 0.25, maxBallSpeed)) * (ballDirection + min(1.75, distance(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) * directionTowards(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) - ballSpeed * ballDirection) * localPlayer.latency ** 2) / 2) if targetedPlayer == localPlayer else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 else i for i in (ballPosition + ballSpeed * normalize(ballDirection) * localPlayer.latency if targetedPlayer == localPlayer else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
     createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR) 
 
 
@@ -1531,7 +1541,7 @@ rule "Measure Latency":
     @Event eachPlayer
     @Condition roundInProgress == true
     
-    if not eventPlayer.latencyToggle:
+    if not eventPlayer.latencyToggle or eventPlayer.isCommunicatingEmote():
         eventPlayer.latency = 0
         return
     eventPlayer.latency = [angleToDirection(eventPlayer.getHorizontalFacingAngle(), eventPlayer.getVerticalFacingAngle() + (eventPlayer.getVerticalFacingAngle() < 0) - 0.5), getTotalTimeElapsed()]
