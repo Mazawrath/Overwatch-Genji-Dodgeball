@@ -1,9 +1,11 @@
 #!mainFile "./Genji-Dodgeball.opy"
+#debug macro so don't need to time deflect:
+##!defineMember isUsingAbility2 isOnGround
 
 settings {
     "main": {
         "modeName": "Genji Dodgeball v7.8.0",
-        "description": "Genji Dodgeball v7.8.0. Developed by Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "description": "Genji Dodgeball v7.8.0. Developed by Mazawrath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -108,6 +110,7 @@ globalvar explosionSoundVolume 44
 globalvar improvedExplosions 45
 globalvar randomExplosionSounds 46
 globalvar finalDuelNuke 47
+globalvar ballDirectionRate 48
 globalvar allowMatchEnd 51
 globalvar passingDamage 52
 globalvar isPassingTeam1 53
@@ -196,7 +199,7 @@ subroutine StartBreak 5
 
 rule "// SETTINGS":
     perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
-    rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
+    rulesetMode = createWorkshopSetting(enum["Modern", "Retro", "Astro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earth/waterbending", "Firebending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 40, 3)
     maxBallSpeed = createWorkshopSetting(int[100:500], "Dodgeball Settings", "Maximum Ball Speed", 500, 4)
@@ -776,6 +779,7 @@ rule "Spawn ball":
     
     ballPosition = circleCenter
     ballDirection = directionTowards(ballPosition, targetedPlayer.getEyePosition())
+    ballDirectionRate = 1.75
     ballSpeed = startingBallSpeed
     ballPlayerMock = false
     ballIsOut = true
@@ -786,8 +790,35 @@ rule "Modern ball motion":
     @Condition ballIsOut == true
     
     chase(ballPosition, ballPosition + ballDirection * ballSpeed, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=ballDirectionRate, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+    #This should remove the terrible client prediction chases have
+    wait(0.016)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Retro ball motion":
+    @Condition rulesetMode == 1
+    @Condition ballIsOut == true
+
+    chase(ballPosition, targetedPlayer.getEyePosition(), rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+
+
+rule "Astro ball motion":
+    @Condition rulesetMode == 2
+    @Condition ballIsOut == true
+
+    chase(ballPosition, updateEveryTick(ballPosition + ballDirection), rate=updateEveryTick(magnitude(ballDirection)), ChaseReeval.DESTINATION_AND_RATE)
+    #ballDirection is the ball's velocity
+    chase(ballDirection, updateEveryTick(ballDirection * 0.93 + targetedPlayer.getEyePosition() - ballPosition), rate=updateEveryTick(sqrt((ballSpeed - max(dotProduct(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition())), 0)) * ballSpeed) * 3), ChaseReeval.DESTINATION_AND_RATE)
+    #ballSpeed is the ball's acceleration coefficient
+    chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+    #Chase client prediction fix
+    wait(0.016)
+    if RULE_CONDITION:
+        goto RULE_START
 
 
 rule "Update ball postiion":
@@ -801,20 +832,12 @@ rule "Update ball postiion":
         goto RULE_START
 
 
-rule "Retro ball motion":
-    @Condition rulesetMode == 1
-    @Condition ballIsOut == true
-
-    chase(ballPosition, targetedPlayer.getEyePosition(), rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
-    chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
-
-
 rule "Ball reaches player":
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
     
-    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode == 0)):
+    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode != 1)):
         DeflectFailed()
         if rulesetMode == 1:
             wait()
@@ -844,7 +867,7 @@ rule "Ball reaches player":
     ballSpeed = min(maxBallSpeed, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    ballDirection = targetedPlayer.getFacingDirection()
+    ballDirection = targetedPlayer.getFacingDirection() * (ballSpeed if rulesetMode == 2 else 1)
     wait(0.001)
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
@@ -857,9 +880,10 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
-    wait(0.032)
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
+    if rulesetMode == 0:
+        ballDirectionRate = 6
+        wait(0.032)
+        ballDirectionRate = 1.75
     # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
     if rulesetMode == 1:
         if RULE_CONDITION:
@@ -871,7 +895,7 @@ rule "Ball reaches player -TEAMS":
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
     
-    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode == 0)):
+    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode != 1)):
         DeflectFailed()
         if rulesetMode == 1:
             wait()
@@ -897,7 +921,7 @@ rule "Ball reaches player -TEAMS":
     ballSpeed = min(500, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    ballDirection = targetedPlayer.getFacingDirection()
+    ballDirection = targetedPlayer.getFacingDirection() * (ballSpeed if rulesetMode == 2 else 1)
     wait(0.001)
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
@@ -915,7 +939,7 @@ rule "Ball reaches player -TEAMS":
         #If the member is the only one left on their team, self pass
         if len([player for player in getLivingPlayers(previousTargetedPlayer.getTeam()) if true]) == 1:
             # Check if using modern rules. Self passing is disabled in retro rules so it's basically a failed deflect.
-            if rulesetMode == 0:
+            if rulesetMode != 1:
                 targetedPlayer = previousTargetedPlayer
             else:
                 DeflectFailed()
@@ -935,9 +959,10 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
-    wait(0.032)
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
+    if rulesetMode == 0:
+        ballDirectionRate = 6
+        wait(0.032)
+        ballDirectionRate = 1.75
     # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
     if rulesetMode == 1:
         if RULE_CONDITION:
@@ -1356,7 +1381,7 @@ rule "dash slow":
 
 rule "Ball bounce off surface":
     @Condition ballIsOut == true
-    @Condition isInLoS(ballPosition, ballPosition + ballDirection * ballSpeed * 0.033, BarrierLos.PASS_THROUGH_BARRIERS) == false
+    @Condition isInLoS(ballPosition, ballPosition + ballDirection * (ballSpeed if rulesetMode != 2 else 1) * 0.033, BarrierLos.PASS_THROUGH_BARRIERS) == false
     @Condition getCurrentMap() != Map.WORKSHOP_CHAMBER
     
     #normal of the plane of the surface with which the ball collides, n
@@ -1374,15 +1399,15 @@ rule "Ball no down when y < -0.5":
     @Condition ballPosition.y < -0.5
     @Condition ballDirection.y < 0
     
-    ballDirection *= vect(1, 0, 1)
+    ballDirection *= vect(1, -1 if rulesetMode == 2 else 0, 1)
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.WHITE, ballPosition, 2)
 
 
 rule "Ball tail effects":
     @Condition not invisibleBall
 
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [i for i in (ballPosition + ballSpeed * ballDirection * localPlayer.latency + ((((min(ballSpeed + 0.25, maxBallSpeed)) * (ballDirection + min(1.75, distance(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) * directionTowards(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()))) - ballSpeed * ballDirection) * localPlayer.latency ** 2) / 2) if targetedPlayer == localPlayer else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 else i for i in (ballPosition + ballSpeed * normalize(ballDirection) * localPlayer.latency if targetedPlayer == localPlayer else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR) 
 
 
 rule "RGB Ball Mode":
@@ -1529,6 +1554,7 @@ rule "Measure Latency":
 rule "Toggle Latency":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.ULTIMATE) == true
+    @Condition rulesetMode != 2
 
     if eventPlayer.latencyToggle:
         eventPlayer.latencyToggle = false
