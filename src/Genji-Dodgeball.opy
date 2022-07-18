@@ -1,9 +1,11 @@
 #!mainFile "./Genji-Dodgeball.opy"
+#debug macro so don't need to time deflect:
+##!defineMember isUsingAbility2 isOnGround
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.7.0",
-        "description": "Genji Dodgeball v7.7.0. Developed by Mazawath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.8.0",
+        "description": "Genji Dodgeball v7.8.0. Developed by Mazawrath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -108,6 +110,7 @@ globalvar explosionSoundVolume 44
 globalvar improvedExplosions 45
 globalvar randomExplosionSounds 46
 globalvar finalDuelNuke 47
+globalvar ballDirectionRate 48
 globalvar allowMatchEnd 51
 globalvar passingDamage 52
 globalvar isPassingTeam1 53
@@ -172,6 +175,8 @@ playervar dashNerf 15
 playervar passingSignal 16
 playervar thirdPerson 17
 playervar yeetPlayer 18
+playervar latency 19
+playervar latencyToggle 20
 
 
 #Subroutine names
@@ -313,7 +318,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.7.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.8.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -497,15 +502,15 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
 
 
 rule "Player falls off Workshop Island":
-    @Disabled
     @Event eachPlayer
     @Hero all
+    @Condition not eventPlayer.isDummy()
     # This rule might no longer be needed...but I'll be dammed if I ever get rid of this rule. 
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     # Ayy nevermind on that last comment it back baby
     @Condition eventPlayer.getPosition().y < -1.5
     
-    wait(5)
+    waitUntil(eventPlayer.getPosition().y >= 1.5 ,5)
     if not RULE_CONDITION:
         return
     smallMessage(getAllPlayers(), "{0} has glitched themselves under the map!".format(eventPlayer))
@@ -774,6 +779,7 @@ rule "Spawn ball":
     
     ballPosition = circleCenter
     ballDirection = directionTowards(ballPosition, targetedPlayer.getEyePosition())
+    ballDirectionRate = 1.75
     ballSpeed = startingBallSpeed
     ballPlayerMock = false
     ballIsOut = true
@@ -783,24 +789,11 @@ rule "Modern ball motion":
     @Condition rulesetMode == 0
     @Condition ballIsOut == true
     
-    prevBallPos2 = prevBallPos
-    prevBallPos = ballPosition
-    chase(ballPosition, ballPosition + ballDirection * ballSpeed * 1, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=1.75, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballPosition, ballPosition + ballDirection * ballSpeed, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
+    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=ballDirectionRate, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
-    wait(0.05)
-    if RULE_CONDITION:
-        goto RULE_START
-
-
-rule "Update ball postiion":
-    @Condition rulesetMode == 1
-    @Condition ballIsOut == true
-
-    # This is for the ball tail to be updated.
-    prevBallPos2 = prevBallPos
-    prevBallPos = ballPosition
-    wait(0.05)
+    #This should remove the terrible client prediction chases have
+    wait(0.016)
     if RULE_CONDITION:
         goto RULE_START
 
@@ -813,12 +806,38 @@ rule "Retro ball motion":
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
 
 
+rule "Astro ball motion":
+    @Condition rulesetMode == 2
+    @Condition ballIsOut == true
+
+    chase(ballPosition, updateEveryTick(ballPosition + ballDirection), rate=updateEveryTick(magnitude(ballDirection)), ChaseReeval.DESTINATION_AND_RATE)
+    #ballDirection is the ball's velocity
+    chase(ballDirection, updateEveryTick(ballDirection * 0.93 + targetedPlayer.getEyePosition() - ballPosition), rate=updateEveryTick(sqrt((ballSpeed - max(dotProduct(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition())), 0)) * ballSpeed) * 3), ChaseReeval.DESTINATION_AND_RATE)
+    #ballSpeed is the ball's acceleration coefficient
+    chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
+    #Chase client prediction fix
+    wait(0.016)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Update ball postiion":
+    @Condition ballIsOut == true
+
+    # This is for the ball tail to be updated.
+    prevBallPos2 = prevBallPos
+    prevBallPos = ballPosition
+    wait(0.05)
+    if RULE_CONDITION:
+        goto RULE_START
+
+
 rule "Ball reaches player":
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
     
-    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode == 0)):
+    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode != 1)):
         DeflectFailed()
         if rulesetMode == 1:
             wait()
@@ -848,7 +867,7 @@ rule "Ball reaches player":
     ballSpeed = min(maxBallSpeed, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    ballDirection = targetedPlayer.getFacingDirection()
+    ballDirection = targetedPlayer.getFacingDirection() * (ballSpeed if rulesetMode == 2 else 1)
     wait(0.001)
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
@@ -861,7 +880,10 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+    if rulesetMode == 0:
+        ballDirectionRate = 6
+        wait(0.032)
+        ballDirectionRate = 1.75
     # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
     if rulesetMode == 1:
         if RULE_CONDITION:
@@ -873,7 +895,7 @@ rule "Ball reaches player -TEAMS":
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
     
-    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode == 0)):
+    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode != 1)):
         DeflectFailed()
         if rulesetMode == 1:
             wait()
@@ -899,7 +921,7 @@ rule "Ball reaches player -TEAMS":
     ballSpeed = min(500, ballSpeed * 1.05)
     if ballSpeed > targetedPlayer.maxBallSpeed:
         targetedPlayer.maxBallSpeed = ballSpeed
-    ballDirection = targetedPlayer.getFacingDirection()
+    ballDirection = targetedPlayer.getFacingDirection() * (ballSpeed if rulesetMode == 2 else 1)
     wait(0.001)
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
@@ -917,7 +939,7 @@ rule "Ball reaches player -TEAMS":
         #If the member is the only one left on their team, self pass
         if len([player for player in getLivingPlayers(previousTargetedPlayer.getTeam()) if true]) == 1:
             # Check if using modern rules. Self passing is disabled in retro rules so it's basically a failed deflect.
-            if rulesetMode == 0:
+            if rulesetMode != 1:
                 targetedPlayer = previousTargetedPlayer
             else:
                 DeflectFailed()
@@ -937,7 +959,10 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=6, ChaseReeval.DESTINATION_AND_RATE)
+    if rulesetMode == 0:
+        ballDirectionRate = 6
+        wait(0.032)
+        ballDirectionRate = 1.75
     # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
     if rulesetMode == 1:
         if RULE_CONDITION:
@@ -1356,13 +1381,13 @@ rule "dash slow":
 
 rule "Ball bounce off surface":
     @Condition ballIsOut == true
-    @Condition raycast(ballPosition, ballPosition + ballDirection * ballSpeed * 0.033, null, getAllPlayers(), false).getHitPosition() != ballPosition + ballDirection * ballSpeed * 0.033
+    @Condition isInLoS(ballPosition, ballPosition + ballDirection * (ballSpeed if rulesetMode != 2 else 1) * 0.033, BarrierLos.PASS_THROUGH_BARRIERS) == false
     @Condition getCurrentMap() != Map.WORKSHOP_CHAMBER
     
     #normal of the plane of the surface with which the ball collides, n
     ballCollisionSurfaceNormal = raycast(ballPosition, ballPosition + ballDirection * ballSpeed * 0.066, null, getAllPlayers(), false).getNormal()
     #reflected vector formula --- new v = v - 2 * (v•n)/(n•n) * n
-    ballDirection = ballDirection - 2 * ballDirection * ballCollisionSurfaceNormal / dotProduct(ballCollisionSurfaceNormal, ballCollisionSurfaceNormal) * ballCollisionSurfaceNormal
+    ballDirection -= 2 * ballDirection * ballCollisionSurfaceNormal / dotProduct(ballCollisionSurfaceNormal, ballCollisionSurfaceNormal) * ballCollisionSurfaceNormal
     playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.WHITE, ballPosition, 1)
     wait(0.02)
     if RULE_CONDITION:
@@ -1374,92 +1399,15 @@ rule "Ball no down when y < -0.5":
     @Condition ballPosition.y < -0.5
     @Condition ballDirection.y < 0
     
-    ballDirection *= vect(1, 0, 1)
+    ballDirection *= vect(1, -1 if rulesetMode == 2 else 0, 1)
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.WHITE, ballPosition, 2)
 
 
-rule "Ball change color":
+rule "Ball tail effects":
     @Condition not invisibleBall
 
-    #if ballColor != 0 and ballSpeed < 20 and true:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 0
-    #elif ballColor != 1 and ballSpeed >= 20 and ballSpeed < 25:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.GREEN, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.GREEN, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.GREEN, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 1
-    #elif ballColor != 2 and ballSpeed >= 25 and ballSpeed < 30:
-    # destroyEffect(ballSmoke)
-    # destroyEffect(ballTail1)
-    # destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.YELLOW, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    switch ballTailColor:
-        case 0:
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            break
-        case 1:
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.YELLOW, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.YELLOW, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            break
-        case 2:
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, ballTail1, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, ballTail2, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
-            break
-        default:
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.SKY_BLUE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-
-    #elif ballColor != 3 and ballSpeed >= 30 and ballSpeed < 35:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.ORANGE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.ORANGE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.ORANGE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 3
-    #elif ballColor != 4 and ballSpeed >= 35 and ballSpeed < 55:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.RED, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.RED, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 4
-    #elif ballColor != 5 and ballSpeed >= 55 and true:
-    #destroyEffect(ballSmoke)
-    #destroyEffect(ballTail1)
-    #destroyEffect(ballTail2)
-    #createEffect(getAllPlayers(), Effect.BAD_AURA, Color.PURPLE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballSmoke = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, ballPosition, Color.PURPLE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail1 = getLastCreatedEntity()
-    #createBeam(getAllPlayers(), Beam.BAD, prevBallPos, prevBallPos2, Color.PURPLE, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #ballTail2 = getLastCreatedEntity()
-    #ballColor = 5
-    #__end__()
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 else i for i in (ballPosition + ballSpeed * normalize(ballDirection) * localPlayer.latency if targetedPlayer == localPlayer and ballSpawnCountdown == 0 else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR) 
 
 
 rule "RGB Ball Mode":
@@ -1587,3 +1535,31 @@ rule "3rd person respawn":
     @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+
+
+rule "Measure Latency":
+    @Event eachPlayer
+    @Condition roundInProgress == true
+    
+    if not eventPlayer.latencyToggle or eventPlayer.isCommunicatingEmote():
+        eventPlayer.latency = 0
+        return
+    eventPlayer.latency = [angleToDirection(eventPlayer.getHorizontalFacingAngle(), eventPlayer.getVerticalFacingAngle() + (eventPlayer.getVerticalFacingAngle() < 0) - 0.5), getTotalTimeElapsed()]
+    eventPlayer.startFacing(eventPlayer.latency[0], 100000, Relativity.TO_PLAYER, FacingReeval.NONE)
+    waitUntil(eventPlayer.latency[0] == updateEveryTick(eventPlayer.getFacingDirection()), 99999)
+    eventPlayer.stopFacing()
+    eventPlayer.latency = ((getTotalTimeElapsed() - eventPlayer.latency.last()) * 0.5) * createWorkshopSetting(float[0:1], "Visual Settings", "Client Prediction Amount", 1, 4)
+
+
+rule "Toggle Latency":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.ULTIMATE) == true
+    @Condition rulesetMode != 2
+
+    if eventPlayer.latencyToggle:
+        eventPlayer.latencyToggle = false
+        smallMessage(eventPlayer, "Lag compensation disabled for next round")
+    else:
+        eventPlayer.latencyToggle = true
+        smallMessage(eventPlayer, "Lag compensation enabled for next round")
+    wait(0.5)

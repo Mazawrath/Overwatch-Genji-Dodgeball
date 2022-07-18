@@ -37,9 +37,9 @@ def StartBreak():
     wait(1)
     bigMessage(getAllPlayers(), "Weapons activated")
     wait(2)
-    smallMessage(getAllPlayers(), "Press reload to pick up a torb")
+    smallMessage(getAllPlayers(), "Press {0} to pick up a torb".format(buttonString(Button.RELOAD)))
     wait(2)
-    smallMessage(getAllPlayers(), "Press reload again to yeet them!")
+    smallMessage(getAllPlayers(), "Press {0} again to yeet them!".format(buttonString(Button.RELOAD)))
     waitUntil(ballSpawnCountdown <= 10, 9999)
     breakInProgress = false
     if getCurrentGamemode() == Gamemode.FFA:
@@ -129,3 +129,14 @@ rule "Get knocked down by yeeted Torb":
     @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0] != eventPlayer.yeetPlayer
 
     eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1.5)
+
+
+# rule "Player leaves during tourney":
+#     @Disabled
+    
+#     @Event playerLeft
+#     @Condition tournamentMode
+#     @Condition not eventPlayer.isDummy()
+
+#     smallMessage(hostPlayer, "{0}, Kills: {1}, Deaths {2}. slot {3}".format(eventPlayer, eventPlayer.getNumberOfElims(), eventPlayer.getNumberOfDeaths(), eventPlayer.getSlot()))
+#     hudSubtext(hostPlayer, "{0}, Kills: {1}, Deaths {2}".format(eventPlayer, eventPlayer.getNumberOfElims(), eventPlayer.getNumberOfDeaths()), HudPosition.RIGHT, -1, Color.WHITE, HudReeval.NONE, SpecVisibility.NEVER)
