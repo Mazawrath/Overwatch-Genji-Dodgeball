@@ -793,7 +793,7 @@ rule "Modern ball motion":
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=ballDirectionRate, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
     #This should remove the terrible client prediction chases have
-    wait(0.016)
+    wait(0.05)
     if RULE_CONDITION:
         goto RULE_START
 
