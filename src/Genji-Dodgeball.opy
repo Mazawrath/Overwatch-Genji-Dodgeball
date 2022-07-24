@@ -793,7 +793,7 @@ rule "Modern ball motion":
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=ballDirectionRate, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
     #This should remove the terrible client prediction chases have
-    wait(0.016)
+    wait(0.064)
     if RULE_CONDITION:
         goto RULE_START
 
@@ -1406,7 +1406,7 @@ rule "Ball no down when y < -0.5":
 rule "Ball tail effects":
     @Condition not invisibleBall
 
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 else i for i in (ballPosition + ballSpeed * normalize(ballDirection) * localPlayer.latency if targetedPlayer == localPlayer and ballSpawnCountdown == 0 else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 and localPlayer.isAlive() else i for i in (ballPosition + ballSpeed * normalize(ballDirection) * localPlayer.latency if targetedPlayer == localPlayer and ballSpawnCountdown == 0 else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
     createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR) 
 
 
