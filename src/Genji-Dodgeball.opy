@@ -1,6 +1,6 @@
 #!mainFile "./Genji-Dodgeball.opy"
 #debug macro so don't need to time deflect:
-##!defineMember isUsingAbility2 isOnGround
+#!defineMember isUsingAbility2 isOnGround
 
 settings {
     "main": {
@@ -1403,13 +1403,6 @@ rule "Ball no down when y < -0.5":
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.WHITE, ballPosition, 2)
 
 
-rule "Ball tail effects":
-    @Condition not invisibleBall
-
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 and localPlayer.isAlive() else i for i in (ballPosition + ballSpeed * normalize(ballDirection) * localPlayer.latency if targetedPlayer == localPlayer and ballSpawnCountdown == 0 else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR) 
-
-
 rule "RGB Ball Mode":
     @Condition ballTailColor == 2
     @Condition ballIsOut
@@ -1563,3 +1556,19 @@ rule "Toggle Latency":
         eventPlayer.latencyToggle = true
         smallMessage(eventPlayer, "Lag compensation enabled for next round")
     wait(0.5)
+
+
+rule "bots":
+    @Condition getNumberOfPlayers(Team.ALL) < 3
+
+    createDummy(Hero.GENJI, Team.ALL, -1, Vector.UP, Vector.UP)
+    wait()
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "am bot":
+    @Event eachPlayer
+    @Condition eventPlayer.isDummy()
+
+    eventPlayer.startFacing(Vector.LEFT,180,Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
