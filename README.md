@@ -1,5 +1,5 @@
 # Overwatch-Genji-Dodgeball
-**Current Version: v7.8.0**  
+**Current Version: v7.8.1**  
 **Deathmatch Code: DYNZ3**
 
 Genji Dodgeball is a minigame inspired by the TF2 game pyro dodgeball.
