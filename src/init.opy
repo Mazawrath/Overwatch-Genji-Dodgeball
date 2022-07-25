@@ -159,12 +159,7 @@ rule "Create global HUD elements":
     #hudSubtext(getAllPlayers(), "Deflect or Dash will deflect the ball to an enemy", HudPosition.RIGHT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #hudSubtext(getAllPlayers(), "If you get hit, you die.  Last man standing wins!", HudPosition.RIGHT, -9, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #ball speed text color change with speed
-    hudSubtext([player for player in getAllPlayers() if ballSpeed < 20], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.BLUE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed >= 20 and ballSpeed < 25], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.GREEN, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed >= 25 and ballSpeed < 30], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.YELLOW, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed >= 30 and ballSpeed < 35], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.ORANGE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed >= 35 and ballSpeed < 55], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed > 55], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudSubtext(getAllPlayers(), "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, rgb(min(2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed), 200) + 55 * (ballSpeed != maxBallSpeed), max(55, min(455 - 2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed), 255)), max(55, 500 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 245)), HudReeval.VISIBILITY_STRING_AND_COLOR, SpecVisibility.DEFAULT)
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     if watermarkEnabled:
         hudSubtext(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
