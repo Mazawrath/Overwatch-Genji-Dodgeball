@@ -1,6 +1,6 @@
 #!mainFile "./Genji-Dodgeball.opy"
 #debug macro so don't need to time deflect:
-#!defineMember isUsingAbility2 isOnGround
+##!defineMember isUsingAbility2 isOnGround
 
 settings {
     "main": {
@@ -1556,19 +1556,3 @@ rule "Toggle Latency":
         eventPlayer.latencyToggle = true
         smallMessage(eventPlayer, "Lag compensation enabled for next round")
     wait(0.5)
-
-
-rule "bots":
-    @Condition getNumberOfPlayers(Team.ALL) < 3
-
-    createDummy(Hero.GENJI, Team.ALL, -1, Vector.UP, Vector.UP)
-    wait()
-    if RULE_CONDITION:
-        goto RULE_START
-
-
-rule "am bot":
-    @Event eachPlayer
-    @Condition eventPlayer.isDummy()
-
-    eventPlayer.startFacing(Vector.LEFT,180,Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
