@@ -1,5 +1,8 @@
 #!mainFile "./Genji-Dodgeball.opy"
 
+#This seems to be the only way of differentiating specs from players(except for the Japanese and Taiwanese, sorry!):
+#!define isSpectator(player) not (player in getAllPlayers() or strContains("$#@{0}".format(player), "$#@{0} ".format(entityReference.split(" "))))
+
 rule "Init player variables":
     @Event eachPlayer
     @Hero all
@@ -116,6 +119,9 @@ rule "Init global variables":
     if rulesetMode == 1 and passingEnabled and getCurrentGamemode() == Gamemode.FFA:
         passingEnabled = false
         hudSubtext(hostPlayer, "Hi host. Very clever idea but sorry retro rules totally breaks self passing. Like, what do you think it can even do? The ball can only go in a straight direction and self passing sends the ball away from you and then curves around so in this case where would it even go? In your head. That's where it goes. I tested it. So you don't have to.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+    createEffect([], Effect.SPHERE, false, Vector.DOWN, false, EffectReeval.NONE)
+    destroyEffect(getLastCreatedEntity())
+    entityReference = getLastCreatedEntity()
 
 
 rule "Create game sphere":
@@ -131,14 +137,14 @@ rule "Create global HUD elements":
     # hudText(getAllPlayers(), null, null, "BETA BUILD - NOT FULLY TESTED - CHANGES ARE NOT FINAL", HudPosition.LEFT, -20, null, null, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     if getCurrentGamemode() == Gamemode.FFA:
         #white normal
-        hudSubtext([player for player in getAllPlayers() if player != targetedPlayer], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+        hudSubtext(getAllPlayers().exclude(targetedPlayer) if localPlayer in getAllPlayers() else [], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     if getCurrentGamemode() == Gamemode.TDM:
         #white normal
         hudSubtext([player for player in getAllPlayers() if player != targetedPlayer and player.getTeam() != targetedPlayer.getTeam()], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
         #sky blue targeting teammate
         hudSubtext([player for player in getAllPlayers() if player != targetedPlayer and player.getTeam() == targetedPlayer.getTeam()], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.SKY_BLUE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #red when you're targeted
-    hudSubtext(targetedPlayer, "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudSubtext(targetedPlayer if localPlayer in getAllPlayers() else [], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudText(getDeadPlayers(Team.ALL), "Waiting for next round", "You have been eliminated or joined during a round", "You will spawn once the next round starts", HudPosition.TOP, 2, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     if bouncepadDashingEnabled or cooldownDashingEnabled:
         goto lbl_0
@@ -159,17 +165,12 @@ rule "Create global HUD elements":
     #hudSubtext(getAllPlayers(), "Deflect or Dash will deflect the ball to an enemy", HudPosition.RIGHT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #hudSubtext(getAllPlayers(), "If you get hit, you die.  Last man standing wins!", HudPosition.RIGHT, -9, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #ball speed text color change with speed
-    hudSubtext([player for player in getAllPlayers() if ballSpeed < 20], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.BLUE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed >= 20 and ballSpeed < 25], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.GREEN, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed >= 25 and ballSpeed < 30], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.YELLOW, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed >= 30 and ballSpeed < 35], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.ORANGE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed >= 35 and ballSpeed < 55], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudSubtext([player for player in getAllPlayers() if ballSpeed > 55], "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudSubtext(getAllPlayers(), "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, rgb(max(0,min(4000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 200, 200)) + 55 * (ballSpeed != maxBallSpeed), max(55, min(455 - 2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed), 255)) + min(2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 100, 0), max(55, 500 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 245) - min(1600000 / 27 / (maxBallSpeed - ballSpawnSpeed)**3 * (ballSpeed - ballSpawnSpeed)**3 - 200, 0)), HudReeval.VISIBILITY_STRING_AND_COLOR, SpecVisibility.DEFAULT)
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     if watermarkEnabled:
         hudSubtext(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     createInWorldText([player for player in getAllPlayers() if ballSpawnCountdown != 0 and player != targetedPlayer], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
-    createInWorldText([player for player in targetedPlayer if ballSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.RED, SpecVisibility.DEFAULT)
+    createInWorldText([player for player in targetedPlayer if ballSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), updateEveryTick(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z) + directionTowards(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), targetedPlayer.getEyePosition()) / 50), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, rgb(255 , 50, 50), SpecVisibility.DEFAULT)
     if rulesetMode == 1:
         if getCurrentGamemode() == Gamemode.FFA:
             hudSubtext(getAllPlayers(), "Retro ruleset. Dash deflecting is disabled.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
@@ -190,7 +191,7 @@ rule "Create player HUD elements":
     @Hero all
     @Condition rulesetMode != 2
 
-    hudSubheader(eventPlayer, "Lag compensation [{0}]: {1}".format(buttonString(Button.ULTIMATE), "On" if eventPlayer.latencyToggle else "Off"), HudPosition.LEFT, 1, Color.WHITE, HudReeval.STRING, SpecVisibility.NEVER)
+    hudSubheader(eventPlayer if localPlayer in getAllPlayers() else [], "Lag compensation [{0}]: {1}".format(buttonString(Button.ULTIMATE), "On" if eventPlayer.latencyToggle else "Off"), HudPosition.LEFT, 1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.NEVER)
     #hudText(eventPlayer, eventPlayer.playerDeflects, "Deflects", null, HudPosition.LEFT, 1, Color.YELLOW, Color.WHITE, Color.YELLOW, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #eventPlayer.playerUI[1] = getLastCreatedEntity()
     #hudText(eventPlayer, eventPlayer.playerKills, "Kills", null, HudPosition.LEFT, 2, Color.ORANGE, Color.WHITE, Color.ORANGE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
@@ -246,12 +247,15 @@ rule "Create ball & targeted effect":
     
     if not ballHero:
         #Orb for when ball is not getting passed
-        createEffect(getAllPlayers().exclude(targetedPlayer), Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(targetedPlayer, Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(targetedPlayer if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(targetedPlayer if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(targetedPlayer, Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(getAllPlayers().exclude(targetedPlayer) if isPassingTeam1 or isPassingTeam2 else [], Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick(targetedPlayer if localPlayer in getAllPlayers() and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick(targetedPlayer if localPlayer in getAllPlayers() and not (localPlayer.isAlive() and localPlayer.latencyToggle) else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if isPassingTeam1 or isPassingTeam2 else []), Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)]), Effect.GOOD_AURA, Color.SKY_BLUE, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
 
 
 rule "Create ball & targeted effect - TEAMS":
@@ -260,14 +264,37 @@ rule "Create ball & targeted effect - TEAMS":
     @Condition not invisibleBall
     
     #Team A standard targeting Team B ball
-    createEffect([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() != player.getTeam()], Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() != player.getTeam()] if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() != player.getTeam()] if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     #Team A standard targeting Team A ball
-    createEffect([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() == player.getTeam()], Effect.ORB, Color.SKY_BLUE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() == player.getTeam()] if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.SKY_BLUE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() == player.getTeam()] if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.SKY_BLUE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(targetedPlayer, Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(targetedPlayer, Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(getAllPlayers().exclude(targetedPlayer) if isPassingTeam1 or isPassingTeam2 else [], Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick(targetedPlayer if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick(targetedPlayer if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick(targetedPlayer if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick(targetedPlayer if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if (isPassingTeam1 or isPassingTeam2) and not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if (isPassingTeam1 or isPassingTeam2) and not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.GOOD_AURA, Color.SKY_BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(targetedPlayer + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+
+
+rule "Ball tail effects":
+    @Condition not invisibleBall
+
+    createBeam(updateEveryTick(getAllPlayers() if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 else i for i in (ballPosition + ballSpeed * normalize(ballDirection) * localPlayer.latency if targetedPlayer == localPlayer and ballSpawnCountdown == 0 else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    createBeam(updateEveryTick([not (not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle)]), Beam.BAD, prevBallPos, ballPosition, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR) 
+
+
+rule "Spectator effects and HUD":
+    hudSubtext(updateEveryTick([isSpectator(localPlayer)]), "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    createInWorldText(updateEveryTick([ballSpawnCountdown != 0 and isSpectator(localPlayer)]), "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
+    if ballHero or invisibleBall:
+        return
+    waitUntil(isGameInProgress(), 99999)
+    createEffect(updateEveryTick([isSpectator(localPlayer)]), Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+     
 
 rule "Set time to 0 if teams and game end disabled":
     @Condition getCurrentGamemode() == Gamemode.TDM

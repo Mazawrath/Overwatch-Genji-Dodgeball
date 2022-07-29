@@ -4,8 +4,8 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.8.0",
-        "description": "Genji Dodgeball v7.8.0. Developed by Mazawrath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.8.1",
+        "description": "Genji Dodgeball v7.8.1. Developed by Mazawrath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -111,6 +111,7 @@ globalvar improvedExplosions 45
 globalvar randomExplosionSounds 46
 globalvar finalDuelNuke 47
 globalvar ballDirectionRate 48
+globalvar entityReference 49
 globalvar allowMatchEnd 51
 globalvar passingDamage 52
 globalvar isPassingTeam1 53
@@ -198,7 +199,7 @@ subroutine StartBreak 5
 
 
 rule "// SETTINGS":
-    perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
+    perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 2, 0)
     rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earth/waterbending", "Firebending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 40, 3)
@@ -318,7 +319,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.8.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.8.1".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -793,7 +794,7 @@ rule "Modern ball motion":
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=ballDirectionRate, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
     #This should remove the terrible client prediction chases have
-    wait(0.016)
+    wait(0.05)
     if RULE_CONDITION:
         goto RULE_START
 
@@ -1403,13 +1404,6 @@ rule "Ball no down when y < -0.5":
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.WHITE, ballPosition, 2)
 
 
-rule "Ball tail effects":
-    @Condition not invisibleBall
-
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos, [updateEveryTick(i) if distance(localPlayer.getEyePosition(), i) < 17.8 else i for i in (ballPosition + ballSpeed * normalize(ballDirection) * localPlayer.latency if targetedPlayer == localPlayer and ballSpawnCountdown == 0 else ballPosition)], [Color.SKY_BLUE, Color.YELLOW, ballTail1][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
-    createBeam(getAllPlayers(), Beam.BAD, prevBallPos2, prevBallPos, [Color.SKY_BLUE, Color.YELLOW, ballTail2][ballTailColor], EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR) 
-
-
 rule "RGB Ball Mode":
     @Condition ballTailColor == 2
     @Condition ballIsOut
@@ -1508,6 +1502,7 @@ rule "Maximum amount of rounds reached":
 
 rule "Toggle 3rd person":
     @Event eachPlayer
+    @Condition not breakInProgress
     @Condition eventPlayer.isHoldingButton(Button.RELOAD) == true
     @Condition eventPlayer.isAlive() == true
     @Condition perspectiveMode == 2
