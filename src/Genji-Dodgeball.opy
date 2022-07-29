@@ -111,6 +111,7 @@ globalvar improvedExplosions 45
 globalvar randomExplosionSounds 46
 globalvar finalDuelNuke 47
 globalvar ballDirectionRate 48
+globalvar entityReference 49
 globalvar allowMatchEnd 51
 globalvar passingDamage 52
 globalvar isPassingTeam1 53
