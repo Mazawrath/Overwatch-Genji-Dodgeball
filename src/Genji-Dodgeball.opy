@@ -1502,6 +1502,7 @@ rule "Maximum amount of rounds reached":
 
 rule "Toggle 3rd person":
     @Event eachPlayer
+    @Condition not breakInProgress
     @Condition eventPlayer.isHoldingButton(Button.RELOAD) == true
     @Condition eventPlayer.isAlive() == true
     @Condition perspectiveMode == 2
