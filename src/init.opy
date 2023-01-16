@@ -137,14 +137,14 @@ rule "Create global HUD elements":
     # hudText(getAllPlayers(), null, null, "BETA BUILD - NOT FULLY TESTED - CHANGES ARE NOT FINAL", HudPosition.LEFT, -20, null, null, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     if getCurrentGamemode() == Gamemode.FFA:
         #white normal
-        hudSubtext(getAllPlayers().exclude(targetedPlayer) if localPlayer in getAllPlayers() else [], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+        hudSubheader(getAllPlayers().exclude(targetedPlayer) if localPlayer in getAllPlayers() else [], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     if getCurrentGamemode() == Gamemode.TDM:
         #white normal
-        hudSubtext([player for player in getAllPlayers() if player != targetedPlayer and player.getTeam() != targetedPlayer.getTeam()], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+        hudSubheader([player for player in getAllPlayers() if player != targetedPlayer and player.getTeam() != targetedPlayer.getTeam()], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
         #sky blue targeting teammate
-        hudSubtext([player for player in getAllPlayers() if player != targetedPlayer and player.getTeam() == targetedPlayer.getTeam()], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.SKY_BLUE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+        hudSubheader([player for player in getAllPlayers() if player != targetedPlayer and player.getTeam() == targetedPlayer.getTeam()], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.SKY_BLUE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #red when you're targeted
-    hudSubtext(targetedPlayer if localPlayer in getAllPlayers() else [], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudSubheader(targetedPlayer if localPlayer in getAllPlayers() else [], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudText(getDeadPlayers(Team.ALL), "Waiting for next round", "You have been eliminated or joined during a round", "You will spawn once the next round starts", HudPosition.TOP, 2, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     if bouncepadDashingEnabled or cooldownDashingEnabled:
         goto lbl_0
@@ -168,22 +168,22 @@ rule "Create global HUD elements":
     hudSubtext(getAllPlayers(), "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, rgb(max(0,min(4000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 200, 200)) + 55 * (ballSpeed != maxBallSpeed), max(55, min(455 - 2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed), 255)) + min(2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 100, 0), max(55, 500 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 245) - min(1600000 / 27 / (maxBallSpeed - ballSpawnSpeed)**3 * (ballSpeed - ballSpawnSpeed)**3 - 200, 0)), HudReeval.VISIBILITY_STRING_AND_COLOR, SpecVisibility.DEFAULT)
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     if watermarkEnabled:
-        hudSubtext(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+        hudSubheader(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     createInWorldText([player for player in getAllPlayers() if ballSpawnCountdown != 0 and player != targetedPlayer], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
     createInWorldText([player for player in targetedPlayer if ballSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), updateEveryTick(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z) + directionTowards(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), targetedPlayer.getEyePosition()) / 50), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, rgb(255 , 50, 50), SpecVisibility.DEFAULT)
     if rulesetMode == 1:
         if getCurrentGamemode() == Gamemode.FFA:
-            hudSubtext(getAllPlayers(), "Retro ruleset. Dash deflecting is disabled.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+            hudSubheader(getAllPlayers(), "Retro ruleset. Dash deflecting is disabled.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
         else:
-            hudSubtext(getAllPlayers(), "Retro ruleset. Dash deflecting & self passing are disabled.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+            hudSubheader(getAllPlayers(), "Retro ruleset. Dash deflecting & self passing are disabled.", HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
             
     if passingEnabled and rulesetMode == 0:
         if getCurrentGamemode() == Gamemode.TDM:
-            hudSubtext(getAllPlayers(), "Hold {0} while deflecting to pass the ball to another teammate!".format(buttonString(Button.SECONDARY_FIRE)), HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+            hudSubheader(getAllPlayers(), "Hold {0} while deflecting to pass the ball to another teammate!".format(buttonString(Button.SECONDARY_FIRE)), HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
         elif getCurrentGamemode() == Gamemode.FFA:
-            hudSubtext(getAllPlayers(), "Hold {0} while deflecting to self pass the ball!".format(buttonString(Button.SECONDARY_FIRE)), HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+            hudSubheader(getAllPlayers(), "Hold {0} while deflecting to self pass the ball!".format(buttonString(Button.SECONDARY_FIRE)), HudPosition.RIGHT, 0, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     if tournamentMode:
-        hudSubtext(getAllPlayers(), "Tourney Mode. Rounds Remaining: {0}".format(maxRounds - currentRound + 1), HudPosition.LEFT, -10, Color.AQUA, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+        hudSubheader(getAllPlayers(), "Tourney Mode. Rounds Remaining: {0}".format(maxRounds - currentRound + 1), HudPosition.LEFT, -10, Color.AQUA, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
 
 
 rule "Create player HUD elements":
@@ -288,7 +288,7 @@ rule "Ball tail effects":
 
 
 rule "Spectator effects and HUD":
-    hudSubtext(updateEveryTick([isSpectator(localPlayer)]), "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudSubheader(updateEveryTick([isSpectator(localPlayer)]), "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     createInWorldText(updateEveryTick([ballSpawnCountdown != 0 and isSpectator(localPlayer)]), "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
     if ballHero or invisibleBall:
         return
