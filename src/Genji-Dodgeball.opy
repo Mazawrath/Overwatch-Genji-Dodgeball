@@ -793,11 +793,6 @@ rule "Modern ball motion":
     chase(ballPosition, ballPosition + ballDirection * ballSpeed, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=ballDirectionRate, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
-    #This should remove the terrible client prediction chases have
-    wait(0.05)
-    if RULE_CONDITION:
-        goto RULE_START
-
 
 rule "Retro ball motion":
     @Condition rulesetMode == 1
@@ -881,6 +876,10 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+    if rulesetMode == 0:
+            ballDirectionRate = 6
+            wait(0.05)
+            ballDirectionRate = 1.75
     # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
     if rulesetMode == 1:
         if RULE_CONDITION:
@@ -956,6 +955,10 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+    if rulesetMode == 0:
+        ballDirectionRate = 6
+        wait(0.05)
+        ballDirectionRate = 1.75
     # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
     if rulesetMode == 1:
         if RULE_CONDITION:
