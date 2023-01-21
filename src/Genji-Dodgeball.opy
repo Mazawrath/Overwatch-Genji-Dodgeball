@@ -168,6 +168,7 @@ globalvar stressTorbs 90
 globalvar breakInProgress 91
 globalvar spawnPoints 92
 globalvar gimmickPlayer 93
+globalvar covidTime 94
 
 
 #Player variables
@@ -1196,10 +1197,12 @@ rule "Check for last player surviving":
         StartBreak()
     else:
         ballSpawnCountdown = 5
+    if currentRound == 3:
+        async(CovidTime()   , AsyncBehavior.NOOP)
     if currentRound == 5 or currentRound == 15:
         async(ReinTime(), AsyncBehavior.NOOP)
     if currentRound == 10 or currentRound == 20:
-            async(BedTime(), AsyncBehavior.NOOP)
+        async(BedTime(), AsyncBehavior.NOOP)
     wait(1)
     roundInProgress = true
     if not bouncepadDashingEnabled:
@@ -1625,7 +1628,7 @@ def ReinTime():
     gimmickPlayer.communicate(Comms.HELLO)
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     waitUntil(ballIsOut, 9999)
-    while roundInProgress:
+    while currentRound != 7 or currentRound != 17:
         # gimmickPlayer.setUltCharge(100)
         # gimmickPlayer.forceButtonPress(Button.ULTIMATE)
         if gimmickPlayer.isDead() and len(getPlayersOnHero(playerHero, Team.ALL)) > 2:
@@ -1704,12 +1707,17 @@ def BedTime():
 def CovidTime():
     bigMessage(getAllPlayers(), "Achoo! Think I have a cold guys...")
     wait(0.25)
-    smallMessage(getAllPlayers(), "Oh no! That thing that happened two years ago has finally made it to Overwatch!")
+    smallMessage(getAllPlayers(), "Oh no! That thing that happened three years ago has finally made it to Overwatch!")
+    waitUntil(roundInProgress, 9999)
+    covidTime = true
+    waitUntil(not roundInProgress, 9999)
+    covidTime = false
 
 
 rule "Social Distancing":
     @Event eachPlayer
     @Condition distance(eventPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player != eventPlayer and player.isAlive() and player.getCurrentHero() == playerHero], lambda player: distance(eventPlayer, player))[0]) < 10
+    @Condition covidTime
     
     eventPlayer.maxBallSpeed = sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player != eventPlayer and player.isAlive() and player.getCurrentHero() == playerHero], lambda player: distance(eventPlayer, player))[0]
     eventPlayer.maxBallSpeed.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
