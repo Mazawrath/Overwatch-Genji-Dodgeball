@@ -73,7 +73,7 @@ rule "Init global variables":
     # Set the countdown to be a bit longer to let players who haven't loaded the map yet load in
     setMatchTime(10)
     if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA:
-        ballHero = Hero.TORBJORN
+        ballHero = Hero.HAMMOND
         name = ballHero
     else:
         # No touchy. I'm talking to you, person thinking it's funny to put your name here. Only Torbjörn can steal credit for making my game.
@@ -81,7 +81,7 @@ rule "Init global variables":
         ballHero = null
     # TODO get this working
     # playerHero = [hero for hero in getAllHeroes() if hero != ballHero]
-    playerHero = Hero.GENJI
+    playerHero = Hero.TORBJORN
     bouncePadStrength = 30
     ballSpeed = startingBallSpeed
     ballSpawnSpeed = 30
@@ -191,7 +191,7 @@ rule "Create player HUD elements":
     @Hero all
     @Condition rulesetMode != 2
 
-    hudSubheader(eventPlayer if localPlayer in getAllPlayers() else [], "Lag compensation [{0}]: {1}".format(buttonString(Button.ULTIMATE), "On" if eventPlayer.latencyToggle else "Off"), HudPosition.LEFT, 1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.NEVER)
+    hudSubheader(eventPlayer if localPlayer in getAllPlayers() else [], "Lag o-rama (DO NOT TOUCH!!!!!) [{0}]: {1}".format(buttonString(Button.ULTIMATE), "On" if eventPlayer.latencyToggle else "Off"), HudPosition.LEFT, 1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.NEVER)
     #hudText(eventPlayer, eventPlayer.playerDeflects, "Deflects", null, HudPosition.LEFT, 1, Color.YELLOW, Color.WHITE, Color.YELLOW, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #eventPlayer.playerUI[1] = getLastCreatedEntity()
     #hudText(eventPlayer, eventPlayer.playerKills, "Kills", null, HudPosition.LEFT, 2, Color.ORANGE, Color.WHITE, Color.ORANGE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)

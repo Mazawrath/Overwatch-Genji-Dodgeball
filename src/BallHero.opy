@@ -8,6 +8,7 @@ rule "Create hero ball":
     waitUntil(hostPlayer.hasSpawned(), 9999)
     getPlayersOnHero(ballHero, Team.ALL).startFacing(directionTowards(getPlayersOnHero(ballHero, Team.ALL).getEyePosition(), hostPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     ballPlayer = getPlayersOnHero(ballHero, Team.ALL)[0]
+    ballPlayer.startScalingSize(0.75, false)
     if ballHero == Hero.TORBJORN:
         switch random.randint(1, 21):
             case 1:
@@ -87,6 +88,7 @@ rule "Init hero ball":
     ballPlayer.stopFacing()
     ballPlayer.setGravity(0)
     ballPlayer.disablePlayerCollision()
+    ballPlayer.forceButtonPress(Button.ABILITY_1)
     # ballPlayer.startForcingPosition(updateEveryTick(ballPosition) + vect(0, -1, 0) , true)
     wait(0.5)
     ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)

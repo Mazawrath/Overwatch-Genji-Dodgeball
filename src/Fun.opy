@@ -33,15 +33,11 @@ rule "Hero ball do funny thing":
     #do a funny thing maybe.
     ballHeroRandom = random.randint(0, 100)
     if (ballHeroRandom <= 3):
-        ballPlayer.setStatusEffect(null, Status.FROZEN, random.randint(10, 60))
-    elif (ballHeroRandom >= 5 and ballHeroRandom <= 8):
         ballPlayer.setStatusEffect(null, Status.BURNING, random.randint(10, 60))
-    elif (ballHeroRandom >= 10 and ballHeroRandom <= 13):
-        ballPlayer.setStatusEffect(null, Status.HACKED, random.randint(10, 30))
     if (random.randint(0, 100) <= 10):
         ballPlayer.communicate(Comms.HELLO)
-    if (random.randint(0, 100) <= 5):
-        ballPlayer.forceButtonPress(Button.ABILITY_2)
+    # if (random.randint(0, 100) <= 5):
+    #     ballPlayer.forceButtonPress(Button.ABILITY_2)
     if (random.randint(0, 100) <= 5):
         ballPlayer.startModifyingVoicelinePitch(random.uniform(0, 2), false)
     else:
@@ -57,10 +53,11 @@ def LongFun():
     switch random.randint(1, 11):
         case 1:
             # I think this one is easily my favorite.
+            ballPlayer.forceButtonPress(Button.ABILITY_1)
             ballPlayer.setFacing(vect(0, 0, 0), Relativity.TO_PLAYER)
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 1000, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
             wait(1.5)
-            createInWorldText(getAllPlayers(), "Torbcopter, ready for takeoff.", ballPlayer.getPosition(), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
+            createInWorldText(getAllPlayers(), "Hammondcopter, ready for takeoff.", ballPlayer.getPosition(), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.ORANGE, SpecVisibility.ALWAYS)
             ballHeroRegretText = getLastCreatedText()
             while ballPlayerMock:
                 ballPlayer.applyImpulse(Vector.UP, 5.5, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
@@ -78,6 +75,7 @@ def LongFun():
             ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
             ballPlayer.setWeapon(random.randint(0, 1))
             ballPlayer.forceButtonPress(Button.INTERACT)
+            ballPlayer.forceButtonPress(Button.ABILITY_1)
             break
         case 3:
             # That was so boring that Torb is going to take a nap
@@ -202,7 +200,7 @@ def LongFun():
                 ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), random.choice(getPlayersOnHero(playerHero, Team.ALL)).getEyePosition()), Relativity.TO_WORLD)
                 ballPlayer.communicate(Comms.HELLO)
                 waitUntil(not ballPlayerMock, ballHeroRegretText)
-            ballPlayer.startScalingSize(1, false)
+            ballPlayer.startScalingSize(0.75, false)
             stopChasingVariable(ballHeroRandom)
             stopChasingVariable(ballHeroRegretText)
             stopChasingVariable(ballPlayer.currentUltPercent)
@@ -402,4 +400,5 @@ def ShortFun():
             ballPlayer.setInvisibility(Invis.NONE)
             ballPlayer.stopScalingSize()
             ballPlayer.stopModifyingVoicelinePitch()
+            ballPlayer.startScalingSize(0.75, false)
             break

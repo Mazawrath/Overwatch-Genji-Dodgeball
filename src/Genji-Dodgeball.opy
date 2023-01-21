@@ -51,11 +51,19 @@ settings {
                 "combatUltGen%": 0,
                 "passiveUltGen%": 0
             },
+            "reinhardt": {
+                "ability1Cooldown%": 0,
+                "ability1Kb%": 300,
+                "movementSpeed%": "200"
+            },
             "torbjorn": {
-                "ability2Duration%": 300
+                "enableAbility1": false,
+                "ability2Cooldown%": 30,
+                "ability2Duration%": 8,
+                "weaponsEnabled": "hammer"
             },
             "enabledHeroes": [
-                "genji"
+                "torbjorn"
             ]
         }
     }
@@ -155,6 +163,7 @@ globalvar breakLength 89
 globalvar stressTorbs 90
 globalvar breakInProgress 91
 globalvar spawnPoints 92
+globalvar reinPlayer 93
 
 
 #Player variables
@@ -179,6 +188,7 @@ playervar thirdPerson 17
 playervar yeetPlayer 18
 playervar latency 19
 playervar latencyToggle 20
+playervar canDeflect 21
 
 
 #Subroutine names
@@ -189,6 +199,7 @@ subroutine DeflectFailed 2
 subroutine ShortFun 3
 subroutine LongFun 4
 subroutine StartBreak 5
+subroutine ReinTime 6
 
 
 #Activated extensions
@@ -208,7 +219,7 @@ rule "// SETTINGS":
     endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 5)
     bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 6)
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 7)
-    torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
+    torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 1, 0)
     ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Fun Settings", "Ball Tail Color", 0, 1)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 2)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 3)
@@ -400,15 +411,13 @@ rule "// GAME RULES":
 rule "Shorten Deflect Length":
     @Event eachPlayer
     @Hero all
-    @Condition eventPlayer.isUsingAbility2() == true
+    @Condition eventPlayer.canDeflect == true
     @Condition eventPlayer.isUsingUltimate() == false
     
     wait(0.3)
     eventPlayer.setAbility2Enabled(false)
-    eventPlayer.setAbility1Enabled(false)
     wait(0.5)
     eventPlayer.setAbility2Enabled(true)
-    eventPlayer.setAbility1Enabled(true)
 
 
 rule "Unlock dash after using jumppad":
@@ -424,7 +433,7 @@ rule "Disable dash after using":
     @Event eachPlayer
     @Hero all
     @Condition bouncepadDashingEnabled == true
-    @Condition eventPlayer.isUsingAbility1() == true
+    @Condition eventPlayer.isUsingAbility2() == true
     
     eventPlayer.setAbility1Enabled(false)
     eventPlayer.isDashEnabled = false
@@ -727,29 +736,6 @@ rule "Only end game when there isn't a round in progress":
     enableGamemodeCompletion()
 
 
-rule "primary = dash":
-    @Event eachPlayer
-    @Hero all
-    @Condition not breakInProgress
-    @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) == true
-    @Condition "{0}".format(eventPlayer) != "bytestats"
-    @Condition eventPlayer.getCurrentHero() != ballHero
-    
-    eventPlayer.forceButtonPress(Button.ABILITY_1)
-
-
-rule "secondary = deflect":
-    @Event eachPlayer
-    @Hero all
-    @Condition not breakInProgress
-    @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) == true
-    @Condition "{0}".format(eventPlayer) != "bytestats"
-    @Condition passingEnabled == false
-    @Condition eventPlayer.getCurrentHero() != ballHero
-    
-    eventPlayer.forceButtonPress(Button.ABILITY_2)
-
-
 rule "// ACTIVE GAME":
 
 
@@ -785,6 +771,9 @@ rule "Spawn ball":
     ballSpeed = startingBallSpeed
     ballPlayerMock = false
     ballIsOut = true
+    if not ballPlayer.isUsingAbility1():
+        wait(0.25)
+        ballPlayer.forceButtonPress(Button.ABILITY_1)
 
 
 rule "Modern ball motion":
@@ -834,7 +823,7 @@ rule "Ball reaches player":
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
     
-    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode != 1)):
+    if not(targetedPlayer.canDeflect or (targetedPlayer.isUsingAbility2() and rulesetMode != 1)):
         DeflectFailed()
         if rulesetMode == 1:
             wait()
@@ -850,11 +839,11 @@ rule "Ball reaches player":
                 if RULE_CONDITION:
                     goto RULE_START
             return
+    # if targetedPlayer.isUsingAbility2():
+    #     ballPlayer.setStatusEffect(null, Status.STUNNED, 0.5)
+    # else:
+    #     ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 0.5)
     if targetedPlayer.isUsingAbility2():
-        ballPlayer.setStatusEffect(null, Status.STUNNED, 0.5)
-    else:
-        ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 0.5)
-    if targetedPlayer.isUsingAbility1():
         targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
         targetedPlayer.teleport(ballPosition)
     targetedPlayer.currentUltPercent += 5
@@ -876,7 +865,7 @@ rule "Ball reaches player":
     else:
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
-        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero and player.getCurrentHero() != Hero.REINHARDT], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     if rulesetMode == 0:
             ballDirectionRate = 6
             wait(0.05)
@@ -892,7 +881,7 @@ rule "Ball reaches player -TEAMS":
     @Condition distance(ballPosition, targetedPlayer.getEyePosition()) <= 1.9
     @Condition ballIsOut == true
     
-    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility1() and rulesetMode != 1)):
+    if not(targetedPlayer.isUsingAbility2() or (targetedPlayer.isUsingAbility2() and rulesetMode != 1)):
         DeflectFailed()
         if rulesetMode == 1:
             wait()
@@ -908,7 +897,7 @@ rule "Ball reaches player -TEAMS":
                 if RULE_CONDITION:
                     goto RULE_START
             return
-    if targetedPlayer.isUsingAbility1():
+    if targetedPlayer.isUsingAbility2():
         targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
         targetedPlayer.teleport(ballPosition)
     targetedPlayer.currentUltPercent += 5
@@ -1201,6 +1190,8 @@ rule "Check for last player surviving":
         StartBreak()
     else:
         ballSpawnCountdown = 5
+    if currentRound % 2 == 0:
+        async(ReinTime(), AsyncBehavior.NOOP)
     wait(1)
     roundInProgress = true
     if not bouncepadDashingEnabled:
@@ -1358,22 +1349,28 @@ rule "All players dead failsafe":
     roundInProgress = true
     ballPosition = vect(0, -1, 0)
 
+rule "Allow one melee":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE)
+
+    wait()
+    eventPlayer.canDeflect = true
+    eventPlayer.allowButton(Button.PRIMARY_FIRE)
+    eventPlayer.forceButtonPress(Button.PRIMARY_FIRE)
+    eventPlayer.disallowButton(Button.PRIMARY_FIRE)
+    wait(0.4)
+    eventPlayer.canDeflect = false
+    waitUntil(not eventPlayer.isHoldingButton(Button.PRIMARY_FIRE), 9999)
 
 rule "dash slow":
     @Event eachPlayer
     @Hero all
-    @Condition eventPlayer.isUsingAbility1() == true
+    @Condition eventPlayer.isUsingAbility2() == true
     
-    eventPlayer.dashNerf = true
-    eventPlayer.moveSpeed = 0
-    chase(eventPlayer.moveSpeed, 100, rate=max(eventPlayer.moveSpeed, 16) ** 1.25, ChaseReeval.DESTINATION_AND_RATE)
-    while eventPlayer.moveSpeed != 100:
-        eventPlayer.setMoveSpeed(eventPlayer.moveSpeed)
-        eventPlayer.setGravity(eventPlayer.moveSpeed)
-        wait(0.1)
-    eventPlayer.setMoveSpeed(100)
-    eventPlayer.setGravity(100)
-    eventPlayer.dashNerf = false
+    if eventPlayer.isOnGround():
+        eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+        wait()
+    eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
 
 
 rule "Ball bounce off surface":
@@ -1529,6 +1526,7 @@ rule "3rd person respawn":
 
 
 rule "Measure Latency":
+    @Disabled
     @Event eachPlayer
     @Condition roundInProgress == true
     
@@ -1549,8 +1547,115 @@ rule "Toggle Latency":
 
     if eventPlayer.latencyToggle:
         eventPlayer.latencyToggle = false
-        smallMessage(eventPlayer, "Lag compensation disabled for next round")
+        smallMessage(eventPlayer, "Lag-o-rama disabled, good idea...")
     else:
         eventPlayer.latencyToggle = true
-        smallMessage(eventPlayer, "Lag compensation enabled for next round")
+        smallMessage(eventPlayer, "Lag-o-rama activated! You will regret this!")
     wait(0.5)
+
+rule "Lag-O-Rama":
+    @Event eachPlayer
+    @Condition eventPlayer.latencyToggle
+
+    wait(random.uniform(0.58, 5))
+    if random.randint(1, 100) <= 50:
+        if random.randint(1, 100) <= 75:
+            eventPlayer.teleport(vect(eventPlayer.getPosition().x + random.uniform(-25, 25), eventPlayer.getPosition().y + random.uniform(0, 0.5), eventPlayer.getPosition().z+ random.uniform(-25, 25)))
+        else:
+            eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, random.uniform(0.25, 0.5))
+            wait(random.uniform(0.01, 2.5))
+            eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, random.uniform(0.25, 0.5))
+            wait(random.uniform(0.01, 2.5))
+            eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, random.uniform(0.25, 0.5))
+    wait(random.uniform(0, 2.5))
+    if random.randint(1, 100) <= 50:
+            eventPlayer.setFacing(vect(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)), Relativity.TO_PLAYER)
+    wait(random.uniform(0, 0.5))
+    # Make them spam their deflect!
+    # if random.randint(1, 100) <= 50:
+    #     eventPlayer.forceButtonPress()
+    # wait(random.uniform(5, 15))
+    if RULE_CONDITION:
+        goto RULE_START
+
+
+rule "Tell player controls":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.ABILITY_1)
+
+    smallMessage(eventPlayer, "Here's a tip:")
+    wait(1)
+    smallMessage(eventPlayer, "Primary fire aka swing hammer = deflect")
+    wait(2)
+    smallMessage(eventPlayer, "Ability 2 aka overload = dash")
+    wait(3)
+
+
+rule "Randomly teleport ball":
+
+    waitUntil(ballIsOut, 9999)
+    wait(random.uniform(2, 5))
+    if random.randint(1, 100) <= 50:
+        if not ballIsOut:
+            goto RULE_START
+        playEffect(getAllPlayers(), DynamicEffect.SOMBRA_LOGO_SOUND, Color.WHITE, ballPosition, 500)
+        smallMessage(getAllPlayers(), "Too much skill detected: Randomizing ball location")
+        ballPosition = vect(random.uniform(-35, 35), random.uniform(1, 15), random.uniform(-35, 35))
+    wait(random.uniform(5, 30))
+    goto RULE_START
+
+    
+
+def ReinTime():
+    createDummy(Hero.REINHARDT, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
+    reinPlayer = getPlayersOnHero(Hero.REINHARDT, Team.ALL)[0]
+    reinPlayer.startModifyingVoicelinePitch(0.5, false)
+    reinPlayer.startScalingSize(2, false)
+    wait(0.25)
+    bigMessage(getAllPlayers(), "Oh, hi Reinhart!")
+    wait(0.5)
+    reinPlayer.communicate(Comms.HELLO)
+    reinPlayer.startFacing(directionTowards(reinPlayer.getPosition(), targetedPlayer.getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    waitUntil(ballIsOut, 9999)
+    while roundInProgress:
+        # reinPlayer.setUltCharge(100)
+        # reinPlayer.forceButtonPress(Button.ULTIMATE)
+        if reinPlayer.isDead() and len(getPlayersOnHero(playerHero, Team.ALL)) > 2:
+            wait(0.25)
+            reinPlayer.resurrect()
+        reinPlayer.forceButtonPress(Button.ABILITY_1)
+        
+        waitUntil(not reinPlayer.isUsingAbility1() or not roundInProgress, 9999)
+        wait(0.25)
+        # while reinPlayer.isUsingAbility1():
+        #     reinPlayer.setFacing(directionTowards(reinPlayer.getPosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
+        #     wait()
+    if reinPlayer.isUsingAbility1():
+        reinPlayer.forceButtonPress(Button.ABILITY_1)
+        wait(0.25)
+    wait(0.25)
+    reinPlayer.communicate(Comms.GOODBYE)
+    wait(1)
+    destroyDummy(Team.ALL, reinPlayer.getSlot())
+
+rule "Rein go too far":
+    @Event global
+    @Condition reinPlayer.antiFloatProtection
+    # @Condition reinPlayer.hasStatusEffect(Status)
+
+    reinPlayer.teleport(vect(0, 2, 0))
+    reinPlayer.forceButtonPress(Button.ABILITY_1)
+    
+
+rule "Dummi":
+    @Event global
+
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    
