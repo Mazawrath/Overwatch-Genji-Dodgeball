@@ -54,7 +54,7 @@ settings {
             "reinhardt": {
                 "ability1Cooldown%": 0,
                 "ability1Kb%": 300,
-                "movementSpeed%": "200"
+                "movementSpeed%": "125"
             },
             "torbjorn": {
                 "enableAbility1": false,
@@ -1610,7 +1610,7 @@ def ReinTime():
     createDummy(Hero.REINHARDT, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
     reinPlayer = getPlayersOnHero(Hero.REINHARDT, Team.ALL)[0]
     reinPlayer.startModifyingVoicelinePitch(0.5, false)
-    reinPlayer.startScalingSize(2, false)
+    reinPlayer.startScalingSize(1.1, false)
     wait(0.25)
     bigMessage(getAllPlayers(), "Oh, hi Reinhart!")
     wait(0.5)
@@ -1624,8 +1624,9 @@ def ReinTime():
             wait(0.25)
             reinPlayer.resurrect()
         reinPlayer.forceButtonPress(Button.ABILITY_1)
-        
+        reinPlayer.startThrottleInDirection(directionTowards(reinPlayer.getPosition(), targetedPlayer.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
         waitUntil(not reinPlayer.isUsingAbility1() or not roundInProgress, 9999)
+        reinPlayer.stopThrottleInDirection()
         wait(0.25)
         # while reinPlayer.isUsingAbility1():
         #     reinPlayer.setFacing(directionTowards(reinPlayer.getPosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
@@ -1641,10 +1642,10 @@ def ReinTime():
 rule "Rein go too far":
     @Event global
     @Condition reinPlayer.antiFloatProtection
-    # @Condition reinPlayer.hasStatusEffect(Status)
+    @Condition distance(reinPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(reinPlayer, player))[0]) > 15
 
     reinPlayer.teleport(vect(0, 2, 0))
-    reinPlayer.forceButtonPress(Button.ABILITY_1)
+    # reinPlayer.forceButtonPress(Button.ABILITY_1)
     
 
 rule "Dummi":
