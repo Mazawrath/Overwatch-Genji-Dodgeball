@@ -205,6 +205,7 @@ subroutine LongFun 4
 subroutine StartBreak 5
 subroutine ReinTime 6
 subroutine BedTime 7
+subroutine CovidTime 8
 
 
 #Activated extensions
@@ -1699,6 +1700,23 @@ def BedTime():
     destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
     destroyDummy(Team.ALL, gimmickPlayer[3].getSlot())
 
+
+def CovidTime():
+    bigMessage(getAllPlayers(), "Achoo! Think I have a cold guys...")
+    wait(0.25)
+    smallMessage(getAllPlayers(), "Oh no! That thing that happened two years ago has finally made it to Overwatch!")
+
+
+rule "Social Distancing":
+    @Event eachPlayer
+    @Condition distance(eventPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player != eventPlayer and player.isAlive() and player.getCurrentHero() == playerHero], lambda player: distance(eventPlayer, player))[0]) < 10
+    
+    eventPlayer.maxBallSpeed = sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player != eventPlayer and player.isAlive() and player.getCurrentHero() == playerHero], lambda player: distance(eventPlayer, player))[0]
+    eventPlayer.maxBallSpeed.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.maxBallSpeed.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.maxBallSpeed.getPosition()), 10, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    wait(0.05)
+    if RULE_CONDITION:
+        goto RULE_START
 
 rule "Rein go too far":
     @Event global
