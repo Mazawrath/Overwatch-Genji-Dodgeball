@@ -56,6 +56,10 @@ settings {
                 "ability1Kb%": 300,
                 "movementSpeed%": "125"
             },
+            "ana": {
+                "ability1Cooldown%": 0,
+                "movementSpeed%": "125"
+            },
             "torbjorn": {
                 "enableAbility1": false,
                 "ability2Cooldown%": 30,
@@ -163,7 +167,7 @@ globalvar breakLength 89
 globalvar stressTorbs 90
 globalvar breakInProgress 91
 globalvar spawnPoints 92
-globalvar reinPlayer 93
+globalvar gimmickPlayer 93
 
 
 #Player variables
@@ -200,6 +204,7 @@ subroutine ShortFun 3
 subroutine LongFun 4
 subroutine StartBreak 5
 subroutine ReinTime 6
+subroutine BedTime 7
 
 
 #Activated extensions
@@ -444,7 +449,7 @@ rule "Target random player":
     @Condition targetedPlayer == -1
     
     wait()
-    targetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player != ballPlayer]))
+    targetedPlayer = (random.choice([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() == playerHero]))
 
 
 rule "Push to circle":
@@ -865,7 +870,7 @@ rule "Ball reaches player":
     else:
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
-        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero and player.getCurrentHero() != Hero.REINHARDT], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero and player.getCurrentHero() != gimmickPlayer[0].getCurrentHero()], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     if rulesetMode == 0:
             ballDirectionRate = 6
             wait(0.05)
@@ -1060,7 +1065,7 @@ def UpdatedDeathEffects():
 rule "Final duel":
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isGameInProgress() == true
-    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() != ballHero]) == 2
+    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() == playerHero]) == 2
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
     @Condition not endlessBall
@@ -1149,7 +1154,7 @@ rule "Create passing aura - TEAMS":
 rule "Check for last player surviving":
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isGameInProgress() == true
-    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() != ballHero]) == 1
+    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() == playerHero]) == 1
     @Condition isEnoughPlayersToStart == true
     
     isInFinalDuel = false
@@ -1190,8 +1195,10 @@ rule "Check for last player surviving":
         StartBreak()
     else:
         ballSpawnCountdown = 5
-    if currentRound % 2 == 0:
+    if currentRound == 5 or currentRound == 15:
         async(ReinTime(), AsyncBehavior.NOOP)
+    if currentRound == 10 or currentRound == 20:
+            async(BedTime(), AsyncBehavior.NOOP)
     wait(1)
     roundInProgress = true
     if not bouncepadDashingEnabled:
@@ -1608,44 +1615,97 @@ rule "Randomly teleport ball":
 
 def ReinTime():
     createDummy(Hero.REINHARDT, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
-    reinPlayer = getPlayersOnHero(Hero.REINHARDT, Team.ALL)[0]
-    reinPlayer.startModifyingVoicelinePitch(0.5, false)
-    reinPlayer.startScalingSize(1.1, false)
+    gimmickPlayer = getPlayersOnHero(Hero.REINHARDT, Team.ALL)[0]
+    gimmickPlayer.startModifyingVoicelinePitch(0.5, false)
+    gimmickPlayer.startScalingSize(1.1, false)
     wait(0.25)
     bigMessage(getAllPlayers(), "Oh, hi Reinhart!")
     wait(0.5)
-    reinPlayer.communicate(Comms.HELLO)
-    reinPlayer.startFacing(directionTowards(reinPlayer.getPosition(), targetedPlayer.getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer.communicate(Comms.HELLO)
+    gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     waitUntil(ballIsOut, 9999)
     while roundInProgress:
-        # reinPlayer.setUltCharge(100)
-        # reinPlayer.forceButtonPress(Button.ULTIMATE)
-        if reinPlayer.isDead() and len(getPlayersOnHero(playerHero, Team.ALL)) > 2:
+        # gimmickPlayer.setUltCharge(100)
+        # gimmickPlayer.forceButtonPress(Button.ULTIMATE)
+        if gimmickPlayer.isDead() and len(getPlayersOnHero(playerHero, Team.ALL)) > 2:
             wait(0.25)
-            reinPlayer.resurrect()
-        reinPlayer.forceButtonPress(Button.ABILITY_1)
-        reinPlayer.startThrottleInDirection(directionTowards(reinPlayer.getPosition(), targetedPlayer.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-        waitUntil(not reinPlayer.isUsingAbility1() or not roundInProgress, 9999)
-        reinPlayer.stopThrottleInDirection()
+            gimmickPlayer.resurrect()
+        gimmickPlayer.forceButtonPress(Button.ABILITY_1)
+        gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+        waitUntil(not gimmickPlayer.isUsingAbility1() or not roundInProgress, 9999)
+        gimmickPlayer.stopThrottleInDirection()
         wait(0.25)
-        # while reinPlayer.isUsingAbility1():
-        #     reinPlayer.setFacing(directionTowards(reinPlayer.getPosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
+        # while gimmickPlayer.isUsingAbility1():
+        #     gimmickPlayer.setFacing(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
         #     wait()
-    if reinPlayer.isUsingAbility1():
-        reinPlayer.forceButtonPress(Button.ABILITY_1)
+    if gimmickPlayer.isUsingAbility1():
+        gimmickPlayer.forceButtonPress(Button.ABILITY_1)
         wait(0.25)
     wait(0.25)
-    reinPlayer.communicate(Comms.GOODBYE)
+    gimmickPlayer.communicate(Comms.GOODBYE)
     wait(1)
-    destroyDummy(Team.ALL, reinPlayer.getSlot())
+    destroyDummy(Team.ALL, gimmickPlayer.getSlot())
+
+def BedTime():
+    createDummy(Hero.ANA, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
+    createDummy(Hero.ANA, Team.ALL, 16, vect(0, 0, 0), vect(0, 0, 0))
+    createDummy(Hero.ANA, Team.ALL, 17, vect(0, 0, 0), vect(0, 0, 0))
+    createDummy(Hero.ANA, Team.ALL, 18, vect(0, 0, 0), vect(0, 0, 0))
+    gimmickPlayer = getPlayersOnHero(Hero.ANA, Team.ALL)
+    wait(0.25)
+    bouncePadDistance[0] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()])
+    bouncePadDistance[1] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()])
+    bouncePadDistance[2] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()])
+    bouncePadDistance[3] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()])
+    gimmickPlayer[0].startFacing(directionTowards(gimmickPlayer[0].getPosition(), bouncePadDistance[0].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer[1].startFacing(directionTowards(gimmickPlayer[1].getPosition(), bouncePadDistance[1].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer[2].startFacing(directionTowards(gimmickPlayer[2].getPosition(), bouncePadDistance[2].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer[3].startFacing(directionTowards(gimmickPlayer[3].getPosition(), bouncePadDistance[3].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    wait(0.5)
+    gimmickPlayer.communicate(Comms.HELLO)
+    bigMessage(getAllPlayers(), "Grandma says it's bedtime :(")
+    waitUntil(ballIsOut, 9999)
+    while roundInProgress:
+        gimmickPlayer.clearStatusEffect(Status.ASLEEP)
+        bouncePadDistance[0] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
+        bouncePadDistance[1] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
+        bouncePadDistance[2] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
+        bouncePadDistance[3] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
+        gimmickPlayer[0].startFacing(directionTowards(gimmickPlayer[0].getPosition(), bouncePadDistance[0].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+        gimmickPlayer[1].startFacing(directionTowards(gimmickPlayer[1].getPosition(), bouncePadDistance[1].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+        gimmickPlayer[2].startFacing(directionTowards(gimmickPlayer[2].getPosition(), bouncePadDistance[2].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+        gimmickPlayer[3].startFacing(directionTowards(gimmickPlayer[3].getPosition(), bouncePadDistance[3].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+        wait(random.uniform(0, 0.25))
+        gimmickPlayer[0].forceButtonPress(Button.ABILITY_1)
+        gimmickPlayer[0].communicate(Comms.SORRY)
+        wait(random.uniform(0, 0.25))
+        gimmickPlayer[1].forceButtonPress(Button.ABILITY_1)
+        gimmickPlayer[1].communicate(Comms.GOODBYE)
+        wait(random.uniform(0, 0.25))
+        gimmickPlayer[2].forceButtonPress(Button.ABILITY_1)
+        gimmickPlayer[2].communicate(Comms.THANKS)
+        wait(random.uniform(0, 0.25))
+        gimmickPlayer[3].forceButtonPress(Button.ABILITY_1)
+        gimmickPlayer[3].communicate(Comms.HELLO)
+        waitUntil(not gimmickPlayer.isUsingAbility1(), 9999)
+        wait(random.uniform(1, 2))
+    wait(0.25)
+    gimmickPlayer.resurrect()
+    wait(0.25)
+    gimmickPlayer.communicate(Comms.GOODBYE)
+    wait(1)
+    destroyDummy(Team.ALL, gimmickPlayer[0].getSlot())
+    destroyDummy(Team.ALL, gimmickPlayer[1].getSlot())
+    destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
+    destroyDummy(Team.ALL, gimmickPlayer[3].getSlot())
+
 
 rule "Rein go too far":
     @Event global
-    @Condition reinPlayer.antiFloatProtection
-    @Condition distance(reinPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(reinPlayer, player))[0]) > 15
+    @Condition gimmickPlayer.antiFloatProtection
+    @Condition distance(gimmickPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(gimmickPlayer, player))[0]) > 15
 
-    reinPlayer.teleport(vect(0, 2, 0))
-    # reinPlayer.forceButtonPress(Button.ABILITY_1)
+    gimmickPlayer.teleport(vect(0, 2, 0))
     
 
 rule "Dummi":
