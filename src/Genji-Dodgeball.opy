@@ -19,7 +19,8 @@ settings {
     "gamemodes": {
         "ffa": {
             "enabledMaps": [
-                "workshopIslandNight"
+                "workshopIslandNight",
+                "workshopIsland"
             ],
             "gameLengthInMn": 15,
             "enableSelfInitiatedRespawn": false
