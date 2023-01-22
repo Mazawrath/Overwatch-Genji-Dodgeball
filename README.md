@@ -24,6 +24,7 @@ Special thanks to the following for updating the game and improving it for every
 - u/Blink
 - u/TheRedstoneBlaze
 - ELIMINATED#1572
+- T1mur4TR#6594
 - DazNachbarzkind#2265
 - And everyone else not named here who contributed.
 
