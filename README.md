@@ -18,5 +18,14 @@ I am the founder of this game, although many names have influenced this game.
 I have done 100% of the development of this game for free and I will always do it for free. Please do not be pressured to donate, this is only for if you want to go above and beyond. But if you appreciate what I create, and have funds to spare, I will appreciate any amount that you give.
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Q5Q64CGIL)  
 
+## Credit to others
+Special thanks to the following for updating the game and improving it for everyone:
+- u/FearlessKat
+- u/Blink
+- u/TheRedstoneBlaze
+- ELIMINATED#1572
+- DazNachbarzkind#2265
+- And everyone else not named here who contributed.
+
 ## YouTube Video
 [![YouTube video](http://img.youtube.com/vi/mQmDIZGKKR8/0.jpg)](http://www.youtube.com/watch?v=mQmDIZGKKR8)

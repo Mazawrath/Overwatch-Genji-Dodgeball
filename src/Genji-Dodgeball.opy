@@ -5,7 +5,7 @@
 settings {
     "main": {
         "modeName": "Genji Dodgeball v7.8.1",
-        "description": "Genji Dodgeball v7.8.1. Developed by Mazawrath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "description": "Genji Dodgeball v7.8.1. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
