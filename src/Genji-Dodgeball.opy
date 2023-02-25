@@ -4,7 +4,7 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.9.0",
+        "modeName": "<FG32CD32FF>Genji Dodgeball v7.9.0",
         "description": "Genji Dodgeball v7.9.0. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
