@@ -1197,7 +1197,6 @@ rule "Check for last player surviving":
         bigMessage(getAllPlayers(), "Tiebreaker!")
     if not isEnoughPlayersToStart:
         return
-    roundInProgress = false
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     currentRound += 1
     if currentRound - 1 < maxRounds and (tournamentMode and breaksEnabled and (currentRound - 1) % breakFrequency == 0):
