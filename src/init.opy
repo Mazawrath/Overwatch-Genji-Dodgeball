@@ -192,7 +192,8 @@ rule "Create player HUD elements":
     @Condition rulesetMode != 2
 
     hudSubheader(eventPlayer if localPlayer in getAllPlayers() else [], "Lag compensation [{0}]: {1}".format(buttonString(Button.ULTIMATE), "On" if eventPlayer.latencyToggle else "Off"), HudPosition.LEFT, 1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.NEVER)
-    hudSubheader(eventPlayer if localPlayer in getAllPlayers() else [], "Third person: [{0}]".format(buttonString(Button.RELOAD)), HudPosition.LEFT, 1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.NEVER)
+    if (perspectiveMode == 0):
+        hudSubheader(eventPlayer if localPlayer in getAllPlayers() else [], "Third person: [{0}]".format(buttonString(Button.RELOAD)), HudPosition.LEFT, 1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.NEVER)
     #hudText(eventPlayer, eventPlayer.playerDeflects, "Deflects", null, HudPosition.LEFT, 1, Color.YELLOW, Color.WHITE, Color.YELLOW, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #eventPlayer.playerUI[1] = getLastCreatedEntity()
     #hudText(eventPlayer, eventPlayer.playerKills, "Kills", null, HudPosition.LEFT, 2, Color.ORANGE, Color.WHITE, Color.ORANGE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
