@@ -882,7 +882,7 @@ rule "Ball reaches player":
             wait(0.05)
             ballDirectionRate = 1.75
     # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
-    if rulesetMode == 1:
+    elif rulesetMode == 1:
         if RULE_CONDITION:
             goto RULE_START
 
@@ -961,7 +961,7 @@ rule "Ball reaches player -TEAMS":
         wait(0.05)
         ballDirectionRate = 1.75
     # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
-    if rulesetMode == 1:
+    elif rulesetMode == 1:
         if RULE_CONDITION:
             goto RULE_START
 
