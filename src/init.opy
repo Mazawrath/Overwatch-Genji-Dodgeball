@@ -45,12 +45,12 @@ rule "Init player variables":
     if (ballHero != null):
         eventPlayer.stopFacing()
     # Force 3rd person if it's toggled on.
-    if (perspectiveMode == 1):
+    if (perspectiveMode == 2):
         eventPlayer.thirdPerson = true
         eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
     wait(3)
     smallMessage(eventPlayer, "Press {0} to enable/disable the scoreboard".format(buttonString(Button.INTERACT)))
-    if (perspectiveMode == 2):
+    if (perspectiveMode == 0):
         wait(3)
         smallMessage(eventPlayer, "Press {0} to toggle 1st/3rd person".format(buttonString(Button.RELOAD)))
 

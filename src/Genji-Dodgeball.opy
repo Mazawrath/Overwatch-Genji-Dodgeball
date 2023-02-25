@@ -200,7 +200,7 @@ subroutine StartBreak 5
 
 
 rule "// SETTINGS":
-    perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 2, 0)
+    perspectiveMode = createWorkshopSetting(enum["Toggle 1st/3rd Person", "1st Person", "3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
     rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earth/waterbending", "Firebending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 40, 3)
@@ -1503,7 +1503,7 @@ rule "Toggle 3rd person":
     @Condition not breakInProgress
     @Condition eventPlayer.isHoldingButton(Button.RELOAD) == true
     @Condition eventPlayer.isAlive() == true
-    @Condition perspectiveMode == 2
+    @Condition perspectiveMode == 0
     
     if not eventPlayer.thirdPerson:
         eventPlayer.thirdPerson = true
