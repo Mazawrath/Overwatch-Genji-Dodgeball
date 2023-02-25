@@ -1153,6 +1153,7 @@ rule "Create passing aura - TEAMS":
     @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE)
     @Condition passingEnabled
     @Condition passingAuraToggle
+    @Condition not invisiblePlayers
 
     createEffect([player for player in getPlayers(eventPlayer.getTeam()) if player != eventPlayer and not player.isDead()], Effect.BAD_AURA, Color.SKY_BLUE, eventPlayer.getEyePosition(), 1.5, EffectReeval.POSITION_AND_RADIUS)
     eventPlayer.passingSignal = getLastCreatedEntity()
@@ -1510,7 +1511,10 @@ rule "Toggle 3rd person":
         wait(0.01)
         eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
     else:
-        eventPlayer.stopCamera()
+        if invisiblePlayers:
+            eventPlayer.startCamera(updateEveryTick(eventPlayer.getEyePosition()), updateEveryTick(eventPlayer + eventPlayer.getFacingDirection() * 1000), 0)
+        else:
+            eventPlayer.stopCamera()
         eventPlayer.thirdPerson = false
 
 
@@ -1528,6 +1532,24 @@ rule "3rd person respawn":
     @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+
+
+rule "Player dead 1st person during invisible players":
+    @Event playerDied
+    @Condition invisiblePlayers
+    @Condition not eventPlayer.thirdPerson
+    
+    eventPlayer.stopCamera()
+
+
+rule "1st person respawn during invisible players":
+    @Event eachPlayer
+    @Condition invisiblePlayers
+    @Condition eventPlayer.hasSpawned() == true
+    @Condition roundInProgress == false
+    @Condition not eventPlayer.thirdPerson
+    
+    eventPlayer.startCamera(updateEveryTick(eventPlayer.getEyePosition()), updateEveryTick(eventPlayer + eventPlayer.getFacingDirection() * 1000), 0)
 
 
 rule "Measure Latency":
