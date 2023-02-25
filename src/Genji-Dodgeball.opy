@@ -869,7 +869,8 @@ rule "Ball reaches player":
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
         isPassingTeam1 = true
-        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
+        if not invisiblePlayers:
+            playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
         previousTargetedPlayer.setHealth(passingDamage)
         targetedPlayer = previousTargetedPlayer
@@ -923,7 +924,8 @@ rule "Ball reaches player -TEAMS":
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
         #if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
-        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
+        if not invisiblePlayers:
+            playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
         previousTargetedPlayer.setHealth(passingDamage)
         stopAssist(passingAssistId)
