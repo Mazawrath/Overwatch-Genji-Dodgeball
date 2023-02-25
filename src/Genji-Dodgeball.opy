@@ -1240,6 +1240,7 @@ rule "Team 1 Last Surviving - TEAMS":
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
     bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.1))
     wait(2)
+    roundInProgress = false
     if not tieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
     else:
@@ -1253,7 +1254,6 @@ rule "Team 1 Last Surviving - TEAMS":
     heal(getAllPlayers(), null, 200)
     if not isEnoughPlayersToStart:
         return
-    roundInProgress = false
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
@@ -1293,6 +1293,7 @@ rule "Team 2 Last Surviving - TEAMS":
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
     bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.2))
     wait(2)
+    roundInProgress = false
     if not tieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
     else:
@@ -1306,7 +1307,6 @@ rule "Team 2 Last Surviving - TEAMS":
     heal(getAllPlayers(), null, 200)
     if not isEnoughPlayersToStart:
         return
-    roundInProgress = false
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
