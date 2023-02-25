@@ -1071,6 +1071,7 @@ def UpdatedDeathEffects():
 rule "Final duel":
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isGameInProgress() == true
+    @Condition roundInProgress
     @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() != ballHero]) == 2
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
@@ -1109,6 +1110,7 @@ rule "Final duel":
 rule "Final duel - TEAMS":
     @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition isGameInProgress() == true
+    @Condition roundInProgress
     #@Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved]) == 2
     @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
     @Condition isEnoughPlayersToStart == true
@@ -1182,6 +1184,7 @@ rule "Check for last player surviving":
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
     bigMessage(getAllPlayers(), "{0} has won the round!".format([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero]))
     wait(2)
+    roundInProgress = false
     if not tieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
     else:
