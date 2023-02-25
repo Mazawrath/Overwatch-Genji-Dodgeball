@@ -1206,8 +1206,9 @@ rule "Check for last player surviving":
         StartBreak()
     else:
         ballSpawnCountdown = 5
-    wait(1)
+    wait(0.025)
     roundInProgress = true
+    wait(0.975)
     if not bouncepadDashingEnabled:
         goto lbl_0
     getAllPlayers().isDashEnabled = false
@@ -1259,8 +1260,9 @@ rule "Team 1 Last Surviving - TEAMS":
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
-    wait(1)
+    wait(0.025)
     roundInProgress = true
+    wait(0.975)
     if not bouncepadDashingEnabled:
         goto lbl_0
     getAllPlayers().isDashEnabled = false
@@ -1312,8 +1314,9 @@ rule "Team 2 Last Surviving - TEAMS":
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
-    wait(1)
+    wait(0.025)
     roundInProgress = true
+    wait(0.975)
     if not bouncepadDashingEnabled:
         goto lbl_0
     getAllPlayers().isDashEnabled = false
