@@ -189,6 +189,7 @@ subroutine DeflectFailed 2
 subroutine ShortFun 3
 subroutine LongFun 4
 subroutine StartBreak 5
+subroutine BallCurve 6
 
 
 #Activated extensions
@@ -878,14 +879,7 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    if rulesetMode == 0:
-            ballDirectionRate = 6
-            wait(0.05)
-            ballDirectionRate = 1.75
-    # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
-    elif rulesetMode == 1:
-        if RULE_CONDITION:
-            goto RULE_START
+    async(BallCurve(), AsyncBehavior.RESTART)
 
 
 rule "Ball reaches player -TEAMS":
@@ -958,6 +952,10 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+    async(BallCurve(), AsyncBehavior.RESTART)
+
+
+def BallCurve():
     if rulesetMode == 0:
         ballDirectionRate = 6
         wait(0.05)
