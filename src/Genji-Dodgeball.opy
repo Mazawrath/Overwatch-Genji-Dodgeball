@@ -218,7 +218,7 @@ subroutine BallCurve 9
 
 
 rule "// SETTINGS":
-    perspectiveMode = createWorkshopSetting(enum["Toggle 1st/3rd Person", "1st Person", "3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
+    perspectiveMode = createWorkshopSetting(enum["Toggle 1st/3rd Person", "1st Person", "3rd Person"], "Dodgeball Settings", "Perspective Mode", 1, 0)
     rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earth/waterbending", "Firebending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 40, 3)
