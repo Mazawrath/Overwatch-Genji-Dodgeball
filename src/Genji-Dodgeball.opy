@@ -4,8 +4,8 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.8.1",
-        "description": "Genji Dodgeball v7.8.1. Developed by Mazawrath. Numerous updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, and ELIMINATED#1572. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "<FG32CD32FF>Genji Dodgeball v7.9.0",
+        "description": "Genji Dodgeball v7.9.0. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -19,7 +19,8 @@ settings {
     "gamemodes": {
         "ffa": {
             "enabledMaps": [
-                "workshopIslandNight"
+                "workshopIslandNight",
+                "workshopIsland"
             ],
             "gameLengthInMn": 15,
             "enableSelfInitiatedRespawn": false
@@ -188,6 +189,7 @@ subroutine DeflectFailed 2
 subroutine ShortFun 3
 subroutine LongFun 4
 subroutine StartBreak 5
+subroutine BallCurve 6
 
 
 #Activated extensions
@@ -199,7 +201,7 @@ subroutine StartBreak 5
 
 
 rule "// SETTINGS":
-    perspectiveMode = createWorkshopSetting(enum["1st Person", "3rd Person", "Toggle 1st/3rd Person"], "Dodgeball Settings", "Perspective Mode", 2, 0)
+    perspectiveMode = createWorkshopSetting(enum["Toggle 1st/3rd Person", "1st Person", "3rd Person"], "Dodgeball Settings", "Perspective Mode", 0, 0)
     rulesetMode = createWorkshopSetting(enum["Modern", "Retro"], "Dodgeball Settings", "Genji Dodgeball Ruleset", 0, 1)
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earth/waterbending", "Firebending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 40, 3)
@@ -319,7 +321,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.8.1".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.9.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -793,11 +795,6 @@ rule "Modern ball motion":
     chase(ballPosition, ballPosition + ballDirection * ballSpeed, rate=ballSpeed, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballDirection, directionTowards(ballPosition, targetedPlayer.getEyePosition()), rate=ballDirectionRate, ChaseReeval.DESTINATION_AND_RATE)
     chase(ballSpeed, maxBallSpeed, rate=0.25, ChaseReeval.DESTINATION_AND_RATE)
-    #This should remove the terrible client prediction chases have
-    wait(0.05)
-    if RULE_CONDITION:
-        goto RULE_START
-
 
 rule "Retro ball motion":
     @Condition rulesetMode == 1
@@ -873,7 +870,8 @@ rule "Ball reaches player":
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
         isPassingTeam1 = true
-        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
+        if not invisiblePlayers:
+            playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
         previousTargetedPlayer.setHealth(passingDamage)
         targetedPlayer = previousTargetedPlayer
@@ -881,14 +879,7 @@ rule "Ball reaches player":
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
-    if rulesetMode == 0:
-        ballDirectionRate = 6
-        wait(0.032)
-        ballDirectionRate = 1.75
-    # pls Blizzard let me do if RULE_CONDITION and rulesetMode == 1:
-    if rulesetMode == 1:
-        if RULE_CONDITION:
-            goto RULE_START
+    async(BallCurve(), AsyncBehavior.RESTART)
 
 
 rule "Ball reaches player -TEAMS":
@@ -927,7 +918,8 @@ rule "Ball reaches player -TEAMS":
     # Check if player is passing and if passing is enabled
     if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE) and passingEnabled:
         #if previousTargetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
-        playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
+        if not invisiblePlayers:
+            playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
         previousTargetedPlayer.setHealth(passingDamage)
         stopAssist(passingAssistId)
@@ -960,12 +952,16 @@ rule "Ball reaches player -TEAMS":
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+    async(BallCurve(), AsyncBehavior.RESTART)
+
+
+def BallCurve():
     if rulesetMode == 0:
         ballDirectionRate = 6
-        wait(0.032)
+        wait(0.05)
         ballDirectionRate = 1.75
     # Hey, what do you know, that comment I had here for months actually ended up correct when I readded retro!   
-    if rulesetMode == 1:
+    elif rulesetMode == 1:
         if RULE_CONDITION:
             goto RULE_START
 
@@ -1075,6 +1071,7 @@ def UpdatedDeathEffects():
 rule "Final duel":
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isGameInProgress() == true
+    @Condition roundInProgress
     @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() != ballHero]) == 2
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
@@ -1113,6 +1110,7 @@ rule "Final duel":
 rule "Final duel - TEAMS":
     @Condition getCurrentGamemode() == Gamemode.TDM
     @Condition isGameInProgress() == true
+    @Condition roundInProgress
     #@Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved]) == 2
     @Condition (len([player for player in getLivingPlayers(Team.1) if player.hasMoved]) == 1 and len([player for player in getLivingPlayers(Team.2) if player.hasMoved]) == 1) == true
     @Condition isEnoughPlayersToStart == true
@@ -1155,6 +1153,7 @@ rule "Create passing aura - TEAMS":
     @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE)
     @Condition passingEnabled
     @Condition passingAuraToggle
+    @Condition not invisiblePlayers
 
     createEffect([player for player in getPlayers(eventPlayer.getTeam()) if player != eventPlayer and not player.isDead()], Effect.BAD_AURA, Color.SKY_BLUE, eventPlayer.getEyePosition(), 1.5, EffectReeval.POSITION_AND_RADIUS)
     eventPlayer.passingSignal = getLastCreatedEntity()
@@ -1186,6 +1185,7 @@ rule "Check for last player surviving":
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
     bigMessage(getAllPlayers(), "{0} has won the round!".format([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero]))
     wait(2)
+    roundInProgress = false
     if not tieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
     else:
@@ -1198,15 +1198,15 @@ rule "Check for last player surviving":
         bigMessage(getAllPlayers(), "Tiebreaker!")
     if not isEnoughPlayersToStart:
         return
-    roundInProgress = false
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     currentRound += 1
     if currentRound - 1 < maxRounds and (tournamentMode and breaksEnabled and (currentRound - 1) % breakFrequency == 0):
         StartBreak()
     else:
         ballSpawnCountdown = 5
-    wait(1)
+    wait(0.025)
     roundInProgress = true
+    wait(0.975)
     if not bouncepadDashingEnabled:
         goto lbl_0
     getAllPlayers().isDashEnabled = false
@@ -1241,6 +1241,7 @@ rule "Team 1 Last Surviving - TEAMS":
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
     bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.1))
     wait(2)
+    roundInProgress = false
     if not tieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
     else:
@@ -1254,12 +1255,12 @@ rule "Team 1 Last Surviving - TEAMS":
     heal(getAllPlayers(), null, 200)
     if not isEnoughPlayersToStart:
         return
-    roundInProgress = false
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
-    wait(1)
+    wait(0.025)
     roundInProgress = true
+    wait(0.975)
     if not bouncepadDashingEnabled:
         goto lbl_0
     getAllPlayers().isDashEnabled = false
@@ -1294,6 +1295,7 @@ rule "Team 2 Last Surviving - TEAMS":
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
     bigMessage(getAllPlayers(), "{0} has won the round!".format(Team.2))
     wait(2)
+    roundInProgress = false
     if not tieBreakerActive:
         getDeadPlayers(Team.ALL).resurrect()
     else:
@@ -1307,12 +1309,12 @@ rule "Team 2 Last Surviving - TEAMS":
     heal(getAllPlayers(), null, 200)
     if not isEnoughPlayersToStart:
         return
-    roundInProgress = false
     currentRound += 1
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     ballSpawnCountdown = 5
-    wait(1)
+    wait(0.025)
     roundInProgress = true
+    wait(0.975)
     if not bouncepadDashingEnabled:
         goto lbl_0
     getAllPlayers().isDashEnabled = false
@@ -1505,14 +1507,17 @@ rule "Toggle 3rd person":
     @Condition not breakInProgress
     @Condition eventPlayer.isHoldingButton(Button.RELOAD) == true
     @Condition eventPlayer.isAlive() == true
-    @Condition perspectiveMode == 2
+    @Condition perspectiveMode == 0
     
     if not eventPlayer.thirdPerson:
         eventPlayer.thirdPerson = true
         wait(0.01)
         eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
     else:
-        eventPlayer.stopCamera()
+        if invisiblePlayers:
+            eventPlayer.startCamera(updateEveryTick(eventPlayer.getEyePosition()), updateEveryTick(eventPlayer + eventPlayer.getFacingDirection() * 1000), 0)
+        else:
+            eventPlayer.stopCamera()
         eventPlayer.thirdPerson = false
 
 
@@ -1530,6 +1535,24 @@ rule "3rd person respawn":
     @Condition eventPlayer.thirdPerson
     
     eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+
+
+rule "Player dead 1st person during invisible players":
+    @Event playerDied
+    @Condition invisiblePlayers
+    @Condition not eventPlayer.thirdPerson
+    
+    eventPlayer.stopCamera()
+
+
+rule "1st person respawn during invisible players":
+    @Event eachPlayer
+    @Condition invisiblePlayers
+    @Condition eventPlayer.hasSpawned() == true
+    @Condition roundInProgress == false
+    @Condition not eventPlayer.thirdPerson
+    
+    eventPlayer.startCamera(updateEveryTick(eventPlayer.getEyePosition()), updateEveryTick(eventPlayer + eventPlayer.getFacingDirection() * 1000), 0)
 
 
 rule "Measure Latency":
