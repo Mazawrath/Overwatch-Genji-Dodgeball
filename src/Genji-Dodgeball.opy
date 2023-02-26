@@ -1201,6 +1201,12 @@ rule "Check for last player surviving":
         StartBreak()
     else:
         ballSpawnCountdown = 5
+    if currentRound == 3:
+        async(CovidTime()   , AsyncBehavior.NOOP)
+    if currentRound == 5 or currentRound == 15:
+        async(ReinTime(), AsyncBehavior.NOOP)
+    if currentRound == 10 or currentRound == 20:
+        async(BedTime(), AsyncBehavior.NOOP)
     wait(1)
     roundInProgress = true
     wait(0.975)
