@@ -45,12 +45,14 @@ rule "Init player variables":
     if (ballHero != null):
         eventPlayer.stopFacing()
     # Force 3rd person if it's toggled on.
-    if (perspectiveMode == 1):
+    if (perspectiveMode == 2):
         eventPlayer.thirdPerson = true
         eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
+    elif invisiblePlayers:
+        eventPlayer.startCamera(updateEveryTick(eventPlayer.getEyePosition()), updateEveryTick(eventPlayer + eventPlayer.getFacingDirection() * 1000), 0)
     wait(3)
     smallMessage(eventPlayer, "Press {0} to enable/disable the scoreboard".format(buttonString(Button.INTERACT)))
-    if (perspectiveMode == 2):
+    if (perspectiveMode == 0):
         wait(3)
         smallMessage(eventPlayer, "Press {0} to toggle 1st/3rd person".format(buttonString(Button.RELOAD)))
 
@@ -167,7 +169,7 @@ rule "Create global HUD elements":
     #ball speed text color change with speed
     hudSubtext(getAllPlayers(), "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, rgb(max(0,min(4000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 200, 200)) + 55 * (ballSpeed != maxBallSpeed), max(55, min(455 - 2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed), 255)) + min(2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 100, 0), max(55, 500 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 245) - min(1600000 / 27 / (maxBallSpeed - ballSpawnSpeed)**3 * (ballSpeed - ballSpawnSpeed)**3 - 200, 0)), HudReeval.VISIBILITY_STRING_AND_COLOR, SpecVisibility.DEFAULT)
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    if watermarkEnabled:
+    if watermarkEnabled and not tournamentMode:
         hudSubheader(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     createInWorldText([player for player in getAllPlayers() if ballSpawnCountdown != 0 and player != targetedPlayer], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
     createInWorldText([player for player in targetedPlayer if ballSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), updateEveryTick(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z) + directionTowards(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), targetedPlayer.getEyePosition()) / 50), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, rgb(255 , 50, 50), SpecVisibility.DEFAULT)
@@ -192,6 +194,8 @@ rule "Create player HUD elements":
     @Condition rulesetMode != 2
 
     hudSubheader(eventPlayer if localPlayer in getAllPlayers() else [], "Lag o-rama (DO NOT TOUCH!!!!!) [{0}]: {1}".format(buttonString(Button.ULTIMATE), "On" if eventPlayer.latencyToggle else "Off"), HudPosition.LEFT, 1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.NEVER)
+    if (perspectiveMode == 0):
+        hudSubheader(eventPlayer if localPlayer in getAllPlayers() else [], "Third person: [{0}]".format(buttonString(Button.RELOAD)), HudPosition.LEFT, 1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.NEVER)
     #hudText(eventPlayer, eventPlayer.playerDeflects, "Deflects", null, HudPosition.LEFT, 1, Color.YELLOW, Color.WHITE, Color.YELLOW, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #eventPlayer.playerUI[1] = getLastCreatedEntity()
     #hudText(eventPlayer, eventPlayer.playerKills, "Kills", null, HudPosition.LEFT, 2, Color.ORANGE, Color.WHITE, Color.ORANGE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
@@ -243,45 +247,54 @@ rule "Create bounce pads":
 rule "Create ball & targeted effect":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.FFA
-    @Condition not invisibleBall
     
-    if not ballHero:
+    if not ballHero and not invisibleBall:
         #Orb for when ball is not getting passed
         createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(updateEveryTick(targetedPlayer if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(updateEveryTick(targetedPlayer if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(getAllPlayers().exclude(targetedPlayer), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    # Can't have an else if for deciding the color, only if else so just make a basic check for colorblind mode otherwise use the more complex first/third color
-    if redGreenColorblindMode:
-        createEffect(targetedPlayer, Effect.GOOD_AURA, Color.YELLOW, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 0.5 if targetedPlayer.thirdPerson else 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    else:
-        createEffect(targetedPlayer, Effect.GOOD_AURA, Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 0.5 if targetedPlayer.thirdPerson else 1, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
-    createEffect(updateEveryTick(targetedPlayer if localPlayer in getAllPlayers() and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick(targetedPlayer if localPlayer in getAllPlayers() and not (localPlayer.isAlive() and localPlayer.latencyToggle) else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if isPassingTeam1 or isPassingTeam2 else []), Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)]), Effect.GOOD_AURA, Color.SKY_BLUE, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    if not invisiblePlayers:
+        createEffect(getAllPlayers().exclude(targetedPlayer), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)]), Effect.GOOD_AURA, Color.SKY_BLUE, targetedPlayer, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        # Can't have an else if for deciding the color, only if else so just make a basic check for colorblind mode otherwise use the more complex first/third color
+        if redGreenColorblindMode:
+            createEffect(targetedPlayer, Effect.GOOD_AURA, Color.YELLOW, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 0.5 if targetedPlayer.thirdPerson else 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        else:
+            createEffect(targetedPlayer, Effect.GOOD_AURA, Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 0.5 if targetedPlayer.thirdPerson else 1, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    if not invisibleBall:
+        createEffect(updateEveryTick(targetedPlayer if localPlayer in getAllPlayers() and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(targetedPlayer if localPlayer in getAllPlayers() and not (localPlayer.isAlive() and localPlayer.latencyToggle) else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if isPassingTeam1 or isPassingTeam2 else []), Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    
 
 
 rule "Create ball & targeted effect - TEAMS":
     @Condition isGameInProgress() == true
     @Condition getCurrentGamemode() == Gamemode.TDM
-    @Condition not invisibleBall
     
-    #Team A standard targeting Team B ball
-    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() != player.getTeam()] if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() != player.getTeam()] if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    #Team A standard targeting Team A ball
-    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() == player.getTeam()] if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.SKY_BLUE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() == player.getTeam()] if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.SKY_BLUE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(getAllPlayers(), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick(targetedPlayer if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick(targetedPlayer if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick(targetedPlayer if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick(targetedPlayer if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if (isPassingTeam1 or isPassingTeam2) and not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if (isPassingTeam1 or isPassingTeam2) and not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.GOOD_AURA, Color.SKY_BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-    createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(targetedPlayer + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    if not invisibleBall:
+        #Team A standard targeting Team B ball
+        createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() != player.getTeam()] if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() != player.getTeam()] if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        #Team A standard targeting Team A ball
+        createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() == player.getTeam()] if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.SKY_BLUE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick([player for player in getAllPlayers() if player != targetedPlayer and targetedPlayer.getTeam() == player.getTeam()] if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.SKY_BLUE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(targetedPlayer if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(targetedPlayer if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+    if not invisiblePlayers:
+        createEffect(getAllPlayers().exclude(targetedPlayer), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect([player for player in getAllPlayers() if player != targetedPlayer and (isPassingTeam1 or isPassingTeam2)], Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(targetedPlayer + Vector.UP), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        # Can't have an else if for deciding the color, only if else so just make a basic check for colorblind mode otherwise use the more complex first/third color
+        if redGreenColorblindMode:
+            createEffect(targetedPlayer, Effect.GOOD_AURA, Color.YELLOW, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 0.5 if targetedPlayer.thirdPerson else 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        else:
+            createEffect(targetedPlayer, Effect.GOOD_AURA, Color.RED, updateEveryTick(targetedPlayer.getPosition() + Vector.UP), 0.5 if targetedPlayer.thirdPerson else 1, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+    if not invisibleBall:
+        createEffect(updateEveryTick(targetedPlayer if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(targetedPlayer if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if (isPassingTeam1 or isPassingTeam2) and not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if (isPassingTeam1 or isPassingTeam2) and not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.GOOD_AURA, Color.SKY_BLUE, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
 
 
 rule "Ball tail effects":
