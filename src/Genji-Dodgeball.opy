@@ -208,6 +208,7 @@ subroutine ReinTime 6
 subroutine BedTime 7
 subroutine CovidTime 8
 subroutine BallCurve 9
+subroutine BallPov 10
 
 #Activated extensions
 
@@ -873,7 +874,7 @@ rule "Ball reaches player":
     else:
         isPassingTeam1 = false
         heal(previousTargetedPlayer, null, passingDamage)
-        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero and player.getCurrentHero() != gimmickPlayer[0].getCurrentHero()], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     if rulesetMode == 0:
             ballDirectionRate = 6
             wait(0.05)
@@ -1654,7 +1655,7 @@ def ReinTime():
     bigMessage(getAllPlayers(), "Oh, hi Reinhart!")
     wait(0.5)
     gimmickPlayer.communicate(Comms.HELLO)
-    gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     waitUntil(ballIsOut, 9999)
     while currentRound != 7 or currentRound != 17:
         # gimmickPlayer.setUltCharge(100)
