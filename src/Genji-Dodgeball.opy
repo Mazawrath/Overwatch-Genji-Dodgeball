@@ -179,6 +179,7 @@ playervar thirdPerson 17
 playervar yeetPlayer 18
 playervar latency 19
 playervar latencyToggle 20
+playervar stunCooldown 22
 
 
 #Subroutine names
@@ -856,7 +857,9 @@ rule "Ball reaches player":
     else:
         ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 0.5)
     if targetedPlayer.isUsingAbility1():
-        targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+        if targetedPlayer.stunCooldown == 0:
+            targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+            targetedPlayer.stunCooldown = 0.5
         targetedPlayer.teleport(ballPosition)
     targetedPlayer.currentUltPercent += 5
     playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, targetedPlayer.getPosition(), 200)
@@ -904,7 +907,9 @@ rule "Ball reaches player -TEAMS":
                     goto RULE_START
             return
     if targetedPlayer.isUsingAbility1():
-        targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+        if targetedPlayer.stunCooldown == 0:
+            targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+            targetedPlayer.stunCooldown = 0.5
         targetedPlayer.teleport(ballPosition)
     targetedPlayer.currentUltPercent += 5
     playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, targetedPlayer.getPosition(), 200)
