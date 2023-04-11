@@ -50,6 +50,9 @@ rule "Init player variables":
         eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
     elif invisiblePlayers:
         eventPlayer.startCamera(updateEveryTick(eventPlayer.getEyePosition()), updateEveryTick(eventPlayer + eventPlayer.getFacingDirection() * 1000), 0)
+    if getCurrentGamemode() == Gamemode.TDM and invisiblePlayers:
+        wait(3)
+        smallMessage(eventPlayer(), "Invisible players active: No emoting allowed! (This rule is enforced, be careful!)")
     wait(3)
     smallMessage(eventPlayer, "Press {0} to enable/disable the scoreboard".format(buttonString(Button.INTERACT)))
     if (perspectiveMode == 0):

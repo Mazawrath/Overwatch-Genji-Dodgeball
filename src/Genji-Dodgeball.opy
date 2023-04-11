@@ -1581,3 +1581,34 @@ rule "Toggle Latency":
         eventPlayer.latencyToggle = true
         smallMessage(eventPlayer, "Lag compensation enabled for next round")
     wait(0.5)
+
+rule "No cheating during invisible players - TEAMS":
+    @Event eachPlayer
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition invisiblePlayers
+    @Condition roundInProgress
+    @Condition eventPlayer.isCommunicatingAnything()
+
+    eventPlayer.emoteCheatCount += 1
+    if eventPlayer.emoteCheatCount == 1:
+        smallMessage(eventPlayer, "Please don't cheat by emoting :(")
+    elif eventPlayer.emoteCheatCount == 2:
+        eventPlayer.setStatusEffect(null, Status.STUNNED, 1)
+        smallMessage(eventPlayer, "No cheating >:(")
+        waitUntil(eventPlayer.isAlive(), 9999)
+        wait(2.5)
+        smallMessage(eventPlayer, "Don't do it again or I get really mad")
+    elif eventPlayer.emoteCheatCount == 3:
+        eventPlayer.setStatusEffect(null, Status.ASLEEP, 5)
+        smallMessage(eventPlayer, "No cheating >:(")
+        waitUntil(eventPlayer.isAlive(), 9999)
+        wait(2.5)
+        smallMessage(eventPlayer, "One more time and I get super mad >:(")
+    else:
+        bigMessage(getAllPlayers(), "{0} keeps trying to cheat by emoting!".format(eventPlayer))
+        kill(eventPlayer, null)
+        if ballIsOut and eventPlayer == targetedPlayer:
+            ballDeleteRequested = true
+        waitUntil(eventPlayer.isAlive(), 9999)
+        wait(1.5)
+        smallMessage(eventPlayer, "What did I say?")
