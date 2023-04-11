@@ -155,6 +155,7 @@ globalvar breakLength 89
 globalvar stressTorbs 90
 globalvar breakInProgress 91
 globalvar spawnPoints 92
+globalvar invisTeamsAntiCheat 93
 
 
 #Player variables
@@ -179,6 +180,7 @@ playervar thirdPerson 17
 playervar yeetPlayer 18
 playervar latency 19
 playervar latencyToggle 20
+playervar emoteCheatCount 21
 playervar stunCooldown 22
 
 
@@ -221,6 +223,7 @@ rule "// SETTINGS":
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
+    invisTeamsAntiCheat = createWorkshopSetting(bool, "Teams Settings", "Invisible Players Anti-cheat", true, 3)
     #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
     gameEndEnabled = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Time", false, 2)
     watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Watermark", true, 0)
@@ -1590,6 +1593,7 @@ rule "Toggle Latency":
 rule "No cheating during invisible players - TEAMS":
     @Event eachPlayer
     @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition invisTeamsAntiCheat
     @Condition invisiblePlayers
     @Condition roundInProgress
     @Condition eventPlayer.isCommunicatingAnything()
