@@ -484,10 +484,16 @@ rule "Player dashes too far out of bounds":
     #Workshop Island Fix
     #@Condition (getCurrentMap() != Map.WORKSHOP_ISLAND and getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 2.5)
     #eventPlayer.teleport(circleCenter + vect(random.randint(-15, 15), 8, random.randint(-15, 15)))
     eventPlayer.applyImpulse(vect(directionTowards(eventPlayer.getPosition(), circleCenter).x, 0, directionTowards(eventPlayer.getPosition(), circleCenter).z), 20, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    if targetedPlayer.stunCooldown == 0:
+        eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 2.5)
+        targetedPlayer.stunCooldown = 0.5
+    else:
+        wait(0.5)
+        eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 2.5)
+        targetedPlayer.stunCooldown = 0.5
     bigMessage(eventPlayer, "Do not dash out of the arena!")
 
 
