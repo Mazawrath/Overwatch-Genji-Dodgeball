@@ -37,6 +37,8 @@ rule "Init player variables":
     eventPlayer.toggleHUD = true
     eventPlayer.dashNerf = false
     eventPlayer.latencyToggle = false
+    eventPlayer.stunCooldown = 0
+    chase(eventPlayer.stunCooldown, 0, rate=1, ChaseReeval.NONE)
     waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
     eventPlayer.setInvisibility(Invis.NONE)
     if invisiblePlayers:
@@ -55,6 +57,10 @@ rule "Init player variables":
     if (perspectiveMode == 0):
         wait(3)
         smallMessage(eventPlayer, "Press {0} to toggle 1st/3rd person".format(buttonString(Button.RELOAD)))
+    if getCurrentGamemode() == Gamemode.TDM and invisiblePlayers and invisTeamsAntiCheat:
+            bigMessage(eventPlayer, "Invisible Players: No emoting!")
+            wait(3)
+            smallMessage(eventPlayer(), "Invisible players active: No emoting allowed! (This rule is enforced, be careful!)")
 
 
 rule "Init global variables":

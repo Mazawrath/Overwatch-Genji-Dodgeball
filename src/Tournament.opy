@@ -128,7 +128,9 @@ rule "Get knocked down by yeeted Torb":
     @Condition distance(eventPlayer, sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0].getPosition()) <= 1.5
     @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0] != eventPlayer.yeetPlayer
 
-    eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1.5)
+    if targetedPlayer.stunCooldown == 0:
+        eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1.5)
+        targetedPlayer.stunCooldown = 0.5
 
 
 # rule "Player leaves during tourney":

@@ -4,8 +4,8 @@
 
 settings {
     "main": {
-        "modeName": "<FG32CD32FF>Genji Dodgeball v7.9.0",
-        "description": "Genji Dodgeball v7.9.0. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.9.1",
+        "description": "Genji Dodgeball v7.9.1. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -19,8 +19,7 @@ settings {
     "gamemodes": {
         "ffa": {
             "enabledMaps": [
-                "workshopIslandNight",
-                "workshopIsland"
+                "workshopIslandNight"
             ],
             "gameLengthInMn": 15,
             "enableSelfInitiatedRespawn": false
@@ -155,6 +154,7 @@ globalvar breakLength 89
 globalvar stressTorbs 90
 globalvar breakInProgress 91
 globalvar spawnPoints 92
+globalvar invisTeamsAntiCheat 93
 
 
 #Player variables
@@ -179,6 +179,8 @@ playervar thirdPerson 17
 playervar yeetPlayer 18
 playervar latency 19
 playervar latencyToggle 20
+playervar emoteCheatCount 21
+playervar stunCooldown 22
 
 
 #Subroutine names
@@ -220,6 +222,7 @@ rule "// SETTINGS":
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
+    invisTeamsAntiCheat = createWorkshopSetting(bool, "Teams Settings", "Invisible Players Anti-cheat", true, 3)
     #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
     gameEndEnabled = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Time", false, 2)
     watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Watermark", true, 0)
@@ -321,7 +324,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.9.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.9.1".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -480,10 +483,16 @@ rule "Player dashes too far out of bounds":
     #Workshop Island Fix
     #@Condition (getCurrentMap() != Map.WORKSHOP_ISLAND and getCurrentMap() != Map.WORKSHOP_ISLAND_NIGHT) == true
     
-    eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 2.5)
     #eventPlayer.teleport(circleCenter + vect(random.randint(-15, 15), 8, random.randint(-15, 15)))
     eventPlayer.applyImpulse(vect(directionTowards(eventPlayer.getPosition(), circleCenter).x, 0, directionTowards(eventPlayer.getPosition(), circleCenter).z), 20, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    if targetedPlayer.stunCooldown == 0:
+        eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 2.5)
+        targetedPlayer.stunCooldown = 0.5
+    else:
+        wait(0.5)
+        eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 2.5)
+        targetedPlayer.stunCooldown = 0.5
     bigMessage(eventPlayer, "Do not dash out of the arena!")
 
 
@@ -856,7 +865,9 @@ rule "Ball reaches player":
     else:
         ballPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 0.5)
     if targetedPlayer.isUsingAbility1():
-        targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+        if targetedPlayer.stunCooldown == 0:
+            targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+            targetedPlayer.stunCooldown = 0.5
         targetedPlayer.teleport(ballPosition)
     targetedPlayer.currentUltPercent += 5
     playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, targetedPlayer.getPosition(), 200)
@@ -904,7 +915,9 @@ rule "Ball reaches player -TEAMS":
                     goto RULE_START
             return
     if targetedPlayer.isUsingAbility1():
-        targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+        if targetedPlayer.stunCooldown == 0:
+            targetedPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1)
+            targetedPlayer.stunCooldown = 0.5
         targetedPlayer.teleport(ballPosition)
     targetedPlayer.currentUltPercent += 5
     playEffect(getAllPlayers(), DynamicEffect.EXPLOSION_SOUND, Color.WHITE, targetedPlayer.getPosition(), 200)
@@ -1581,3 +1594,35 @@ rule "Toggle Latency":
         eventPlayer.latencyToggle = true
         smallMessage(eventPlayer, "Lag compensation enabled for next round")
     wait(0.5)
+
+rule "No cheating during invisible players - TEAMS":
+    @Event eachPlayer
+    @Condition getCurrentGamemode() == Gamemode.TDM
+    @Condition invisTeamsAntiCheat
+    @Condition invisiblePlayers
+    @Condition roundInProgress
+    @Condition eventPlayer.isCommunicatingAnything()
+
+    eventPlayer.emoteCheatCount += 1
+    if eventPlayer.emoteCheatCount == 1:
+        smallMessage(eventPlayer, "Please don't cheat by emoting :(")
+    elif eventPlayer.emoteCheatCount == 2:
+        eventPlayer.setStatusEffect(null, Status.STUNNED, 1)
+        smallMessage(eventPlayer, "No cheating >:(")
+        waitUntil(eventPlayer.isAlive(), 9999)
+        wait(2.5)
+        smallMessage(eventPlayer, "Don't do it again or I get really mad")
+    elif eventPlayer.emoteCheatCount == 3:
+        eventPlayer.setStatusEffect(null, Status.ASLEEP, 5)
+        smallMessage(eventPlayer, "No cheating >:(")
+        waitUntil(eventPlayer.isAlive(), 9999)
+        wait(2.5)
+        smallMessage(eventPlayer, "One more time and I get super mad >:(")
+    else:
+        bigMessage(getAllPlayers(), "{0} keeps trying to cheat by emoting!".format(eventPlayer))
+        kill(eventPlayer, null)
+        if ballIsOut and eventPlayer == targetedPlayer:
+            ballDeleteRequested = true
+        waitUntil(eventPlayer.isAlive(), 9999)
+        wait(1.5)
+        smallMessage(eventPlayer, "What did I say?")
