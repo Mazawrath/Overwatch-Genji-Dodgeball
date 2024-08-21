@@ -852,8 +852,8 @@ rule "Ball reaches player":
                 goto RULE_START
         return
     if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
-        #If they don't have enough health, kill em
-        if targetedPlayer.getHealth() <= 100:
+        #Player already deflected once
+        if targetedPlayer.getHealth() != targetedPlayer.getMaxHealth():
             DeflectFailed()
             if rulesetMode == 1:
                 wait()
@@ -884,11 +884,11 @@ rule "Ball reaches player":
         if not invisiblePlayers:
             playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
-        previousTargetedPlayer.setHealth(passingDamage)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth() * 0.1)
         targetedPlayer = previousTargetedPlayer
     else:
         isPassingTeam1 = false
-        heal(previousTargetedPlayer, null, passingDamage)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth())
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     async(BallCurve(), AsyncBehavior.RESTART)
 
@@ -906,8 +906,8 @@ rule "Ball reaches player -TEAMS":
                 goto RULE_START
         return
     if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
-        #If they don't have enough health, kill em
-        if targetedPlayer.getHealth() <= 100:
+        #Player already deflected once
+        if targetedPlayer.getHealth() != targetedPlayer.getMaxHealth():
             DeflectFailed()
             if rulesetMode == 1:
                 wait()
@@ -934,7 +934,7 @@ rule "Ball reaches player -TEAMS":
         if not invisiblePlayers:
             playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
-        previousTargetedPlayer.setHealth(passingDamage)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth() * 0.1)
         stopAssist(passingAssistId)
         #passingPlayer = null
         #Check which team is passing
@@ -961,7 +961,7 @@ rule "Ball reaches player -TEAMS":
         if isPassingTeam1 == false or isPassingTeam2 == false:
             stopAssist(passingAssistId)
             #passingPlayer = null
-        heal(previousTargetedPlayer, null, passingDamage)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth())
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
@@ -992,7 +992,7 @@ rule "End assist after a second - TEAMS":
 def DeflectFailed():
     @Name "Player Didn't Deflect - Kill"
     
-    heal(getLivingPlayers(Team.ALL), null, 200)
+    getAllPlayers().setHealth(9001)
     isPassingTeam1 = false
     isPassingTeam2 = false
     targetedPlayer.setStatusEffect(previousTargetedPlayer, Status.STUNNED, 1)
@@ -1265,7 +1265,7 @@ rule "Team 1 Last Surviving - TEAMS":
         wait(0.25)
         targetedPlayer = -1
         bigMessage(getAllPlayers(), "Tiebreaker!")
-    heal(getAllPlayers(), null, 200)
+    getAllPlayers().setHealth(9001)
     if not isEnoughPlayersToStart:
         return
     currentRound += 1
@@ -1319,7 +1319,7 @@ rule "Team 2 Last Surviving - TEAMS":
         wait(0.25)
         targetedPlayer = -1
         bigMessage(getAllPlayers(), "Tiebreaker!")
-    heal(getAllPlayers(), null, 200)
+    getAllPlayers().setHealth(9001)
     if not isEnoughPlayersToStart:
         return
     currentRound += 1
