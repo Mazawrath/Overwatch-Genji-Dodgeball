@@ -108,7 +108,6 @@ rule "Init global variables":
     explosionSoundVolume = 30
     improvedExplosions = true
     randomExplosionSounds = true
-    passingDamage = 100
     isPassingTeam1 = false
     isPassingTeam2 = false
     passingPlayer = null
