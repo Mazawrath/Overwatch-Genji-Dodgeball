@@ -90,9 +90,9 @@ globalvar sphereSize 24
 globalvar circleCenter 25
 globalvar redGreenColorblindMode 26
 globalvar watermarkEnabled 27
-globalvar bouncepadDashingEnabled 28
+globalvar dashingEnabled 28
 globalvar gameEndEnabled 29
-globalvar cooldownDashingEnabled 30
+# globalvar cooldownDashingEnabled 30
 globalvar deathSpherePos 31
 globalvar deathBeam 32
 globalvar ballDirection 33
@@ -208,13 +208,14 @@ rule "// SETTINGS":
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earth/waterbending", "Firebending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 40, 3)
     maxBallSpeed = createWorkshopSetting(int[100:500], "Dodgeball Settings", "Maximum Ball Speed", 500, 4)
-    endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 5)
+    dashingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Dashing", true, 5)
     bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 6)
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 7)
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Fun Settings", "Ball Tail Color", 0, 1)
-    invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 2)
-    invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 3)
+    endlessBall = createWorkshopSetting(bool, "Fun Settings", "Endless Ball", false, 2)
+    invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 3)
+    invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 4)
     tournamentMode = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Tournament Mode", false, 0)
     maxRounds = createWorkshopSetting(int[1:50], "Tournament Settings (FFA Only)", "Total Rounds", 30, 1)
     breaksEnabled = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Breaks", true, 2)
@@ -226,7 +227,6 @@ rule "// SETTINGS":
     #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
     gameEndEnabled = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Time", false, 2)
     watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Watermark", true, 0)
-    cooldownDashingEnabled = true
     redGreenColorblindMode = createWorkshopSetting(bool, "Visual Settings", "Red/Green Colorblind Mode", false, 2)
     finalDuelNuke = createWorkshopSetting(bool, "Visual Settings", "Final Duel Explosion", true, 3)
 
@@ -412,26 +412,8 @@ rule "Shorten Deflect Length":
     eventPlayer.setAbility1Enabled(false)
     wait(0.5)
     eventPlayer.setAbility2Enabled(true)
-    eventPlayer.setAbility1Enabled(true)
-
-
-rule "Unlock dash after using jumppad":
-    @Event eachPlayer
-    @Hero all
-    @Condition bouncepadDashingEnabled == true
-    @Condition eventPlayer.isDashEnabled == true
-    
-    eventPlayer.setAbility1Enabled(true)
-
-
-rule "Disable dash after using":
-    @Event eachPlayer
-    @Hero all
-    @Condition bouncepadDashingEnabled == true
-    @Condition eventPlayer.isUsingAbility1() == true
-    
-    eventPlayer.setAbility1Enabled(false)
-    eventPlayer.isDashEnabled = false
+    if dashingEnabled:
+        eventPlayer.setAbility1Enabled(true)
 
 
 rule "Target random player":
@@ -1220,11 +1202,6 @@ rule "Check for last player surviving":
     wait(0.025)
     roundInProgress = true
     wait(0.975)
-    if not bouncepadDashingEnabled:
-        goto lbl_0
-    getAllPlayers().isDashEnabled = false
-    getAllPlayers().setAbility1Enabled(false)
-    lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
@@ -1274,11 +1251,6 @@ rule "Team 1 Last Surviving - TEAMS":
     wait(0.025)
     roundInProgress = true
     wait(0.975)
-    if not bouncepadDashingEnabled:
-        goto lbl_0
-    getAllPlayers().isDashEnabled = false
-    getAllPlayers().setAbility1Enabled(false)
-    lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
@@ -1328,11 +1300,6 @@ rule "Team 2 Last Surviving - TEAMS":
     wait(0.025)
     roundInProgress = true
     wait(0.975)
-    if not bouncepadDashingEnabled:
-        goto lbl_0
-    getAllPlayers().isDashEnabled = false
-    getAllPlayers().setAbility1Enabled(false)
-    lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 

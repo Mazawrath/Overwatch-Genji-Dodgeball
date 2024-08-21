@@ -25,10 +25,8 @@ rule "Init player variables":
     eventPlayer.isDashEnabled = false
     eventPlayer.setStatusEffect(null, Status.INVINCIBLE, 9999)
     eventPlayer.setHealingReceived(0)
-    if cooldownDashingEnabled:
-        goto lbl_0
-    eventPlayer.setAbility1Enabled(false)
-    lbl_0:
+    if not dashingEnabled:
+        eventPlayer.setAbility1Enabled(false)
     eventPlayer.disableRespawn()
     eventPlayer.enableDeathSpectateAllPlayers()
     eventPlayer.enableDeathSpectateTargetHud()
@@ -110,7 +108,6 @@ rule "Init global variables":
     explosionSoundVolume = 30
     improvedExplosions = true
     randomExplosionSounds = true
-    cooldownDashingEnabled = true
     passingDamage = 100
     isPassingTeam1 = false
     isPassingTeam2 = false
@@ -155,17 +152,6 @@ rule "Create global HUD elements":
     #red when you're targeted
     hudSubheader(targetedPlayer if localPlayer in getAllPlayers() else [], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudText(getDeadPlayers(Team.ALL), "Waiting for next round", "You have been eliminated or joined during a round", "You will spawn once the next round starts", HudPosition.TOP, 2, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
-    if bouncepadDashingEnabled or cooldownDashingEnabled:
-        goto lbl_0
-    #hudSubtext(getAllPlayers(), "Current Dashing Mode: None", HudPosition.LEFT, -1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    #return
-    lbl_0:
-    #if cooldownDashingEnabled:
-    #        goto lbl_1
-    #hudSubtext(getAllPlayers(), "Current Dashing Mode: Bouncepad", HudPosition.LEFT, -1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    #return
-    lbl_1:
-    #hudSubtext(getAllPlayers(), "Current Dashing Mode: Cooldown", HudPosition.LEFT, -1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #server load text for lobby owner only
     #hudText(hostPlayer, null, "Server Load", getServerLoad(), HudPosition.RIGHT, 0, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #hudText(hostPlayer, null, "Server Load Average", getAverageServerLoad(), HudPosition.RIGHT, 0, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
