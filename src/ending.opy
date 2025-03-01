@@ -90,11 +90,15 @@
 # 	TheEnding()
 
 def Cinema():
+    disableCenter = true
     destroyAllHudTexts()
     destroyAllEffects()
     destroyAllHudTexts()
+    destroyAllInWorldTexts()
     getAllPlayers().disableHeroHud()
     getAllPlayers().disableGamemodeHud()
+    getAllPlayers().setAbility1Enabled(false)
+    getAllPlayers().setAbility2Enabled(false)
 	getAllPlayers().preloadHero(Hero.GENJI)
 	smallMessage(getAllPlayers(), "Wow, what a great game, {0} won!".format(wonPlayer))
 	wait(1.5)
@@ -107,6 +111,8 @@ def Cinema():
 	getAllPlayers().setAbility1Enabled(false)
 	getAllPlayers().setAbility2Enabled(false)
 	wait(2)
+    getAllPlayers().setAbility1Enabled(false)
+    getAllPlayers().setAbility2Enabled(false)
 	getAllPlayers().setStatusEffect(null, Status.ROOTED, 9999)
 	createDummy(Hero.TORBJORN, Team.ALL, -1, [0, 0, 0], [0,0,0])
     wait()
@@ -122,6 +128,7 @@ def Cinema():
     getAllPlayers().disableRespawn()
     gimmickPlayer.setWeapon(2)
     gimmickPlayer.setPrimaryFireEnabled(true)
+    gimmickPlayer.setSecondaryFireEnabled(true)
     gimmickPlayer.setUltCharge(100)
     getPlayersOnHero(Hero.GENJI, Team.ALL).enablePlayerCollision()
     getPlayersOnHero(Hero.GENJI, Team.ALL).teleport(vect(15, 0, 0))
@@ -167,7 +174,7 @@ def Cinema():
     wonPlayer.setMoveSpeed(250)
     wonPlayer.applyImpulse(directionTowards(wonPlayer.getPosition(), vect(0, wonPlayer.getPosition().y, 0)), ballSpeed, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     while true:
-        waitUntil(wonPlayer.getPosition().x >= -8, 9999)
+        waitUntil(wonPlayer.getPosition().x >= -8.5, 9999)
         wonPlayer.applyImpulse(directionTowards(wonPlayer.getPosition(), vect(-20, wonPlayer.getPosition().y, 0)), ballSpeed, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
         gimmickPlayer.setStatusEffect(null, Status.STUNNED, 0.25)
         waitUntil(wonPlayer.getPosition().x <= -20, 9999)
@@ -188,7 +195,7 @@ def Cinema():
         elif ballSpeed > 70:
             break
     ballSpeed = 0
-    chase(ballSpeed, 6, duration=1, ChaseReeval.NONE)
+    chase(ballSpeed, 10, duration=3, ChaseReeval.NONE)
     getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(-12, ballTail2.y, 17), vect(-12, ballTail2.y, 0), 0)
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), vect(19.5 + ballSpeed, 0, 0.5)), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     gimmickPlayer.forceButtonPress(Button.ULTIMATE)

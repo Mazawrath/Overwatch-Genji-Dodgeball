@@ -60,6 +60,7 @@ rule "Init player variables":
 
 
 rule "Init global variables":
+    disableCenter = false
     targetedPlayer = -1
     previousTargetedPlayer = -1
     ballSpawnCountdown = 30

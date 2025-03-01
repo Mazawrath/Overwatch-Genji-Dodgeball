@@ -80,37 +80,6 @@ rule "Torb must die":
     eventPlayer.communicate(Comms.HELLO)
 
 
-rule "Yeet Stress relief Torb":
-    @Event eachPlayer
-    @Condition breakInProgress
-    @Condition distance(eventPlayer, sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer, player))[0].getPosition()) <= 2
-    @Condition eventPlayer.isHoldingButton(Button.RELOAD)
-
-    eventPlayer.yeetPlayer = sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer, player))[0]
-    eventPlayer.yeetPlayer.attachTo(eventPlayer, vect(0,0.5,1))
-    eventPlayer.yeetPlayer.communicate(Comms.HELLO)
-    wait(0.5)
-    waitUntil(eventPlayer.isHoldingButton(Button.RELOAD) or not breakInProgress, 9999)
-    eventPlayer.yeetPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 4)
-    eventPlayer.yeetPlayer.detach()
-    eventPlayer.yeetPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
-    wait(1)
-    eventPlayer.yeetPlayer = null
-
-
-rule "Get knocked down by yeeted Torb":
-    @Event eachPlayer
-    @Condition breakInProgress
-    # Only knock the player down if the stress torb is in the air (hopefully only when getting yeeted)
-    @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0].isInAir()
-    @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0].hasStatusEffect(Status.KNOCKED_DOWN)
-    # Chceck for the nearest stress torb
-    @Condition distance(eventPlayer, sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0].getPosition()) <= 1.5
-    @Condition sorted([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player in stressTorbs and player.isAlive()], lambda player: distance(eventPlayer.getEyePosition(), player))[0] != eventPlayer.yeetPlayer
-
-    eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, 1.5)
-
-
 # rule "Player leaves during tourney":
 #     @Disabled
     

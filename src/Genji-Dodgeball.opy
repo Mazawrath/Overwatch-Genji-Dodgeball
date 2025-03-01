@@ -4,8 +4,8 @@
 
 settings {
     "main": {
-        "modeName": "<FG32CD32FF>Genji Dodgeball v7.9.0",
-        "description": "Genji Dodgeball v7.9.0. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v4.1.25",
+        "description": "Genji Dodgeball v4.1.25. APRIL FOOLS!!!!!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -43,6 +43,8 @@ settings {
         "allTeams": {
             "genji": {
                 "ability2Cooldown%": 0,
+                "enableAbility1": false,
+                "enableAbility2": false,
                 "enableInfiniteAmmo": true,
                 "enablePrimaryFire": false,
                 "enableMelee": false,
@@ -175,6 +177,7 @@ globalvar gimmickPlayer 93
 globalvar covidTime 94
 globalvar gimmickName 95
 globalvar wonPlayer 96
+globalvar disableCenter 97
 
 
 #Player variables
@@ -241,8 +244,7 @@ rule "// SETTINGS":
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 3)
     tournamentMode = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Tournament Mode", true, 0)
     maxRounds = createWorkshopSetting(int[1:50], "Tournament Settings (FFA Only)", "Total Rounds", 30, 1)
-    breaksEnabled = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Breaks", true, 2)
-    breakFrequency = createWorkshopSetting(int[1:25], "Tournament Settings (FFA Only)", "Run Break Every __ Rounds", 10, 3)
+    breaksEnabled = false
     allowMatchEnd = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Score", true, 0)
     scoreToWin = createWorkshopSetting(int[1:30], "Teams Settings", "Score to Win", 10, 1)
     passingAuraToggle = createWorkshopSetting(bool, "Teams Settings", "Passing Aura", true, 2)
@@ -318,8 +320,6 @@ rule "// INITIALIZATION":
 
 #!include "./Tournament.opy"
 
-#!include "./Ending.opy"
-
 
 rule "Enable Scoreboard":
     @Event eachPlayer
@@ -349,7 +349,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.9.0".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Entire game single handedly made by {0}. Version 4.1.25".format("tumtum9000"), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -359,7 +359,7 @@ rule "Check for <2 players":
     @Condition getNumberOfHeroes(playerHero, Team.ALL) == 1
     
     isInFinalDuel = false
-    hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+    # hudHeader(getAllPlayers(), "Waiting for more players", HudPosition.TOP, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     waitingForPlayersHUD = getLastCreatedText()
     isEnoughPlayersToStart = false
     stopChasingVariable(ballSpawnCountdown)
@@ -426,18 +426,6 @@ rule "Wait for more players - TEAMS":
 rule "// GAME RULES":
 
 
-rule "Shorten Deflect Length":
-    @Event eachPlayer
-    @Hero all
-    @Condition eventPlayer.canDeflect == true
-    @Condition eventPlayer.isUsingUltimate() == false
-    
-    wait(0.3)
-    eventPlayer.setAbility2Enabled(false)
-    wait(0.5)
-    eventPlayer.setAbility2Enabled(true)
-
-
 rule "Unlock dash after using jumppad":
     @Event eachPlayer
     @Hero all
@@ -487,6 +475,7 @@ rule "Push to circle":
 rule "Put out center":
     @Event eachPlayer
     @Hero all
+    @Condition not disableCenter
     @Condition distance(eventPlayer.getPosition(), circleCenter) < centerOffLimitsSize + 0.5
     
     eventPlayer.applyImpulse(directionTowards(circleCenter, eventPlayer), 10, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION_XYZ)
@@ -499,6 +488,7 @@ rule "Put out center":
 rule "Player dashes too far out of bounds":
     @Event eachPlayer
     @Hero all
+    @Condition not disableCenter
     @Condition distance(eventPlayer.getPosition(), vect(circleCenter.x, eventPlayer.getPosition().y, circleCenter.z)) > sphereSize + 1
     @Condition eventPlayer != ballPlayer
     # No need for a knockdown in Workshop Expanse.
@@ -645,6 +635,7 @@ rule "Anti-Stuck Activation":
 rule "Bounce when near pad 1":
     @Event eachPlayer
     @Hero all
+    @Condition gimmickPlayer.getCurrentHero() != Hero.TORBJORN
     @Condition bouncePad1 != null
     @Condition distance(eventPlayer.getPosition(), bouncePad1) <= bouncePadRange
     @Condition eventPlayer.bouncePadCooldown == 0
@@ -666,6 +657,7 @@ rule "Bounce when near pad 1":
 rule "Bounce when near pad 2":
     @Event eachPlayer
     @Hero all
+    @Condition gimmickPlayer.getCurrentHero() != Hero.TORBJORN
     @Condition bouncePad2 != null
     @Condition distance(eventPlayer.getPosition(), bouncePad2) <= bouncePadRange
     @Condition eventPlayer.bouncePadCooldown == 0
@@ -687,6 +679,7 @@ rule "Bounce when near pad 2":
 rule "Bounce when near pad 3":
     @Event eachPlayer
     @Hero all
+    @Condition gimmickPlayer.getCurrentHero() != Hero.TORBJORN
     @Condition bouncePad3 != null
     @Condition distance(eventPlayer.getPosition(), bouncePad3) <= bouncePadRange
     @Condition eventPlayer.bouncePadCooldown == 0
@@ -708,6 +701,7 @@ rule "Bounce when near pad 3":
 rule "Bounce when near pad 4":
     @Event eachPlayer
     @Hero all
+    @Condition gimmickPlayer.getCurrentHero() != Hero.TORBJORN
     @Condition bouncePad4 != null
     @Condition distance(eventPlayer.getPosition(), bouncePad4) <= bouncePadRange
     @Condition eventPlayer.bouncePadCooldown == 0
@@ -1388,6 +1382,7 @@ rule "All players dead failsafe":
 rule "Allow one melee":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE)
+    @Condition eventPlayer != gimmickPlayer
 
     wait()
     eventPlayer.canDeflect = true
@@ -1639,6 +1634,7 @@ rule "Lag-O-Rama":
 
 rule "Tell player controls":
     @Event eachPlayer
+    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
     @Condition eventPlayer.isHoldingButton(Button.ABILITY_1)
 
     smallMessage(eventPlayer, "Here's a tip:")
@@ -1697,7 +1693,7 @@ def ReinTime():
     getAllPlayers().communicate(Comms.HELLO)
     gimmickPlayer.playerKills = 69
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    waitUntil(currentRound == 8, 9999)
+    waitUntil(currentRound == 9, 9999)
     gimmickPlayer.communicate(Comms.GOODBYE)
     wait(1)
     destroyDummy(Team.ALL, gimmickPlayer.getSlot())
@@ -1802,6 +1798,13 @@ rule "Rein go too far":
 rule "Dummi":
     @Event global
 
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
