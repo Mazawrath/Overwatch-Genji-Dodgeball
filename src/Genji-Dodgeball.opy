@@ -507,7 +507,6 @@ rule "Player dashes too far out of bounds":
     #eventPlayer.teleport(circleCenter + vect(random.randint(-15, 15), 8, random.randint(-15, 15)))
     eventPlayer.applyImpulse(vect(directionTowards(eventPlayer.getPosition(), circleCenter).x, 0, directionTowards(eventPlayer.getPosition(), circleCenter).z), 20, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
-    bigMessage(eventPlayer, "Do not dash out of the arena!")
 
 
 rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
