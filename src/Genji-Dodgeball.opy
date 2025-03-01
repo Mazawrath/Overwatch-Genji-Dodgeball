@@ -74,6 +74,9 @@ settings {
                 "weaponsEnabled": "hammer",
                 "healingReceived%": 500
             },
+            "ramattra": {
+                "ultDuration%": 500
+            },
             "enabledHeroes": [
                 "torbjorn"
             ]
@@ -1712,6 +1715,29 @@ rule "Get frozen by Mei":
     eventPlayer.setStatusEffect(attacker, Status.FROZEN, 3)
     wait(6)
 
+rule "Ramattra pick a victim":
+    @Event eachPlayer
+    @Condition covidTime
+    @Condition eventPlayer == gimmickPlayer
+    @Condition eventPlayer.getCurrentHero() == Hero.RAMATTRA
+
+    if (not gimmickPlayer.isUsingUltimate()):
+        gimmickPlayer.setUltCharge(100)
+        gimmickPlayer.forceButtonPress(Button.ULTIMATE)
+    waitUntil(not gimmickPlayer.isUsingUltimate(), 9999)
+    wait()
+    goto RULE_START
+
+rule "Ramattra does the annoying":
+    @Event eachPlayer
+    @Condition covidTime
+    @Condition eventPlayer == gimmickPlayer
+    @Condition eventPlayer.getCurrentHero() == Hero.RAMATTRA
+
+    gimmickPlayer.playerDeflects = random.choice([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player.isAlive()])
+    wait(6)
+    goto RULE_START
+
 def ReinTime():
     gimmickName = "HRAH"
     createDummy(Hero.REINHARDT, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
@@ -1798,15 +1824,19 @@ def BedTime():
 
 def CovidTime():
     gimmickName = "Social Distancing"
+    createDummy(Hero.RAMATTRA, Team.ALL, -1, vect(5, 0, 7), vect(0, 0, 0))
     wait(0.25)
-    bigMessage(getAllPlayers(), "Achoo! Think I have a cold guys...")
+    gimmickPlayer = getPlayersOnHero(Hero.RAMATTRA, Team.ALL)
+    bigMessage(getAllPlayers(), "Oh no! Rammatra has a cold!")
     wait(0.25)
     smallMessage(getAllPlayers(), "Contagious virus detected! Social distancing enabled!")
     waitUntil(roundInProgress, 9999)
+    gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), gimmickPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     covidTime = true
-    waitUntil(not roundInProgress, 9999)
-    covidTime = false
-    gimmickName = "Nothing"
+    # waitUntil(not roundInProgress, 9999)
+    # covidTime = false
+    # gimmickName = "Nothing"
 
 def MeiTime():
     gimmickName = "Mei Gets Her Freeze Back :)"
@@ -1840,14 +1870,15 @@ def CorrectTorbHeight():
 # def HackedControls():
 #     getAllPlayers().startTransformingThrottle(-1, -1, Direction)
 
-
 rule "Social Distancing":
     @Event eachPlayer
-    @Condition distance(eventPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player != eventPlayer and player.isAlive() and player.getCurrentHero() == playerHero], lambda player: distance(eventPlayer, player))[0]) < 6
+    @Condition eventPlayer == gimmickPlayer
+    @Condition distance(eventPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(eventPlayer, player))[0]) < 15
     @Condition covidTime
     
-    eventPlayer.maxBallSpeed = sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player != eventPlayer and player.isAlive() and player.getCurrentHero() == playerHero], lambda player: distance(eventPlayer, player))[0]
+    eventPlayer.maxBallSpeed = sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(eventPlayer.getPosition(), player.getPosition()))[0]
     eventPlayer.maxBallSpeed.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    wait()
     eventPlayer.maxBallSpeed.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.maxBallSpeed.getPosition()), 10, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     wait(0.05)
     if RULE_CONDITION:
@@ -1855,10 +1886,11 @@ rule "Social Distancing":
 
 rule "Rein go too far":
     @Event global
+    @Condition gimmickPlayer.getCurrentHero() == Hero.REINHARDT
     @Condition gimmickPlayer.antiFloatProtection
     @Condition distance(gimmickPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(gimmickPlayer, player))[0]) > 15
 
-    gimmickPlayer.teleport(vect(0, 2, 0))
+    gimmickPlayer.teleport(vect(1, 2, 0))
     
 
 rule "Dummi":
