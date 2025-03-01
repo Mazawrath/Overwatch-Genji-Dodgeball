@@ -69,6 +69,8 @@ settings {
                 "enableAbility1": false,
                 "ability2Cooldown%": 30,
                 "ability2Duration%": 8,
+                "combatUltGen%": 0,
+                "passiveUltGen%": 0,
                 "weaponsEnabled": "hammer"
             },
             "enabledHeroes": [
