@@ -71,7 +71,8 @@ settings {
                 "ability2Duration%": 8,
                 "combatUltGen%": 0,
                 "passiveUltGen%": 0,
-                "weaponsEnabled": "hammer"
+                "weaponsEnabled": "hammer",
+                "healingReceived%": 500
             },
             "enabledHeroes": [
                 "torbjorn"
@@ -883,7 +884,6 @@ rule "Ball reaches player":
         targetedPlayer = previousTargetedPlayer
     else:
         isPassingTeam1 = false
-        heal(previousTargetedPlayer, null, passingDamage)
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero and player.getCurrentHero() != gimmickPlayer[0].getCurrentHero()], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     if rulesetMode == 0:
             ballDirectionRate = 6
@@ -988,7 +988,6 @@ rule "End assist after a second - TEAMS":
 def DeflectFailed():
     @Name "Player Didn't Deflect - Kill"
     
-    heal(getLivingPlayers(Team.ALL), null, 200)
     isPassingTeam1 = false
     isPassingTeam2 = false
     targetedPlayer.setStatusEffect(previousTargetedPlayer, Status.STUNNED, 1)
