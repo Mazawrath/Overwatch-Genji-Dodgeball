@@ -1074,7 +1074,8 @@ def UpdatedDeathEffects():
 rule "Final duel":
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isGameInProgress() == true
-    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() != ballHero]) == 2
+    @Condition gimmickPlayer == null
+    @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() == Hero.TORBJORN]) == 2
     @Condition isEnoughPlayersToStart == true
     @Condition isInFinalDuel == false
     @Condition not endlessBall
@@ -1213,11 +1214,13 @@ rule "Check for last player surviving":
         ballSpawnCountdown = 5
     if currentRound == 3:
         async(CovidTime(), AsyncBehavior.NOOP)
-    if currentRound == 5 or currentRound == 15:
+    if currentRound == 5:
         async(ReinTime(), AsyncBehavior.NOOP)
         ballSpawnCountdown = 10
     if currentRound == 10 or currentRound == 20:
         async(BedTime(), AsyncBehavior.NOOP)
+    if currentRound == 15:
+        async(MeiTime(), AsyncBehavior.NOOP)
     wait(1)
     roundInProgress = true
     wait(0.975)
@@ -1667,15 +1670,35 @@ rule "Rein Does the Spam":
     if gimmickPlayer.isDead() and len(getPlayersOnHero(playerHero, Team.ALL)) > 2:
         wait(0.25)
         gimmickPlayer.resurrect()
-    gimmickPlayer.forceButtonPress(Button.ULTIMATE)
     gimmickPlayer.forceButtonPress(Button.ABILITY_1)
+    gimmickPlayer.forceButtonPress(Button.ULTIMATE)
     gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
     waitUntil(not gimmickPlayer.isUsingAbility1() or not roundInProgress, 9999)
     gimmickPlayer.stopThrottleInDirection()
     wait(0.25)
     goto RULE_START
 
-    
+rule "Mei does the annoying":
+    @Event eachPlayer
+    # @Condition eventPlayer.playerKills == 69
+    @Condition eventPlayer.getCurrentHero() == Hero.MEI
+
+    if gimmickPlayer.getAbilityCharge(Button.ABILITY_2) == 0:
+        gimmickPlayer.stopForcingButton(Button.PRIMARY_FIRE)
+        wait()
+        gimmickPlayer.forceButtonPress(Button.ABILITY_2)
+        wait()
+    gimmickPlayer.startForcingButton(Button.PRIMARY_FIRE)
+    gimmickPlayer.playerDeflects = random.choice([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player.isAlive()])
+    wait(6)
+    goto RULE_START
+
+rule "Get frozen by Mei":
+    @Event playerTookDamage
+    @Condition attacker.getCurrentHero() == Hero.MEI
+
+    eventPlayer.setStatusEffect(attacker, Status.FROZEN, 3)
+    wait(6)
 
 def ReinTime():
     gimmickName = "HRAH"
@@ -1698,6 +1721,7 @@ def ReinTime():
     wait(1)
     destroyDummy(Team.ALL, gimmickPlayer.getSlot())
     gimmickName = "Nothing"
+    gimmickPlayer = null
 
 def BedTime():
     gimmickName = "Grandma Bedtime Simulator"
@@ -1757,10 +1781,11 @@ def BedTime():
     destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
     destroyDummy(Team.ALL, gimmickPlayer[3].getSlot())
     gimmickName = "Nothing"
+    gimmickPlayer = null
 
 
 def CovidTime():
-    gimmickName = "Social Distancing :)"
+    gimmickName = "Social Distancing"
     wait(0.25)
     bigMessage(getAllPlayers(), "Achoo! Think I have a cold guys...")
     wait(0.25)
@@ -1770,6 +1795,21 @@ def CovidTime():
     waitUntil(not roundInProgress, 9999)
     covidTime = false
     gimmickName = "Nothing"
+
+def MeiTime():
+    gimmickName = "Mei Gets Her Freeze Back :)"
+    wait(0.25)
+    bigMessage(getAllPlayers(), "Mei wants her OW1 freeze back...")
+    createDummy(Hero.MEI, Team.ALL, -1, vect(0, 0, 0), vect(0, 0, 0))
+    gimmickPlayer = getPlayersOnHero(Hero.MEI, Team.ALL)
+    wait(5)
+    gimmickPlayer.startForcingButton(Button.PRIMARY_FIRE)
+    gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), gimmickPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    waitUntil(currentRound == 18, 9999)
+    destroyDummy(Team.ALL, gimmickPlayer.getSlot())
+    gimmickName = "Nothing"
+    gimmickPlayer = null
 
 # def HackedControls():
 #     getAllPlayers().startTransformingThrottle(-1, -1, Direction)
