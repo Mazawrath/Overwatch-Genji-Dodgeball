@@ -1385,6 +1385,10 @@ rule "All players dead failsafe":
 rule "Allow one melee":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE)
+    @Condition not eventPlayer.hasStatusEffect(Status.STUNNED)
+    @Condition not eventPlayer.hasStatusEffect(Status.FROZEN)
+    @Condition not eventPlayer.hasStatusEffect(Status.KNOCKED_DOWN)
+    @Condition not eventPlayer.hasStatusEffect(Status.ASLEEP)
     @Condition eventPlayer != gimmickPlayer
 
     wait()
