@@ -133,30 +133,6 @@ def LongFun():
             ballPlayer.stopThrottleInDirection()
             ballPlayer.setMoveSpeed(100)
             break
-        case 7:
-            # nice
-            if (ballHeroRandom == 69):
-                # HYPER TBAG!
-                ballPlayer.setWeapon(2)
-                while ballPlayerMock == true:
-                    ballPlayer.communicate(Comms.YES)
-                    wait(0.05)
-                    ballPlayer.startForcingButton(Button.CROUCH)
-                    wait(0.05)
-                    ballPlayer.stopForcingButton(Button.CROUCH)
-            else:
-                # Tbag them
-                ballPlayer.communicate(Comms.YES)
-                ballPlayer.setWeapon(2)
-                ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
-                while ballPlayerMock == true:
-                    wait(0.1)
-                    ballPlayer.startForcingButton(Button.CROUCH)
-                    wait(0.1)
-                    ballPlayer.stopForcingButton(Button.CROUCH)
-                ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
-                ballPlayer.setWeapon(random.randint(0, 1))
-            break
         case 8:
             # Torb thinks one Genji in specific is broken.
             wait(1)
@@ -248,31 +224,6 @@ def ShortFun():
         return
     ballHeroRandom = random.randint(0, 100)
     switch random.randint(1, 11):
-        case 1:
-            # nice
-            if (ballHeroRandom == 69):
-                ballSpawnCountdown = 5
-                # HYPER TBAG!
-                ballPlayer.setWeapon(2)
-                while ballPlayerMock == true:
-                    ballPlayer.communicate(Comms.YES)
-                    wait(0.05)
-                    ballPlayer.startForcingButton(Button.CROUCH)
-                    wait(0.05)
-                    ballPlayer.stopForcingButton(Button.CROUCH)
-            else:
-                # Tbag them
-                ballPlayer.communicate(Comms.YES)
-                ballPlayer.setWeapon(2)
-                ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
-                while ballPlayerMock == true:
-                    wait(0.1)
-                    ballPlayer.startForcingButton(Button.CROUCH)
-                    wait(0.1)
-                    ballPlayer.stopForcingButton(Button.CROUCH)
-                ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
-                ballPlayer.setWeapon(random.randint(0, 1))
-            break
         case 2:
             # Hammer their dead body
             wait(0.5)
