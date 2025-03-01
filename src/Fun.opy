@@ -64,19 +64,6 @@ def LongFun():
                 waitUntil(not ballPlayerMock,0.25)
             destroyInWorldText(ballHeroRegretText)
             break
-        case 2:
-            # Hammer their dead body
-            wait(0.5)
-            ballPlayer.communicate(Comms.NO)
-            ballPlayer.setWeapon(2)
-            ballPlayer.forceButtonPress(Button.ABILITY_1)
-            ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
-            waitUntil(not ballPlayerMock, 9999)
-            ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
-            ballPlayer.setWeapon(random.randint(0, 1))
-            ballPlayer.forceButtonPress(Button.INTERACT)
-            ballPlayer.forceButtonPress(Button.ABILITY_1)
-            break
         case 3:
             # That was so boring that Torb is going to take a nap
             ballPlayer.setStatusEffect(null, Status.ASLEEP, 9999)
@@ -114,7 +101,6 @@ def LongFun():
                 ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), vect(random.uniform(-20, 20), random.uniform(0, 5), random.uniform(-20, 20))), Relativity.TO_WORLD)
                 wait(0.05)
                 ballPlayer.stopForcingButton(Button.ULTIMATE)
-                ballPlayer.forceButtonPress(Button.PRIMARY_FIRE)
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
             break
         case 6:
@@ -132,26 +118,6 @@ def LongFun():
             destroyInWorldText(ballHeroRegretText)
             ballPlayer.stopThrottleInDirection()
             ballPlayer.setMoveSpeed(100)
-            break
-        case 8:
-            # Torb thinks one Genji in specific is broken.
-            wait(1)
-            ballHeroRandom = random.choice(getPlayersOnHero(playerHero, Team.ALL))
-            ballPlayer.enablePlayerCollision()
-            ballPlayer.setMoveSpeed(150)
-            ballPlayer.startThrottleInDirection(directionTowards(ballPlayer.getPosition(), ballHeroRandom.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom.getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-            ballPlayer.setWeapon(2)
-            ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
-            createInWorldText(getAllPlayers(), "Come here {0}, I'll fix you right up!".format(ballHeroRandom), ballPlayer.getEyePosition() + vect(0, 1, 0), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
-            ballHeroRegretText = getLastCreatedText()
-            waitUntil(not ballPlayerMock, 9999)
-            ballPlayer.disablePlayerCollision()
-            ballPlayer.stopThrottleInDirection()
-            ballPlayer.setMoveSpeed(100)
-            ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
-            ballPlayer.setWeapon(random.randint(0, 1))
-            destroyInWorldText(ballHeroRegretText)
             break
         case 9:
             ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
@@ -224,17 +190,6 @@ def ShortFun():
         return
     ballHeroRandom = random.randint(0, 100)
     switch random.randint(1, 11):
-        case 2:
-            # Hammer their dead body
-            wait(0.5)
-            ballPlayer.communicate(Comms.NO)
-            ballPlayer.setWeapon(2)
-            ballPlayer.startForcingButton(Button.PRIMARY_FIRE)
-            waitUntil(not ballPlayerMock, 9999)
-            ballPlayer.stopForcingButton(Button.PRIMARY_FIRE)
-            ballPlayer.setWeapon(random.randint(0, 1))
-            ballPlayer.forceButtonPress(Button.INTERACT)
-            break
         case 3:
             # That was so boring Torb is going to take a nap
             ballPlayer.setStatusEffect(null, Status.ASLEEP, 9999)
