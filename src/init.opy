@@ -37,6 +37,7 @@ rule "Init player variables":
     eventPlayer.toggleHUD = true
     eventPlayer.dashNerf = false
     eventPlayer.latencyToggle = false
+    eventPlayer.torbDie = false
     waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
     eventPlayer.setInvisibility(Invis.NONE)
     if invisiblePlayers:

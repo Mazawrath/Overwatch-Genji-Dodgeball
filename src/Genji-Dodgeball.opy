@@ -202,6 +202,7 @@ playervar yeetPlayer 18
 playervar latency 19
 playervar latencyToggle 20
 playervar canDeflect 21
+playervar torbDie 22
 
 
 #Subroutine names
@@ -993,7 +994,7 @@ def DeflectFailed():
     previousTargetedPlayer.currentUltPercent += 15
     if ballHero and previousTargetedPlayer == -1:
         previousTargetedPlayer = ballPlayer
-    kill(targetedPlayer, previousTargetedPlayer)
+    targetedPlayer.torbDie = true
     if ballHero and not ballPlayer.hasStatusEffect(Status.FROZEN):
         ballPlayer.stopFacing()
         ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
@@ -1202,7 +1203,7 @@ rule "Check for last player surviving":
         wait(0.25)
         targetedPlayer = -1
         bigMessage(getAllPlayers(), "Tiebreaker!")
-
+    getAllPlayers().torbDie = false
     if currentRound > maxRounds:
         wonPlayer = sorted(getPlayersOnHero(Hero.TORBJORN, Team.ALL), lambda player: player.getScore()).last()
         Cinema()

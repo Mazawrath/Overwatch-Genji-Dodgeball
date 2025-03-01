@@ -59,8 +59,8 @@ def StartBreak():
 rule "Torb must die":
     @Event eachPlayer
     @Hero torbjorn
+    @Condition eventPlayer.torbDie
 
-    @Condition eventPlayer.getHealth() == 1
     if random.randint(1, 3) == 1:
             switch random.randint(1,2):
                 case 1:
@@ -72,7 +72,7 @@ rule "Torb must die":
         eventPlayer.communicate(Comms.GOODBYE)
     eventPlayer.detach()
     eventPlayer.clearStatusEffect(Status.UNKILLABLE)
-    kill(eventPlayer, null)
+    kill(eventPlayer, previousTargetedPlayer)
     eventPlayer.setStatusEffect(null, Status.UNKILLABLE, 9999)
     waitUntil(eventPlayer.isAlive(), 9999)
     eventPlayer.teleport(vect(random.randint(-10, 10), 8, random.randint(-10, 10)))

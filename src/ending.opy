@@ -120,11 +120,11 @@ def Cinema():
     gimmickPlayer.startScalingSize(50, false)
     gimmickPlayer.teleport(vect(0, 0, -100))
     endlessBall = 5
-    getAllPlayers().clearStatusEffect(Status.UNKILLABLE)
     getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * endlessBall, gimmickPlayer.getEyePosition(), 5000)
     chase(endlessBall, 30, duration=4, ChaseReeval.NONE)
     bigMessage(getAllPlayers(), "{0} gets to preview the S-E-X update! (Release date 2030)".format(wonPlayer))
     wait(7)
+    getAllPlayers().clearStatusEffect(Status.UNKILLABLE)
     getAllPlayers().disableRespawn()
     gimmickPlayer.setWeapon(2)
     gimmickPlayer.setPrimaryFireEnabled(true)
