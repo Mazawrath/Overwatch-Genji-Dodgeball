@@ -19,8 +19,7 @@ settings {
     "gamemodes": {
         "ffa": {
             "enabledMaps": [
-                "workshopIslandNight",
-                "workshopIsland"
+                "workshopIslandNight"
             ],
             "gameLengthInMn": 15,
             "enableSelfInitiatedRespawn": false
@@ -517,7 +516,7 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
     if gimmickName == "Correct Torb height (and speed)":
         eventPlayer.applyImpulse(Vector.UP, 8, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     else:
-    eventPlayer.applyImpulse(Vector.UP, 2, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+        eventPlayer.applyImpulse(Vector.UP, 2, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     eventPlayer.applyImpulse(directionTowards(eventPlayer, circleCenter), 2, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
     wait(0.008)
     if RULE_CONDITION:
@@ -629,7 +628,7 @@ rule "Anti-Stuck Activation":
     @Condition eventPlayer not in stressTorbs
     @Condition eventPlayer.getPosition().y < -4
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
-    
+
     eventPlayer.applyImpulse(Vector.UP, 5, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION_XYZ)
     wait(0.5)
     if RULE_CONDITION:
@@ -1218,12 +1217,14 @@ rule "Check for last player surviving":
         ballSpawnCountdown = 5
     if currentRound == 3:
         async(CovidTime(), AsyncBehavior.NOOP)
-    if currentRound == 5:
+    elif currentRound == 5:
         async(ReinTime(), AsyncBehavior.NOOP)
         ballSpawnCountdown = 10
-    if currentRound == 10 or currentRound == 20:
+    elif currentRound == 10:
+        async(CorrectTorbHeight(), AsyncBehavior.NOOP)
+    elif currentRound == 15:
         async(BedTime(), AsyncBehavior.NOOP)
-    if currentRound == 15:
+    elif currentRound == 20:
         async(MeiTime(), AsyncBehavior.NOOP)
     wait(1)
     roundInProgress = true
@@ -1679,10 +1680,11 @@ rule "Rein Does the Spam":
         wait(0.25)
         gimmickPlayer.resurrect()
     gimmickPlayer.forceButtonPress(Button.ABILITY_1)
-    gimmickPlayer.forceButtonPress(Button.ULTIMATE)
     gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
     waitUntil(not gimmickPlayer.isUsingAbility1() or not roundInProgress, 9999)
     gimmickPlayer.stopThrottleInDirection()
+    wait()
+    gimmickPlayer.forceButtonPress(Button.ULTIMATE)
     wait(0.25)
     goto RULE_START
 
@@ -1826,7 +1828,7 @@ def CorrectTorbHeight():
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).startScalingSize(0, false)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setMoveSpeed(200)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setJumpVerticalSpeed(200)
-    waitUntil(currentRound == 8, 9999)
+    waitUntil(currentRound == 13, 9999)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).startScalingSize(1, false)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setMoveSpeed(100)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setJumpVerticalSpeed(100)
