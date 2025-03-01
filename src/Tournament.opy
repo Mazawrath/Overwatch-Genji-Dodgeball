@@ -56,29 +56,12 @@ def StartBreak():
     disableAnnouncer()
 
 
-rule "Stress relief Torbs join":
-    @Event eachPlayer
-    @Condition tournamentMode
-    @Condition eventPlayer in stressTorbs
-
-    wait(0.5)
-    eventPlayer.enableRespawn()
-    eventPlayer.setRespawnTime(5)
-    eventPlayer.clearStatusEffect(Status.INVINCIBLE)
-    eventPlayer.setStatusEffect(null, Status.UNKILLABLE, 9999)
-    # eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), sorted([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() == playerHero]).getEyePosition()), 200, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(eventPlayer, player))[0].getEyePosition()), 500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    wait(random.uniform(1, 2))
-    eventPlayer.communicate(Comms.NO)
-    
-
 rule "Torb must die":
     @Event eachPlayer
     @Hero torbjorn
 
     @Condition eventPlayer.getHealth() == 1
-    if random.randint(1, 4) == 1:
-        if random.randint(0,1):
+    if random.randint(1, 3) == 1:
             switch random.randint(1,2):
                 case 1:
                     eventPlayer.applyImpulse(Vector.UP, 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
@@ -87,9 +70,6 @@ rule "Torb must die":
                     eventPlayer.applyImpulse(directionTowards(eventPlayer.getEyePosition(), vect(circleCenter.x, circleCenter.y + 4, circleCenter.z)), 75, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
                     break
         eventPlayer.communicate(Comms.GOODBYE)
-        wait(random.uniform(0.016, 0.5))
-    else:
-        wait()
     eventPlayer.detach()
     eventPlayer.clearStatusEffect(Status.UNKILLABLE)
     kill(eventPlayer, null)

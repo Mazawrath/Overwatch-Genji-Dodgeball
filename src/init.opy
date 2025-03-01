@@ -23,7 +23,7 @@ rule "Init player variables":
     if (ballHero != null and not isGameInProgress()):
         eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), ballPlayer.getEyePosition()), 100, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     eventPlayer.isDashEnabled = false
-    eventPlayer.setStatusEffect(null, Status.INVINCIBLE, 9999)
+    eventPlayer.setStatusEffect(null, Status.UNKILLABLE, 9999)
     if cooldownDashingEnabled:
         goto lbl_0
     eventPlayer.setAbility1Enabled(false)
@@ -51,19 +51,18 @@ rule "Init player variables":
     elif invisiblePlayers:
         eventPlayer.startCamera(updateEveryTick(eventPlayer.getEyePosition()), updateEveryTick(eventPlayer + eventPlayer.getFacingDirection() * 1000), 0)
     wait(3)
-    smallMessage(eventPlayer, "Press {0} to enable/disable the scoreboard".format(buttonString(Button.INTERACT)))
-    if (perspectiveMode == 0):
-        wait(3)
-        smallMessage(eventPlayer, "Press {0} to toggle 1st/3rd person".format(buttonString(Button.RELOAD)))
+    smallMessage(eventPlayer, "Here's a tip:")
+    wait(1)
+    smallMessage(eventPlayer, "Primary fire aka swing hammer = deflect")
+    wait(2)
+    smallMessage(eventPlayer, "Ability 2 aka overload = dash")
+    wait(3) 
 
 
 rule "Init global variables":
     targetedPlayer = -1
     previousTargetedPlayer = -1
-    if (random.randint(1, 100) == 69):
-        ballSpawnCountdown = 69
-    else:    
-        ballSpawnCountdown = 5
+    ballSpawnCountdown = 30
     if tournamentMode and getCurrentGamemode() != Gamemode.FFA:
         tournamentMode = false
         hudText(hostPlayer, null, null, "Tournament mode is only supported in FFA", HudPosition.LEFT, -20, null, null, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
@@ -108,9 +107,10 @@ rule "Init global variables":
     isPassingTeam1 = false
     isPassingTeam2 = false
     passingPlayer = null
-    currentRound = 1
+    currentRound = 4
     breakLength = 120
     maxRoundsToggle = false
+    gimmickName = "Nothing"
     if getCurrentGamemode() == Gamemode.FFA:
         if tournamentMode:
             maxRoundsToggle = true
@@ -170,7 +170,7 @@ rule "Create global HUD elements":
     hudSubtext(getAllPlayers(), "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, rgb(max(0,min(4000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 200, 200)) + 55 * (ballSpeed != maxBallSpeed), max(55, min(455 - 2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed), 255)) + min(2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 100, 0), max(55, 500 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 245) - min(1600000 / 27 / (maxBallSpeed - ballSpawnSpeed)**3 * (ballSpeed - ballSpawnSpeed)**3 - 200, 0)), HudReeval.VISIBILITY_STRING_AND_COLOR, SpecVisibility.DEFAULT)
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     if watermarkEnabled and not tournamentMode:
-        hudSubheader(getAllPlayers(), "Discord.gg/GenjiDodgeball", HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
+        hudSubheader(getAllPlayers(), "Current Gimimck: {0}".format(gimmickName), HudPosition.LEFT, 0, [Color.LIME_GREEN if gimmickName == "Nothing" else ballTail1], HudReeval.VISIBILITY_SORT_ORDER_STRING_AND_COLOR, SpecVisibility.DEFAULT)
     createInWorldText([player for player in getAllPlayers() if ballSpawnCountdown != 0 and player != targetedPlayer], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
     createInWorldText([player for player in targetedPlayer if ballSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), updateEveryTick(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z) + directionTowards(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), targetedPlayer.getEyePosition()) / 50), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, rgb(255 , 50, 50), SpecVisibility.DEFAULT)
     if rulesetMode == 1:
@@ -266,6 +266,8 @@ rule "Create ball & targeted effect":
         createEffect(updateEveryTick(targetedPlayer if localPlayer in getAllPlayers() and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(updateEveryTick(targetedPlayer if localPlayer in getAllPlayers() and not (localPlayer.isAlive() and localPlayer.latencyToggle) else []), Effect.GOOD_AURA, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if isPassingTeam1 or isPassingTeam2 else []), Effect.GOOD_AURA, Color.SKY_BLUE, updateEveryTick(ballPosition), 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+
+    createEffect(getAllPlayers(), Effect.BAD_AURA_SOUND, Color.AQUA, ballPosition, 1000, EffectReeval.POSITION_AND_RADIUS)
     
 
 

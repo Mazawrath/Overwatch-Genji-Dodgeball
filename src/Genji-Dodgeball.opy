@@ -54,11 +54,15 @@ settings {
             "reinhardt": {
                 "ability1Cooldown%": 0,
                 "ability1Kb%": 300,
-                "movementSpeed%": "125"
+                "movementSpeed%": 125,
+                "enableSpawningWithUlt": true,
+                "combatUltGen%": 500,
+                "passiveUltGen%": 500,
+                "ultGen%": 500
             },
             "ana": {
-                "ability1Cooldown%": 0,
-                "movementSpeed%": "125"
+                "ability1Cooldown%": 10,
+                "movementSpeed%": "150"
             },
             "torbjorn": {
                 "enableAbility1": false,
@@ -169,6 +173,7 @@ globalvar breakInProgress 91
 globalvar spawnPoints 92
 globalvar gimmickPlayer 93
 globalvar covidTime 94
+globalvar gimmickName 95
 
 
 #Player variables
@@ -209,6 +214,7 @@ subroutine BedTime 7
 subroutine CovidTime 8
 subroutine BallCurve 9
 subroutine BallPov 10
+subroutine MeiTime 11
 
 #Activated extensions
 
@@ -756,7 +762,7 @@ rule "Start round":
     roundInProgress = true
     ballPlayerMock = false
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
-    ballSpawnCountdown = 5
+    ballSpawnCountdown = 30
 
 
 rule "Start round - TEAMS":
@@ -1165,7 +1171,7 @@ rule "Check for last player surviving":
     @Condition isEnoughPlayersToStart == true
     
     isInFinalDuel = false
-    [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero].addToScore(1)
+    [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() == playerHero].addToScore(1)
     wait(0.25)
     if (getMatchTime() == 0 or tieBreakerActive) and gameEndEnabled:
         #If there is alredy a tiebreaker, then the tiebreaker has ended.
@@ -1181,7 +1187,7 @@ rule "Check for last player surviving":
             tieBreakerActive = false
     stopChasingVariable(ballSpawnCountdown)
     stopChasingVariable(getAllPlayers().bouncePadCooldown)
-    bigMessage(getAllPlayers(), "{0} has won the round!".format([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero]))
+    bigMessage(getAllPlayers(), "{0} has won the round!".format([player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() == playerHero]))
     wait(2)
     roundInProgress = false
     if not tieBreakerActive:
@@ -1203,9 +1209,10 @@ rule "Check for last player surviving":
     else:
         ballSpawnCountdown = 5
     if currentRound == 3:
-        async(CovidTime()   , AsyncBehavior.NOOP)
+        async(CovidTime(), AsyncBehavior.NOOP)
     if currentRound == 5 or currentRound == 15:
         async(ReinTime(), AsyncBehavior.NOOP)
+        ballSpawnCountdown = 10
     if currentRound == 10 or currentRound == 20:
         async(BedTime(), AsyncBehavior.NOOP)
     wait(1)
@@ -1417,11 +1424,10 @@ rule "Ball no down when y < -0.5":
 
 
 rule "RGB Ball Mode":
-    @Condition ballTailColor == 2
-    @Condition ballIsOut
+    # @Condition ballTailColor == 2
+    # @Condition ballIsOut
 
     ballTail1 = rgb(random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
-    ballTail2 = rgb(random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
     wait(0.1)
     if RULE_CONDITION:
         goto RULE_START
@@ -1507,6 +1513,7 @@ rule "Team 2 Win - TEAMS":
     declareTeamVictory(Team.2)
 
 rule "Maximum amount of rounds reached":
+    @Disabled
     @Condition maxRoundsToggle
     @Condition currentRound > maxRounds
     
@@ -1596,9 +1603,10 @@ rule "Toggle Latency":
 rule "Lag-O-Rama":
     @Event eachPlayer
     @Condition eventPlayer.latencyToggle
+    @Condition eventPlayer.getCurrentHero() == playerHero
 
-    wait(random.uniform(0.58, 5))
-    if random.randint(1, 100) <= 50:
+    wait(random.uniform(0.58, 2))
+    if random.randint(1, 100) <= 75:
         if random.randint(1, 100) <= 75:
             eventPlayer.teleport(vect(eventPlayer.getPosition().x + random.uniform(-25, 25), eventPlayer.getPosition().y + random.uniform(0, 0.5), eventPlayer.getPosition().z+ random.uniform(-25, 25)))
         else:
@@ -1607,7 +1615,7 @@ rule "Lag-O-Rama":
             eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, random.uniform(0.25, 0.5))
             wait(random.uniform(0.01, 2.5))
             eventPlayer.setStatusEffect(null, Status.KNOCKED_DOWN, random.uniform(0.25, 0.5))
-    wait(random.uniform(0, 2.5))
+    wait(random.uniform(0, 1.5))
     if random.randint(1, 100) <= 50:
             eventPlayer.setFacing(vect(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)), Relativity.TO_PLAYER)
     wait(random.uniform(0, 0.5))
@@ -1644,42 +1652,49 @@ rule "Randomly teleport ball":
     wait(random.uniform(5, 30))
     goto RULE_START
 
+
+rule "Rein Does the Spam":
+    @Event eachPlayer
+    @Condition eventPlayer.playerKills == 69
+    @Condition eventPlayer.getCurrentHero() == Hero.REINHARDT
+
+    if gimmickPlayer.isDead() and len(getPlayersOnHero(playerHero, Team.ALL)) > 2:
+        wait(0.25)
+        gimmickPlayer.resurrect()
+    gimmickPlayer.forceButtonPress(Button.ULTIMATE)
+    gimmickPlayer.forceButtonPress(Button.ABILITY_1)
+    gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    waitUntil(not gimmickPlayer.isUsingAbility1() or not roundInProgress, 9999)
+    gimmickPlayer.stopThrottleInDirection()
+    wait(0.25)
+    goto RULE_START
+
     
 
 def ReinTime():
+    gimmickName = "HRAH"
     createDummy(Hero.REINHARDT, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
     gimmickPlayer = getPlayersOnHero(Hero.REINHARDT, Team.ALL)[0]
     gimmickPlayer.startModifyingVoicelinePitch(0.5, false)
     gimmickPlayer.startScalingSize(1.1, false)
+    gimmickPlayer.playerKills = 0
+    # gimmickPlayer.ult
     wait(0.25)
+    getAllPlayers().startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * 0.65, gimmickPlayer.getEyePosition(), 5000)
     bigMessage(getAllPlayers(), "Oh, hi Reinhart!")
-    wait(0.5)
-    gimmickPlayer.communicate(Comms.HELLO)
+    wait(5)
+    getAllPlayers().stopCamera()
+    getAllPlayers().communicate(Comms.HELLO)
+    gimmickPlayer.playerKills = 69
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    waitUntil(ballIsOut, 9999)
-    while currentRound != 7 or currentRound != 17:
-        # gimmickPlayer.setUltCharge(100)
-        # gimmickPlayer.forceButtonPress(Button.ULTIMATE)
-        if gimmickPlayer.isDead() and len(getPlayersOnHero(playerHero, Team.ALL)) > 2:
-            wait(0.25)
-            gimmickPlayer.resurrect()
-        gimmickPlayer.forceButtonPress(Button.ABILITY_1)
-        gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-        waitUntil(not gimmickPlayer.isUsingAbility1() or not roundInProgress, 9999)
-        gimmickPlayer.stopThrottleInDirection()
-        wait(0.25)
-        # while gimmickPlayer.isUsingAbility1():
-        #     gimmickPlayer.setFacing(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
-        #     wait()
-    if gimmickPlayer.isUsingAbility1():
-        gimmickPlayer.forceButtonPress(Button.ABILITY_1)
-        wait(0.25)
-    wait(0.25)
+    waitUntil(currentRound == 8, 9999)
     gimmickPlayer.communicate(Comms.GOODBYE)
     wait(1)
     destroyDummy(Team.ALL, gimmickPlayer.getSlot())
+    gimmickName = "Nothing"
 
 def BedTime():
+    gimmickName = "Grandma Bedtime Simulator"
     createDummy(Hero.ANA, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
     createDummy(Hero.ANA, Team.ALL, 16, vect(0, 0, 0), vect(0, 0, 0))
     createDummy(Hero.ANA, Team.ALL, 17, vect(0, 0, 0), vect(0, 0, 0))
@@ -1720,6 +1735,10 @@ def BedTime():
         wait(random.uniform(0, 0.25))
         gimmickPlayer[3].forceButtonPress(Button.ABILITY_1)
         gimmickPlayer[3].communicate(Comms.HELLO)
+        gimmickPlayer[0].startThrottleInDirection(directionTowards(gimmickPlayer[0], [random.uniform(-20, 20), 1, random.uniform(-20, 20)]), 1, Relativity.TO_PLAYER, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+        gimmickPlayer[1].startThrottleInDirection(directionTowards(gimmickPlayer[1], [random.uniform(-20, 20), 1, random.uniform(-20, 20)]), 1, Relativity.TO_PLAYER, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+        gimmickPlayer[2].startThrottleInDirection(directionTowards(gimmickPlayer[2], [random.uniform(-20, 20), 1, random.uniform(-20, 20)]), 1, Relativity.TO_PLAYER, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+        gimmickPlayer[3].startThrottleInDirection(directionTowards(gimmickPlayer[3], [random.uniform(-20, 20), 1, random.uniform(-20, 20)]), 1, Relativity.TO_PLAYER, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
         waitUntil(not gimmickPlayer.isUsingAbility1(), 9999)
         wait(random.uniform(1, 2))
     wait(0.25)
@@ -1731,21 +1750,28 @@ def BedTime():
     destroyDummy(Team.ALL, gimmickPlayer[1].getSlot())
     destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
     destroyDummy(Team.ALL, gimmickPlayer[3].getSlot())
+    gimmickName = "Nothing"
 
 
 def CovidTime():
+    gimmickName = "Social Distancing :)"
+    wait(0.25)
     bigMessage(getAllPlayers(), "Achoo! Think I have a cold guys...")
     wait(0.25)
-    smallMessage(getAllPlayers(), "Oh no! That thing that happened three years ago has finally made it to Overwatch!")
+    smallMessage(getAllPlayers(), "Contagious virus detected! Social distancing enabled!")
     waitUntil(roundInProgress, 9999)
     covidTime = true
     waitUntil(not roundInProgress, 9999)
     covidTime = false
+    gimmickName = "Nothing"
+
+# def HackedControls():
+#     getAllPlayers().startTransformingThrottle(-1, -1, Direction)
 
 
 rule "Social Distancing":
     @Event eachPlayer
-    @Condition distance(eventPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player != eventPlayer and player.isAlive() and player.getCurrentHero() == playerHero], lambda player: distance(eventPlayer, player))[0]) < 10
+    @Condition distance(eventPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player != eventPlayer and player.isAlive() and player.getCurrentHero() == playerHero], lambda player: distance(eventPlayer, player))[0]) < 6
     @Condition covidTime
     
     eventPlayer.maxBallSpeed = sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player != eventPlayer and player.isAlive() and player.getCurrentHero() == playerHero], lambda player: distance(eventPlayer, player))[0]
@@ -1766,10 +1792,6 @@ rule "Rein go too far":
 rule "Dummi":
     @Event global
 
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
