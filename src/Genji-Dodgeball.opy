@@ -220,6 +220,7 @@ subroutine BallCurve 9
 subroutine BallPov 10
 subroutine MeiTime 11
 subroutine Cinema 12
+subroutine CorrectTorbHeight 13
 
 #Activated extensions
 
@@ -513,6 +514,9 @@ rule "Player tries to abuse ledge on Workshop Island (push up and to center)":
     @Condition (getCurrentMap() == Map.WORKSHOP_ISLAND or getCurrentMap() == Map.WORKSHOP_ISLAND_NIGHT) == true
     
     #Prevents people from going under the ledge on Workshop Island, which caused ball to go into floor.  Used to be an annoying stunkill
+    if gimmickName == "Correct Torb height (and speed)":
+        eventPlayer.applyImpulse(Vector.UP, 8, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    else:
     eventPlayer.applyImpulse(Vector.UP, 2, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     eventPlayer.applyImpulse(directionTowards(eventPlayer, circleCenter), 2, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
     wait(0.008)
@@ -1814,6 +1818,20 @@ def MeiTime():
     destroyDummy(Team.ALL, gimmickPlayer.getSlot())
     gimmickName = "Nothing"
     gimmickPlayer = null
+
+def CorrectTorbHeight():
+    gimmickName = "Correct Torb height (and speed)"
+    wait(0.25)
+    bigMessage(getAllPlayers(), "Lore Accurate Torb Height Activated")
+    getPlayersOnHero(Hero.TORBJORN, Team.ALL).startScalingSize(0, false)
+    getPlayersOnHero(Hero.TORBJORN, Team.ALL).setMoveSpeed(200)
+    getPlayersOnHero(Hero.TORBJORN, Team.ALL).setJumpVerticalSpeed(200)
+    waitUntil(currentRound == 8, 9999)
+    getPlayersOnHero(Hero.TORBJORN, Team.ALL).startScalingSize(1, false)
+    getPlayersOnHero(Hero.TORBJORN, Team.ALL).setMoveSpeed(100)
+    getPlayersOnHero(Hero.TORBJORN, Team.ALL).setJumpVerticalSpeed(100)
+    gimmickName = "Nothing"
+    
 
 # def HackedControls():
 #     getAllPlayers().startTransformingThrottle(-1, -1, Direction)
