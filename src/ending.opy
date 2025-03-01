@@ -1,101 +1,100 @@
-settings {
-    "main": {
-        "modeName": "Genji Dodgeball v7.9.1",
-        "description": "Genji Dodgeball v7.9.1. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
-    },
-    "lobby": {
-        "allowPlayersInQueue": true,
-        "mapRotation": "afterGame",
-        "enableMatchVoiceChat": true,
-        "spectatorSlots": 6,
-        "returnToLobby": "never",
-        "swapTeamsAfterMatch": false,
-        "teamBalancing": "afterGame"
-    },
-    "gamemodes": {
-        "ffa": {
-            "enabledMaps": [
-                "workshopIslandNight"
-            ],
-            "gameLengthInMn": 15,
-            "enableSelfInitiatedRespawn": false
-        },
-        "tdm": {
-            "enabled": false,
-            "gameLengthInMn": 15,
-            "needsImbalancedTeamScoreToWin": true,
-            "team1ScoreToWin": 10,
-            "team2ScoreToWin": 10
-        },
-        "general": {
-            "enableHeroSwitching": false,
-            "gamemodeStartTrigger": "immediately",
-            "heroLimit": "off",
-            "enableRandomHeroes": true
-        }
-    },
-    "heroes": {
-        "allTeams": {
-            "genji": {
-                "ability2Cooldown%": 0,
-                "enableInfiniteAmmo": true,
-                "enablePrimaryFire": false,
-                "enableMelee": false,
-                "enableSecondaryFire": false,
-                "ability1Cooldown%": 38,
-                "combatUltGen%": 0,
-                "passiveUltGen%": 0
-            },
-            "torbjorn": {
-                "ability2Duration%": 300
-            },
-            "enabledHeroes": [
-                "torbjorn"
-            ]
-        }
-    }
-}
+# settings {
+#     "main": {
+#         "modeName": "Genji Dodgeball v7.9.1",
+#         "description": "Genji Dodgeball v7.9.1. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+#     },
+#     "lobby": {
+#         "allowPlayersInQueue": true,
+#         "mapRotation": "afterGame",
+#         "enableMatchVoiceChat": true,
+#         "spectatorSlots": 6,
+#         "returnToLobby": "never",
+#         "swapTeamsAfterMatch": false,
+#         "teamBalancing": "afterGame"
+#     },
+#     "gamemodes": {
+#         "ffa": {
+#             "enabledMaps": [
+#                 "workshopIslandNight"
+#             ],
+#             "gameLengthInMn": 15,
+#             "enableSelfInitiatedRespawn": false
+#         },
+#         "tdm": {
+#             "enabled": false,
+#             "gameLengthInMn": 15,
+#             "needsImbalancedTeamScoreToWin": true,
+#             "team1ScoreToWin": 10,
+#             "team2ScoreToWin": 10
+#         },
+#         "general": {
+#             "enableHeroSwitching": false,
+#             "gamemodeStartTrigger": "immediately",
+#             "heroLimit": "off",
+#             "enableRandomHeroes": true
+#         }
+#     },
+#     "heroes": {
+#         "allTeams": {
+#             "genji": {
+#                 "ability2Cooldown%": 0,
+#                 "enableInfiniteAmmo": true,
+#                 "enablePrimaryFire": false,
+#                 "enableMelee": false,
+#                 "enableSecondaryFire": false,
+#                 "ability1Cooldown%": 38,
+#                 "combatUltGen%": 0,
+#                 "passiveUltGen%": 0
+#             },
+#             "torbjorn": {
+#                 "ability2Duration%": 300
+#             },
+#             "enabledHeroes": [
+#                 "torbjorn"
+#             ]
+#         }
+#     }
+# }
 
-globalvar gimmickPlayer 1
-globalvar wonPlayer 2
-globalvar endlessBall 3
-globalvar ballTail2 4
-globalvar ballSpeed 5
-globalvar torbBall 6
+# globalvar gimmickPlayer 1
+# globalvar wonPlayer 2
+# globalvar endlessBall 3
+# globalvar ballTail2 4
+# globalvar ballSpeed 5
+# globalvar torbBall 6
 
-subroutine TheEnding 0
+# subroutine TheEnding 0
 
-#!extension spawnMoreDummyBots
+# #!extension spawnMoreDummyBots
 
-rule "Guh?":
-    @Event global
+# rule "Guh?":
+#     @Event global
 
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(Hero.TORBJORN, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
 
-rule "Start Ending":
-	@Event eachPlayer
-	@Condition eventPlayer.isHoldingButton(Button.CROUCH)
+# rule "Start Ending":
+# 	@Event eachPlayer
+# 	@Condition eventPlayer.isHoldingButton(Button.CROUCH)
 
-	TheEnding()
+# 	TheEnding()
 
-def TheEnding():
+def Cinema():
     destroyAllHudTexts()
     destroyAllEffects()
     destroyAllHudTexts()
     getAllPlayers().disableHeroHud()
     getAllPlayers().disableGamemodeHud()
-	wonPlayer = hostPlayer
 	getAllPlayers().preloadHero(Hero.GENJI)
 	smallMessage(getAllPlayers(), "Wow, what a great game, {0} won!".format(wonPlayer))
 	wait(1.5)
@@ -122,6 +121,7 @@ def TheEnding():
     wait(7)
     getAllPlayers().disableRespawn()
     gimmickPlayer.setWeapon(2)
+    gimmickPlayer.setPrimaryFireEnabled(true)
     gimmickPlayer.setUltCharge(100)
     getPlayersOnHero(Hero.GENJI, Team.ALL).enablePlayerCollision()
     getPlayersOnHero(Hero.GENJI, Team.ALL).teleport(vect(15, 0, 0))

@@ -107,7 +107,7 @@ rule "Init global variables":
     isPassingTeam1 = false
     isPassingTeam2 = false
     passingPlayer = null
-    currentRound = 4
+    currentRound = 1
     breakLength = 120
     maxRoundsToggle = false
     gimmickName = "Nothing"

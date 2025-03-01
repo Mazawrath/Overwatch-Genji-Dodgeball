@@ -174,6 +174,7 @@ globalvar spawnPoints 92
 globalvar gimmickPlayer 93
 globalvar covidTime 94
 globalvar gimmickName 95
+globalvar wonPlayer 96
 
 
 #Player variables
@@ -215,6 +216,7 @@ subroutine CovidTime 8
 subroutine BallCurve 9
 subroutine BallPov 10
 subroutine MeiTime 11
+subroutine Cinema 12
 
 #Activated extensions
 
@@ -237,7 +239,7 @@ rule "// SETTINGS":
     ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Fun Settings", "Ball Tail Color", 0, 1)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 2)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 3)
-    tournamentMode = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Tournament Mode", false, 0)
+    tournamentMode = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Tournament Mode", true, 0)
     maxRounds = createWorkshopSetting(int[1:50], "Tournament Settings (FFA Only)", "Total Rounds", 30, 1)
     breaksEnabled = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Breaks", true, 2)
     breakFrequency = createWorkshopSetting(int[1:25], "Tournament Settings (FFA Only)", "Run Break Every __ Rounds", 10, 3)
@@ -315,6 +317,8 @@ rule "// INITIALIZATION":
 
 
 #!include "./Tournament.opy"
+
+#!include "./Ending.opy"
 
 
 rule "Enable Scoreboard":
@@ -1200,6 +1204,11 @@ rule "Check for last player surviving":
         wait(0.25)
         targetedPlayer = -1
         bigMessage(getAllPlayers(), "Tiebreaker!")
+
+    if currentRound > maxRounds:
+        wonPlayer = sorted(getPlayersOnHero(Hero.TORBJORN, Team.ALL), lambda player: player.getScore()).last()
+        Cinema()
+        return
     if not isEnoughPlayersToStart:
         return
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
@@ -1348,6 +1357,7 @@ rule "Player check":
 
 
 rule "All players dead failsafe":
+    @Disabled
     @Condition getNumberOfLivingPlayers(Team.ALL) == 0
     @Condition isGameInProgress() == true
     @Condition tieBreakerActive == false
@@ -1797,3 +1807,5 @@ rule "Dummi":
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     
+
+#!include "./Ending.opy"
