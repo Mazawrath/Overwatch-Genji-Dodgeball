@@ -99,6 +99,7 @@ def Cinema():
     getAllPlayers().disableGamemodeHud()
     getAllPlayers().setAbility1Enabled(false)
     getAllPlayers().setAbility2Enabled(false)
+    getAllPlayers().disableKillFeed()
 	getAllPlayers().preloadHero(Hero.GENJI)
 	smallMessage(getAllPlayers(), "Wow, what a great game, {0} won!".format(wonPlayer))
 	wait(1.5)

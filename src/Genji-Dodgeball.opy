@@ -44,11 +44,10 @@ settings {
                 "ability2Cooldown%": 0,
                 "enableAbility1": false,
                 "enableAbility2": false,
-                "enableInfiniteAmmo": true,
                 "enablePrimaryFire": false,
                 "enableMelee": false,
                 "enableSecondaryFire": false,
-                "ability1Cooldown%": 38,
+                "ability1Cooldown%": 70,
                 "combatUltGen%": 0,
                 "passiveUltGen%": 0
             },
@@ -183,6 +182,7 @@ globalvar covidTime 94
 globalvar gimmickName 95
 globalvar wonPlayer 96
 globalvar disableCenter 97
+globalvar gimmickEndRound
 
 
 #Player variables
@@ -227,6 +227,7 @@ subroutine BallPov 10
 subroutine MeiTime 11
 subroutine Cinema 12
 subroutine CorrectTorbHeight 13
+subroutine GenjiReturns
 
 #Activated extensions
 
@@ -1393,12 +1394,13 @@ rule "All players dead failsafe":
 
 rule "Allow one melee":
     @Event eachPlayer
+    @Condition not eventPlayer.isDummy()
+    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE)
     @Condition not eventPlayer.hasStatusEffect(Status.STUNNED)
     @Condition not eventPlayer.hasStatusEffect(Status.FROZEN)
     @Condition not eventPlayer.hasStatusEffect(Status.KNOCKED_DOWN)
     @Condition not eventPlayer.hasStatusEffect(Status.ASLEEP)
-    @Condition eventPlayer != gimmickPlayer
 
     wait()
     eventPlayer.canDeflect = true
@@ -1611,6 +1613,7 @@ rule "Measure Latency":
 rule "Toggle Latency":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.ULTIMATE) == true
+    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
     @Condition rulesetMode != 2
 
     if eventPlayer.latencyToggle:
@@ -1624,7 +1627,7 @@ rule "Toggle Latency":
 rule "Lag-O-Rama":
     @Event eachPlayer
     @Condition eventPlayer.latencyToggle
-    @Condition eventPlayer.getCurrentHero() == playerHero
+    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
 
     wait(random.uniform(0.58, 2))
     if random.randint(1, 100) <= 75:
@@ -1640,6 +1643,8 @@ rule "Lag-O-Rama":
     if random.randint(1, 100) <= 50:
             eventPlayer.setFacing(vect(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)), Relativity.TO_PLAYER)
     wait(random.uniform(0, 0.5))
+    if eventPlayer.latencyToggle:
+        smallMessage(eventPlayer, "Lag-O-Rama activated with ultimate!")
     # Make them spam their deflect!
     # if random.randint(1, 100) <= 50:
     #     eventPlayer.forceButtonPress()
@@ -1714,7 +1719,17 @@ rule "Get frozen by Mei":
     eventPlayer.setStatusEffect(attacker, Status.FROZEN, 3)
     wait(6)
 
-rule "Ramattra pick a victim":
+rule "Get pushed by Genji":
+    @Event playerTookDamage
+    @Condition attacker.getCurrentHero() == Hero.GENJI
+
+    eventPlayer.setStatusEffect(null, Status.STUNNED, 0.25)
+    eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    wait()
+    eventPlayer.applyImpulse(directionTowards(attacker, eventPlayer.getPosition()), 15, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    wait()
+
+rule "Ramattra does the annoying":
     @Event eachPlayer
     @Condition covidTime
     @Condition eventPlayer == gimmickPlayer
@@ -1727,18 +1742,24 @@ rule "Ramattra pick a victim":
     wait()
     goto RULE_START
 
-rule "Ramattra does the annoying":
+rule "Dummy pick a victim":
     @Event eachPlayer
-    @Condition covidTime
-    @Condition eventPlayer == gimmickPlayer
-    @Condition eventPlayer.getCurrentHero() == Hero.RAMATTRA
+    @Condition eventPlayer in gimmickPlayer
+    @Condition eventPlayer.getCurrentHero() == Hero.RAMATTRA or eventPlayer.getCurrentHero() == Hero.GENJI
 
-    gimmickPlayer.playerDeflects = random.choice([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player.isAlive()])
-    wait(6)
+    if eventPlayer.getCurrentHero() == Hero.GENJI:
+        if random.randint(0, 1):
+            eventPlayer.forceButtonPress(Button.ABILITY_1)
+        elif random.randint(0, 1):
+            eventPlayer.forceButtonPress(Button.JUMP)
+    eventPlayer.playerDeflects = random.choice([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player.isAlive()])
+    waitUntil(eventPlayer.playerDeflects.isDead(), random.uniform(4, 8))
+    wait()
     goto RULE_START
 
 def ReinTime():
     gimmickName = "HRAH"
+    gimmickEndRound = currentRound + 3
     createDummy(Hero.REINHARDT, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
     gimmickPlayer = getPlayersOnHero(Hero.REINHARDT, Team.ALL)[0]
     gimmickPlayer.startModifyingVoicelinePitch(0.5, false)
@@ -1753,7 +1774,7 @@ def ReinTime():
     getAllPlayers().communicate(Comms.HELLO)
     gimmickPlayer.playerKills = 69
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    waitUntil(currentRound == 9, 9999)
+    waitUntil(currentRound == gimmickEndRound, 9999)
     gimmickPlayer.communicate(Comms.GOODBYE)
     wait(1)
     destroyDummy(Team.ALL, gimmickPlayer.getSlot())
@@ -1762,6 +1783,7 @@ def ReinTime():
 
 def BedTime():
     gimmickName = "Grandma Bedtime Simulator"
+    gimmickEndRound = currentRound + 1
     createDummy(Hero.ANA, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
     createDummy(Hero.ANA, Team.ALL, 16, vect(0, 0, 0), vect(0, 0, 0))
     createDummy(Hero.ANA, Team.ALL, 17, vect(0, 0, 0), vect(0, 0, 0))
@@ -1823,22 +1845,37 @@ def BedTime():
 
 def CovidTime():
     gimmickName = "Social Distancing"
+    gimmickEndRound = currentRound + 1
+    ballSpawnCountdown = 15
     createDummy(Hero.RAMATTRA, Team.ALL, -1, vect(5, 0, 7), vect(0, 0, 0))
     wait(0.25)
     gimmickPlayer = getPlayersOnHero(Hero.RAMATTRA, Team.ALL)
-    bigMessage(getAllPlayers(), "Oh no! Rammatra has a cold!")
     wait(0.25)
-    smallMessage(getAllPlayers(), "Contagious virus detected! Social distancing enabled!")
+    gimmickPlayer.startModifyingVoicelinePitch(0.5, false)
+    getAllPlayers().startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * 0.65, gimmickPlayer.getEyePosition(), 5000)
+    wait(2)
+    smallMessage(getAllPlayers(), "Oh no! Ramattra has a cold!")
+    wait(2)
+    gimmickPlayer.setUltCharge(100)
+    gimmickPlayer.forceButtonPress(Button.ULTIMATE)
+    wait(1)
+    smallMessage(getAllPlayers(), "But he also wants a hug! Stay away from him!")
+    wait(2)
+    getAllPlayers().stopCamera()
+    wait(3)
+    smallMessage(getAllPlayers(), "Contagious virus detected! Social distancing activated!")
     waitUntil(roundInProgress, 9999)
     gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), gimmickPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     covidTime = true
-    # waitUntil(not roundInProgress, 9999)
-    # covidTime = false
-    # gimmickName = "Nothing"
+    waitUntil(currentRound == gimmickEndRound, 9999)
+    destroyDummy(Team.ALL, gimmickPlayer.getSlot())
+    covidTime = false
+    gimmickName = "Nothing"
 
 def MeiTime():
     gimmickName = "Mei Gets Her Freeze Back :)"
+    gimmickEndRound = currentRound + 2
     wait(0.25)
     bigMessage(getAllPlayers(), "Mei wants her OW1 freeze back...")
     createDummy(Hero.MEI, Team.ALL, -1, vect(0, 0, 0), vect(0, 0, 0))
@@ -1847,24 +1884,69 @@ def MeiTime():
     gimmickPlayer.startForcingButton(Button.PRIMARY_FIRE)
     gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), gimmickPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    waitUntil(currentRound == 18, 9999)
+    waitUntil(currentRound == gimmickEndRound, 9999)
     destroyDummy(Team.ALL, gimmickPlayer.getSlot())
     gimmickName = "Nothing"
     gimmickPlayer = null
 
 def CorrectTorbHeight():
     gimmickName = "Correct Torb height (and speed)"
+    gimmickEndRound = currentRound + 2
     wait(0.25)
     bigMessage(getAllPlayers(), "Lore Accurate Torb Height Activated")
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).startScalingSize(0, false)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setMoveSpeed(200)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setJumpVerticalSpeed(200)
-    waitUntil(currentRound == 13, 9999)
+    getPlayersOnHero(Hero.TORBJORN, Team.ALL).startModifyingVoicelinePitch(1.5, false)
+    waitUntil(currentRound == gimmickEndRound, 9999)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).startScalingSize(1, false)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setMoveSpeed(100)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setJumpVerticalSpeed(100)
+    getPlayersOnHero(Hero.TORBJORN, Team.ALL).startModifyingVoicelinePitch(1, false)
     gimmickName = "Nothing"
     
+
+def GenjiReturns():
+    gimmickName = "Genji wants his job back"
+    gimmickEndRound = currentRound + 2
+    createDummy(Hero.GENJI, Team.ALL, 15, vect(1, 0, 0), vect(0, 0, 0))
+    createDummy(Hero.GENJI, Team.ALL, 16, vect(1, 0, 0), vect(0, 0, 0))
+    createDummy(Hero.GENJI, Team.ALL, 17, vect(1, 0, 0), vect(0, 0, 0))
+    gimmickPlayer = getPlayersOnHero(Hero.GENJI, Team.ALL)
+    wait(0.25)
+    getAllPlayers().startCamera(gimmickPlayer[0].getEyePosition() + gimmickPlayer[0].getFacingDirection() * 0.65, gimmickPlayer[0].getEyePosition(), 50)
+    wait(2.5)
+    smallMessage(getAllPlayers(), "Wait...Genji???")
+    wait(3)
+    smallMessage(getAllPlayers(), "Genji isn't suppoed to be here!")
+    wait(3.25)
+    smallMessage(getAllPlayers(), "Uh oh...I think he's pissed you took his job!")
+    wait(3)
+    getAllPlayers().stopCamera()
+    gimmickPlayer[0].setPrimaryFireEnabled(true)
+    gimmickPlayer[0].setAbility1Enabled(true)
+    gimmickPlayer[1].setPrimaryFireEnabled(true)
+    gimmickPlayer[1].setAbility1Enabled(true)
+    gimmickPlayer[2].setPrimaryFireEnabled(true)
+    gimmickPlayer[2].setAbility1Enabled(true)
+    wait()
+    gimmickPlayer[0].startForcingButton(Button.PRIMARY_FIRE)
+    gimmickPlayer[1].startForcingButton(Button.PRIMARY_FIRE)
+    gimmickPlayer[2].startForcingButton(Button.PRIMARY_FIRE)
+    gimmickPlayer[0].playerKills = 59
+    gimmickPlayer[1].playerKills = 59
+    gimmickPlayer[2].playerKills = 59
+    gimmickPlayer[0].startThrottleInDirection(directionTowards(gimmickPlayer[0].getPosition(), gimmickPlayer[0].playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    gimmickPlayer[1].startThrottleInDirection(directionTowards(gimmickPlayer[1].getPosition(), gimmickPlayer[1].playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    gimmickPlayer[2].startThrottleInDirection(directionTowards(gimmickPlayer[2].getPosition(), gimmickPlayer[2].playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    gimmickPlayer[0].startFacing(directionTowards(gimmickPlayer[0].getEyePosition(), gimmickPlayer[0].playerDeflects.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer[1].startFacing(directionTowards(gimmickPlayer[1].getEyePosition(), gimmickPlayer[1].playerDeflects.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer[2].startFacing(directionTowards(gimmickPlayer[2].getEyePosition(), gimmickPlayer[2].playerDeflects.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    waitUntil(currentRound == gimmickEndRound, 9999)
+    destroyDummy(Team.ALL, gimmickPlayer[0].getSlot())
+    destroyDummy(Team.ALL, gimmickPlayer[1].getSlot())
+    destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
+    gimmickName = "Nothing"
 
 # def HackedControls():
 #     getAllPlayers().startTransformingThrottle(-1, -1, Direction)
