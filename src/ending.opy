@@ -123,8 +123,9 @@ def Cinema():
     endlessBall = 5
     getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * endlessBall, gimmickPlayer.getEyePosition(), 5000)
     chase(endlessBall, 30, duration=4, ChaseReeval.NONE)
+    wait(4)
     bigMessage(getAllPlayers(), "{0} gets to preview the S-E-X update! (Release date 2030)".format(wonPlayer))
-    wait(7)
+    wait(3)
     getAllPlayers().clearStatusEffect(Status.UNKILLABLE)
     getAllPlayers().disableRespawn()
     gimmickPlayer.setWeapon(2)
@@ -172,7 +173,6 @@ def Cinema():
     getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(-12, ballTail2.y, 17), wonPlayer.getEyePosition(), 10)
     ballSpeed = 6
     torbBall = 1
-    wonPlayer.setMoveSpeed(250)
     wonPlayer.applyImpulse(directionTowards(wonPlayer.getPosition(), vect(0, wonPlayer.getPosition().y, 0)), ballSpeed, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     while true:
         waitUntil(wonPlayer.getPosition().x >= -8.5, 9999)
@@ -185,13 +185,12 @@ def Cinema():
         torbBall += 0.05
         if ballSpeed > 16 and ballSpeed < 36:
             wonPlayer.startFacing(directionTowards(wonPlayer.getEyePosition(), vect(0, wonPlayer.getEyePosition().y, 0)), 1500, Relativity.TO_WORLD, FacingReeval.NONE)
-            getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(wonPlayer.getEyePosition().x + wonPlayer.getFacingDirection().x * 0.65, (wonPlayer.getEyePosition().y + wonPlayer.getFacingDirection().y * 0.65) + 0.4, (wonPlayer.getEyePosition().z + wonPlayer.getFacingDirection().z * 0.65) + 0.25), vect(wonPlayer.getEyePosition().x, wonPlayer.getEyePosition().y + 0.3, wonPlayer.getEyePosition().z), 50)
+            getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(-8.19, 11.2, 3.96), vect(-14.26, 11.2, -3.14), 50)
         elif ballSpeed > 36 and ballSpeed < 45:
-            getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(-12, ballTail2.y, 17), vect(-12, ballTail2.y, 0), 10)
+            getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(-12, ballTail2.y, 17), vect(-12, ballTail2.y, 0), 0)
         elif ballSpeed > 45 and ballSpeed < 50:
             getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(11.98, 4, 1.72), vect(15, 0, 0), 0)
         elif ballSpeed > 60 and ballSpeed < 70:
-            # getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(9, 22, -7), vect(-3, 20, -4), 0)
             getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(9, 21.5, -7), vect(0.58, 19.5, -7.35), 0)
         elif ballSpeed > 70:
             break
@@ -201,6 +200,8 @@ def Cinema():
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), vect(19.5 + ballSpeed, 0, 0.5)), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     gimmickPlayer.forceButtonPress(Button.ULTIMATE)
     gimmickPlayer.startForcingButton(Button.PRIMARY_FIRE)
+    waitUntil(gimmickPlayer.isUsingUltimate(), 9999)
+    getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(16.19, 0.84, 0.77), vect(0.58, 15, -7.35), 0)
     wait(1.5)
     waitUntil(not gimmickPlayer.isUsingUltimate(), 9999)
     gimmickPlayer.stopForcingButton(Button.PRIMARY_FIRE)
@@ -208,6 +209,7 @@ def Cinema():
     gimmickPlayer.startModifyingVoicelinePitch(0, false)
     wait()
     kill(gimmickPlayer, null)
+    kill(wonPlayer,l gimmickPlayer)
     wait(5)
     ballSpeed = 0
     chase(ballSpeed, 15, duration=8, ChaseReeval.NONE)
@@ -217,6 +219,7 @@ def Cinema():
 
     # getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(13, 22, -7), vect(-3, 20, -4), 0)
     # getAllPlayers().stopCamera()
+    # getAllPlayers().setGravity(100)
     # getAllPlayers().stopFacing()
     # getAllPlayers().clearStatusEffect(Status.ROOTED)
     # hudHeader(getAllPlayers(), hostPlayer.getEyePosition(), HudPosition.LEFT, 0, Color.BLUE, HudReeval.STRING, SpecVisibility.ALWAYS)
