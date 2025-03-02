@@ -34,6 +34,7 @@ settings {
         "general": {
             "enableHeroSwitching": false,
             "gamemodeStartTrigger": "immediately",
+            "enableKillCam": false,
             "heroLimit": "off",
             "enableRandomHeroes": true
         }
@@ -184,6 +185,7 @@ globalvar wonPlayer 96
 globalvar disableCenter 97
 globalvar gimmickEndRound
 globalvar hammerDown
+globalvar triviaActive
 
 
 #Player variables
@@ -230,6 +232,7 @@ subroutine Cinema 12
 subroutine CorrectTorbHeight 13
 subroutine GenjiReturns
 subroutine HammerDown
+subroutine TriviaTime
 
 #Activated extensions
 
@@ -647,6 +650,7 @@ rule "Anti-Stuck Activation":
 rule "Bounce when near pad 1":
     @Event eachPlayer
     @Hero all
+    @Condition not triviaActive
     @Condition gimmickPlayer.getCurrentHero() != Hero.TORBJORN
     @Condition bouncePad1 != null
     @Condition distance(eventPlayer.getPosition(), bouncePad1) <= bouncePadRange
@@ -669,6 +673,7 @@ rule "Bounce when near pad 1":
 rule "Bounce when near pad 2":
     @Event eachPlayer
     @Hero all
+    @Condition not triviaActive
     @Condition gimmickPlayer.getCurrentHero() != Hero.TORBJORN
     @Condition bouncePad2 != null
     @Condition distance(eventPlayer.getPosition(), bouncePad2) <= bouncePadRange
@@ -691,6 +696,7 @@ rule "Bounce when near pad 2":
 rule "Bounce when near pad 3":
     @Event eachPlayer
     @Hero all
+    @Condition not triviaActive
     @Condition gimmickPlayer.getCurrentHero() != Hero.TORBJORN
     @Condition bouncePad3 != null
     @Condition distance(eventPlayer.getPosition(), bouncePad3) <= bouncePadRange
@@ -713,6 +719,7 @@ rule "Bounce when near pad 3":
 rule "Bounce when near pad 4":
     @Event eachPlayer
     @Hero all
+    @Condition not triviaActive
     @Condition gimmickPlayer.getCurrentHero() != Hero.TORBJORN
     @Condition bouncePad4 != null
     @Condition distance(eventPlayer.getPosition(), bouncePad4) <= bouncePadRange
@@ -772,7 +779,7 @@ rule "Start round":
     roundInProgress = true
     ballPlayerMock = false
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
-    ballSpawnCountdown = 30
+    ballSpawnCountdown = 3
 
 
 rule "Start round - TEAMS":
@@ -889,7 +896,7 @@ rule "Ball reaches player":
         targetedPlayer = previousTargetedPlayer
     else:
         isPassingTeam1 = false
-        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero and player.getCurrentHero() != gimmickPlayer[0].getCurrentHero()], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
+        targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() == playerHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     if rulesetMode == 0:
             ballDirectionRate = 6
             wait(0.05)
@@ -1084,6 +1091,7 @@ def UpdatedDeathEffects():
 rule "Final duel":
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition isGameInProgress() == true
+    @Condition not triviaActive
     @Condition gimmickPlayer == null
     @Condition len([player for player in getLivingPlayers(Team.ALL) if player.hasMoved and player.getCurrentHero() == Hero.TORBJORN]) == 2
     @Condition isEnoughPlayersToStart == true
@@ -1218,7 +1226,7 @@ rule "Check for last player surviving":
         return
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     currentRound += 1
-        ballSpawnCountdown = 5
+    ballSpawnCountdown = 5
     if currentRound == 3:
         async(CovidTime(), AsyncBehavior.NOOP)
     elif currentRound == 6:
@@ -1234,6 +1242,9 @@ rule "Check for last player surviving":
         async(MeiTime(), AsyncBehavior.NOOP)
     elif currentRound == 26:
         GenjiReturns()
+    elif currentRound == 29:
+        TriviaTime()
+    
     wait(1)
     roundInProgress = true
     wait(0.975)
@@ -1371,6 +1382,7 @@ rule "All players dead failsafe":
     @Condition getNumberOfLivingPlayers(Team.ALL) == 0
     @Condition isGameInProgress() == true
     @Condition tieBreakerActive == false
+    @Condition gimmickPlayer.getCurrentHero() != Hero.TORBJORN
     
     isInFinalDuel = false
     if ballIsOut == false:
@@ -1877,6 +1889,7 @@ def CovidTime():
     covidTime = true
     waitUntil(currentRound == gimmickEndRound, 9999)
     destroyDummy(Team.ALL, gimmickPlayer.getSlot())
+    gimmickPlayer = null
     covidTime = false
     gimmickName = "Nothing"
 
@@ -1954,6 +1967,7 @@ def GenjiReturns():
     destroyDummy(Team.ALL, gimmickPlayer[1].getSlot())
     destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
     gimmickName = "Nothing"
+    gimmickPlayer = null
 
 def HammerDown():
     hammerDown = true
@@ -2001,6 +2015,135 @@ rule "Rein go too far":
     @Condition distance(gimmickPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(gimmickPlayer, player))[0]) > 15
 
     gimmickPlayer.teleport(vect(1, 2, 0))
+
+def TriviaTime():
+    ballPlayerMock = false
+    wait(1.5)
+    smallMessage(getAllPlayers(), "Are you ready for this round's gimmick?")
+    wait(2.5)
+    smallMessage(getAllPlayers(), "This round's gimmick is...")
+    wait(3.5)
+    gimmickName = "TRIVIA!!!!!!"
+    bigMessage(getAllPlayers(), "TRIVIA!!!!!!!!!!!!!!!")
+    enableMusic()
+    targetedPlayer = null
+    getAllPlayers().disablePlayerCollision()
+    wait(3)
+    getAllPlayers().communicate(Comms.YES)
+    wait(0.25)
+    getAllPlayers().communicate(Comms.YES)
+    wait(0.25)
+    getAllPlayers().communicate(Comms.YES)
+    wait(3)
+    smallMessage(getAllPlayers(), "How well do you know your Genji Dodgeball lore?")
+    wait(3.5)
+    smallMessage(getAllPlayers(), "Let's find out!")
+    wait(5)
+    bigMessage(getAllPlayers(), "Question 1:")
+    isPassingTeam1 = "Genji"
+    isPassingTeam2 = "Torbjörn"
+    breaksEnabled = "Wrecking Ball"
+    breakFrequency = "Goku"
+    wait(3)
+    bigMessage(getAllPlayers(), "What hero do you play as in Genji Dodgeball?")
+    setObjectiveDescription(getAllPlayers(), "What hero do you play as in Genji Dodgeball?", HudReeval.NONE)
+    createInWorldText(getAllPlayers(), isPassingTeam1, vect(bouncePad1.x, bouncePad1.y + 2, bouncePad1.z), 6, Clip.SURFACES, WorldTextReeval.STRING, Color.WHITE, SpecVisibility.ALWAYS)
+    createInWorldText(getAllPlayers(), isPassingTeam2, vect(bouncePad2.x, bouncePad2.y + 2, bouncePad2.z), 6, Clip.SURFACES, WorldTextReeval.STRING, Color.WHITE, SpecVisibility.ALWAYS)
+    createInWorldText(getAllPlayers(), breaksEnabled, vect(bouncePad3.x, bouncePad3.y + 2, bouncePad3.z), 6, Clip.SURFACES, WorldTextReeval.STRING, Color.WHITE, SpecVisibility.ALWAYS)
+    createInWorldText(getAllPlayers(), breakFrequency, vect(bouncePad4.x, bouncePad4.y + 2, bouncePad4.z), 6, Clip.SURFACES, WorldTextReeval.STRING, Color.WHITE, SpecVisibility.ALWAYS)
+    setMatchTime(30)
+    wait(5)
+    smallMessage(getAllPlayers(), "Stand in the bouncepad with the correct answer!")
+    wait()
+    waitUntil(getMatchTime() == 0, 999)
+    smallMessage(getAllPlayers(), "The correct answer is...")
+    wait(3)
+    smallMessage(getAllPlayers(), "Genji!")
+    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad1) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
+    wait()
+    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad1) > bouncePadRange + 1.5], null)
+    wait(4)
+    smallMessage(getAllPlayers(), "Wait a second...")
+    wait(3)
+    smallMessage(getAllPlayers(), "You're just going to copy whatever answer Maza picks?")
+    wait(3.5)
+    smallMessage(getAllPlayers(), "Aren't you?")
+    wait(4)
+    # hostPlayer.clearStatusEffect(Status.UNKILLABLE)
+    # wait()
+    # kill(hostPlayer, null)
+    wait(1)
+    smallMessage(getAllPlayers(), "There, no more Maza :)")
+    wait(4)
+    # QUESTION 2
+    bigMessage(getAllPlayers(), "Question 2:")
+    wait(3)
+    bigMessage(getAllPlayers(), "What map did GDB first support?")
+    setObjectiveDescription(getAllPlayers(), "What map did GDB first support?", HudReeval.NONE)
+    isPassingTeam1 = "King's Row"
+    isPassingTeam2 = "Workshop Island"
+    breaksEnabled  = "Blizzard World"
+    breakFrequency = "Workshop Chamber"
+    setMatchTime(30)
+    wait(5)
+    smallMessage(getAllPlayers(), "Stand in the bouncepad with the correct answer!")
+    wait()
+    waitUntil(getMatchTime() == 0, 999)
+    smallMessage(getAllPlayers(), "The correct answer is...")
+    wait(3)
+    smallMessage(getAllPlayers(), "Blizzard World!")
+    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
+    wait()
+    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5], null)
+    wait(2)
+    smallMessage(getAllPlayers(), "Wow, great work!")
+    wait(4)
+    # QUESTION 3
+    bigMessage(getAllPlayers(), "Question 3:")
+    wait(3)
+    bigMessage(getAllPlayers(), "Which GDB version added offical Team Deathatch support?")
+    setObjectiveDescription(getAllPlayers(), "Which GDB version added offical Team Deathatch support?", HudReeval.NONE)
+    isPassingTeam1 = "v6.0.0"
+    isPassingTeam2 = "v5.1.0"
+    breaksEnabled  = "v7.0.0"
+    breakFrequency = "It had it's own seperate version first"
+    setMatchTime(30)
+    wait(5)
+    smallMessage(getAllPlayers(), "Stand in the bouncepad with the correct answer!")
+    wait()
+    waitUntil(getMatchTime() == 0, 999)
+    smallMessage(getAllPlayers(), "The correct answer is...")
+    wait(3)
+    smallMessage(getAllPlayers(), "Blizzard World!")
+    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
+    wait()
+    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5], null)
+    wait(2)
+    smallMessage(getAllPlayers(), "Wow, great work!")
+    wait(4)
+    # QUESTION 5
+    bigMessage(getAllPlayers(), "Question 5:")
+    wait(3)
+    bigMessage(getAllPlayers(), "Is this cinema?")
+    setObjectiveDescription(getAllPlayers(), "Is this cinema?", HudReeval.NONE)
+    isPassingTeam1 = "Yes"
+    isPassingTeam2 = "Yes"
+    breaksEnabled  = "Yes"
+    breakFrequency = "No"
+    setMatchTime(30)
+    wait(5)
+    smallMessage(getAllPlayers(), "Stand in the bouncepad with the correct answer!")
+    wait()
+    waitUntil(getMatchTime() == 0, 999)
+    smallMessage(getAllPlayers(), "The correct answer is...")
+    wait(3)
+    smallMessage(getAllPlayers(), "Of course this is cinema :)")
+    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) < bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
+    wait()
+    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) < bouncePadRange + 1.5], null)
+    wait(2)
+    smallMessage(getAllPlayers(), "Wow, great work!")
+    wait(5000)
     
 
 rule "Dummi":
@@ -2017,6 +2160,7 @@ rule "Dummi":
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    
+    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+
 
 #!include "./Ending.opy"
