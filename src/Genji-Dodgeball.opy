@@ -1218,21 +1218,22 @@ rule "Check for last player surviving":
         return
     getAllPlayers().bouncePadCooldown = bouncePadCooldownLengthStart
     currentRound += 1
-    if currentRound - 1 < maxRounds and (tournamentMode and breaksEnabled and (currentRound - 1) % breakFrequency == 0):
-        StartBreak()
-    else:
         ballSpawnCountdown = 5
     if currentRound == 3:
         async(CovidTime(), AsyncBehavior.NOOP)
-    elif currentRound == 5:
+    elif currentRound == 6:
+        async(HammerDown(), AsyncBehavior.NOOP)
+    elif currentRound == 10:
         async(ReinTime(), AsyncBehavior.NOOP)
         ballSpawnCountdown = 10
-    elif currentRound == 10:
-        async(CorrectTorbHeight(), AsyncBehavior.NOOP)
     elif currentRound == 15:
+        async(CorrectTorbHeight(), AsyncBehavior.NOOP)
+    elif currentRound == 19:
         async(BedTime(), AsyncBehavior.NOOP)
-    elif currentRound == 20:
+    elif currentRound == 22:
         async(MeiTime(), AsyncBehavior.NOOP)
+    elif currentRound == 26:
+        GenjiReturns()
     wait(1)
     roundInProgress = true
     wait(0.975)
