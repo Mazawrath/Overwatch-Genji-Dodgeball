@@ -1397,6 +1397,7 @@ rule "Allow one melee":
     @Condition not eventPlayer.isDummy()
     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE)
+    @Condition eventPlayer.passingSignal == 0
     @Condition not eventPlayer.hasStatusEffect(Status.STUNNED)
     @Condition not eventPlayer.hasStatusEffect(Status.FROZEN)
     @Condition not eventPlayer.hasStatusEffect(Status.KNOCKED_DOWN)
@@ -1409,7 +1410,7 @@ rule "Allow one melee":
     eventPlayer.disallowButton(Button.PRIMARY_FIRE)
     wait(0.3)
     eventPlayer.canDeflect = false
-    wait(0.51)
+    eventPlayer.passingSignal = 0.51
     waitUntil(not eventPlayer.isHoldingButton(Button.PRIMARY_FIRE), 9999)
 
 rule "dash slow":
