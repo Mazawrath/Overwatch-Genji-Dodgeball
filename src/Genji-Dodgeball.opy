@@ -1407,8 +1407,9 @@ rule "Allow one melee":
     eventPlayer.allowButton(Button.PRIMARY_FIRE)
     eventPlayer.forceButtonPress(Button.PRIMARY_FIRE)
     eventPlayer.disallowButton(Button.PRIMARY_FIRE)
-    wait(0.4)
+    wait(0.3)
     eventPlayer.canDeflect = false
+    wait(0.51)
     waitUntil(not eventPlayer.isHoldingButton(Button.PRIMARY_FIRE), 9999)
 
 rule "dash slow":
