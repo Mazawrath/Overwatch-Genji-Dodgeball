@@ -183,6 +183,7 @@ globalvar gimmickName 95
 globalvar wonPlayer 96
 globalvar disableCenter 97
 globalvar gimmickEndRound
+globalvar hammerDown
 
 
 #Player variables
@@ -228,6 +229,7 @@ subroutine MeiTime 11
 subroutine Cinema 12
 subroutine CorrectTorbHeight 13
 subroutine GenjiReturns
+subroutine HammerDown
 
 #Activated extensions
 
@@ -1804,7 +1806,7 @@ def BedTime():
     gimmickPlayer.communicate(Comms.HELLO)
     bigMessage(getAllPlayers(), "Grandma says it's bedtime :(")
     waitUntil(ballIsOut, 9999)
-    while roundInProgress:
+    while currentRound != gimmickEndRound:
         gimmickPlayer.clearStatusEffect(Status.ASLEEP)
         bouncePadDistance[0] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
         bouncePadDistance[1] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
@@ -1848,7 +1850,7 @@ def BedTime():
 def CovidTime():
     gimmickName = "Social Distancing"
     gimmickEndRound = currentRound + 1
-    ballSpawnCountdown = 15
+    ballSpawnCountdown = 17
     createDummy(Hero.RAMATTRA, Team.ALL, -1, vect(5, 0, 7), vect(0, 0, 0))
     wait(0.25)
     gimmickPlayer = getPlayersOnHero(Hero.RAMATTRA, Team.ALL)
@@ -1861,7 +1863,9 @@ def CovidTime():
     gimmickPlayer.setUltCharge(100)
     gimmickPlayer.forceButtonPress(Button.ULTIMATE)
     wait(1)
-    smallMessage(getAllPlayers(), "But he also wants a hug! Stay away from him!")
+    smallMessage(getAllPlayers(), "But he also wants a hug!")
+    wait(2)
+    smallMessage(getAllPlayers(), "Stay away from him!")
     wait(2)
     getAllPlayers().stopCamera()
     wait(3)
@@ -1950,8 +1954,30 @@ def GenjiReturns():
     destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
     gimmickName = "Nothing"
 
+def HammerDown():
+    hammerDown = true
+    gimmickName = "Hammer down"
+    gimmickEndRound = currentRound + 2
+    ballSpawnCountdown = 10
+    wait(1)
+    smallMessage(getAllPlayers(), "Torb's hammer has gotten 20 pounds heavier!")
+    wait(2.5)
+    smallMessage(getAllPlayers(), "Try crushing your friend's skull with it :)")
+    waitUntil(currentRound == gimmickEndRound, 9999)
+    hammerDown = false
+    gimmickName = "Nothing"
+
+
 # def HackedControls():
 #     getAllPlayers().startTransformingThrottle(-1, -1, Direction)
+
+rule "Hammer Down":
+    @Event playerTookDamage
+    @Condition hammerDown
+    @Condition attacker.getCurrentHero() == Hero.TORBJORN
+
+    eventPlayer.setStatusEffect(attacker, Status.KNOCKED_DOWN, 0.5)
+    wait(1)
 
 rule "Social Distancing":
     @Event eachPlayer
