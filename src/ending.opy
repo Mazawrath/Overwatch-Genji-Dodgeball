@@ -91,6 +91,7 @@
 
 def Cinema():
     disableCenter = true
+    ballPlayerMock = false
     destroyAllHudTexts()
     destroyAllEffects()
     destroyAllHudTexts()
@@ -195,9 +196,9 @@ def Cinema():
         elif ballSpeed > 70:
             break
     ballSpeed = 0
-    chase(ballSpeed, 10, duration=3, ChaseReeval.NONE)
+    chase(ballSpeed, 11, duration=3.25, ChaseReeval.NONE)
     getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(-12, ballTail2.y, 17), vect(-12, ballTail2.y, 0), 0)
-    gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), vect(19.5 + ballSpeed, 0, 0.5)), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), vect(18.5 + ballSpeed, 0, 0.5)), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     gimmickPlayer.forceButtonPress(Button.ULTIMATE)
     gimmickPlayer.startForcingButton(Button.PRIMARY_FIRE)
     waitUntil(gimmickPlayer.isUsingUltimate(), 9999)
@@ -209,13 +210,14 @@ def Cinema():
     gimmickPlayer.startModifyingVoicelinePitch(0, false)
     wait()
     kill(gimmickPlayer, null)
-    kill(wonPlayer,l gimmickPlayer)
+    kill(wonPlayer, gimmickPlayer)
     wait(5)
     ballSpeed = 0
     chase(ballSpeed, 15, duration=8, ChaseReeval.NONE)
     getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(10, 15 + ballSpeed, -10), vect(10, 0, -10), 0)
     wait(5)
     declarePlayerVictory(hostPlayer)
+    wait(20)
 
     # getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(13, 22, -7), vect(-3, 20, -4), 0)
     # getAllPlayers().stopCamera()

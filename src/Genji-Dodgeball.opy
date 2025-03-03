@@ -334,28 +334,6 @@ rule "// INITIALIZATION":
 #!include "./Tournament.opy"
 
 
-rule "Enable Scoreboard":
-    @Event eachPlayer
-    @Hero all
-    @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
-    @Condition eventPlayer.toggleHUD == true
-    
-    eventPlayer.disableGamemodeHud()
-    waitUntil(not eventPlayer.isHoldingButton(Button.INTERACT), 10)
-    eventPlayer.toggleHUD = false
-
-
-rule "Disable Scoreboard":
-    @Event eachPlayer
-    @Hero all
-    @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
-    @Condition eventPlayer.toggleHUD == false
-    
-    eventPlayer.enableGamemodeHud()
-    waitUntil(not eventPlayer.isHoldingButton(Button.INTERACT), 10)
-    eventPlayer.toggleHUD = true
-
-
 #!include "./BallHero.opy"
 
 
@@ -405,6 +383,7 @@ rule "Check for <2 players - TEAMS":
 
 
 rule "Wait for more players":
+    @Disabled
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition getNumberOfHeroes(playerHero, Team.ALL) > 1
     @Condition isEnoughPlayersToStart == false
@@ -1241,8 +1220,8 @@ rule "Check for last player surviving":
     elif currentRound == 22:
         async(MeiTime(), AsyncBehavior.NOOP)
     elif currentRound == 26:
-        GenjiReturns()
-    elif currentRound == 29:
+        async(GenjiReturns(), AsyncBehavior.NOOP)
+    elif currentRound == 30:
         TriviaTime()
     
     wait(1)
@@ -1468,7 +1447,7 @@ rule "RGB Ball Mode":
     # @Condition ballIsOut
 
     ballTail1 = rgb(random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
-    wait(0.1)
+    wait(1)
     if RULE_CONDITION:
         goto RULE_START
 
@@ -1862,9 +1841,9 @@ def BedTime():
 
 def CovidTime():
     gimmickName = "Social Distancing"
-    gimmickEndRound = currentRound + 1
+    gimmickEndRound = currentRound + 2
     ballSpawnCountdown = 17
-    createDummy(Hero.RAMATTRA, Team.ALL, -1, vect(5, 0, 7), vect(0, 0, 0))
+    createDummy(Hero.RAMATTRA, Team.ALL, -1, vect(10, 0.1, 7), vect(0, 0, 0))
     wait(0.25)
     gimmickPlayer = getPlayersOnHero(Hero.RAMATTRA, Team.ALL)
     wait(0.25)
@@ -1898,7 +1877,7 @@ def MeiTime():
     gimmickEndRound = currentRound + 2
     wait(0.25)
     bigMessage(getAllPlayers(), "Mei wants her OW1 freeze back...")
-    createDummy(Hero.MEI, Team.ALL, -1, vect(0, 0, 0), vect(0, 0, 0))
+    createDummy(Hero.MEI, Team.ALL, -1, vect(5, 0.1, 8), vect(0, 0, 0))
     gimmickPlayer = getPlayersOnHero(Hero.MEI, Team.ALL)
     wait(5)
     gimmickPlayer.startForcingButton(Button.PRIMARY_FIRE)
@@ -1911,7 +1890,7 @@ def MeiTime():
 
 def CorrectTorbHeight():
     gimmickName = "Correct Torb height (and speed)"
-    gimmickEndRound = currentRound + 2
+    gimmickEndRound = currentRound + 3
     wait(0.25)
     bigMessage(getAllPlayers(), "Lore Accurate Torb Height Activated")
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).startScalingSize(0, false)
@@ -1971,12 +1950,14 @@ def GenjiReturns():
 
 def HammerDown():
     hammerDown = true
-    gimmickName = "Hammer down"
-    gimmickEndRound = currentRound + 2
-    ballSpawnCountdown = 10
+    gimmickName = "Hammer Time"
+    gimmickEndRound = currentRound + 3
+    ballSpawnCountdown = 13
     wait(1)
+    smallMessage(getAllPlayers(), "New gimmick!")
+    wait(3.5)
     smallMessage(getAllPlayers(), "Torb's hammer has gotten 20 pounds heavier!")
-    wait(2.5)
+    wait(3.5)
     smallMessage(getAllPlayers(), "Try crushing your friend's skull with it :)")
     waitUntil(currentRound == gimmickEndRound, 9999)
     hammerDown = false
@@ -1991,7 +1972,7 @@ rule "Hammer Down":
     @Condition hammerDown
     @Condition attacker.getCurrentHero() == Hero.TORBJORN
 
-    eventPlayer.setStatusEffect(attacker, Status.KNOCKED_DOWN, 0.5)
+    eventPlayer.setStatusEffect(attacker, Status.KNOCKED_DOWN, 0.75)
     wait(1)
 
 rule "Social Distancing":
@@ -2065,7 +2046,7 @@ def TriviaTime():
     wait(4)
     smallMessage(getAllPlayers(), "Wait a second...")
     wait(3)
-    smallMessage(getAllPlayers(), "You're just going to copy whatever answer Maza picks?")
+    smallMessage(getAllPlayers(), "You're just going to copy whatever answer Maza picks")
     wait(3.5)
     smallMessage(getAllPlayers(), "Aren't you?")
     wait(4)
@@ -2078,8 +2059,8 @@ def TriviaTime():
     # QUESTION 2
     bigMessage(getAllPlayers(), "Question 2:")
     wait(3)
-    bigMessage(getAllPlayers(), "What map did GDB first support?")
-    setObjectiveDescription(getAllPlayers(), "What map did GDB first support?", HudReeval.NONE)
+    bigMessage(getAllPlayers(), "What is the first map that GDB supported?")
+    setObjectiveDescription(getAllPlayers(), "What is the first map that GDB supported?", HudReeval.NONE)
     isPassingTeam1 = "King's Row"
     isPassingTeam2 = "Workshop Island"
     breaksEnabled  = "Blizzard World"
@@ -2091,6 +2072,7 @@ def TriviaTime():
     waitUntil(getMatchTime() == 0, 999)
     smallMessage(getAllPlayers(), "The correct answer is...")
     wait(3)
+    playEffect(getAllPlayers(), DynamicEffect.BUFF_IMPACT_SOUND, Color.AQUA, vect(0, 0, 0), 1000)
     smallMessage(getAllPlayers(), "Blizzard World!")
     [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
     wait()
@@ -2114,15 +2096,66 @@ def TriviaTime():
     waitUntil(getMatchTime() == 0, 999)
     smallMessage(getAllPlayers(), "The correct answer is...")
     wait(3)
-    smallMessage(getAllPlayers(), "Blizzard World!")
-    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
+    playEffect(getAllPlayers(), DynamicEffect.BUFF_IMPACT_SOUND, Color.AQUA, vect(0, 0, 0), 1000)
+    smallMessage(getAllPlayers(), "It technically had its own seperate version")
     wait()
-    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5], null)
+    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5], null)
+    wait(2)
+    smallMessage(getAllPlayers(), "That was a mean one...")
+    wait(3)
+    smallMessage(getAllPlayers(), "I'm just going to act like you all got it right :)")
+    wait(4)
+    # QUESTION 4
+    bigMessage(getAllPlayers(), "Question 4:")
+    wait(3)
+    bigMessage(getAllPlayers(), "Which playstyle is most consistent? :)?")
+    setObjectiveDescription(getAllPlayers(), "Which playstyle is most consistent? :)", HudReeval.NONE)
+    isPassingTeam1 = "Firebending"
+    isPassingTeam2 = "Waterbending"
+    breaksEnabled  = "Earthbending"
+    breakFrequency = "Airbending"
+    setMatchTime(30)
+    wait(5)
+    smallMessage(getAllPlayers(), "Stand in the bouncepad with the correct answer!")
+    wait()
+    waitUntil(getMatchTime() == 0, 999)
+    smallMessage(getAllPlayers(), "The correct answer is...")
+    wait(3)
+    playEffect(getAllPlayers(), DynamicEffect.BUFF_IMPACT_SOUND, Color.AQUA, vect(0, 0, 0), 1000)
+    smallMessage(getAllPlayers(), "Edge is consistent :)")
+    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad2) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
+    wait()
+    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad2) > bouncePadRange + 1.5], null)
     wait(2)
     smallMessage(getAllPlayers(), "Wow, great work!")
     wait(4)
+
     # QUESTION 5
     bigMessage(getAllPlayers(), "Question 5:")
+    wait(3)
+    bigMessage(getAllPlayers(), "What is the highest rank in ranked GDB?")
+    setObjectiveDescription(getAllPlayers(), "What is the highest rank in ranked GDB?", HudReeval.NONE)
+    isPassingTeam1 = "Omnigod"
+    isPassingTeam2 = "God"
+    breaksEnabled  = "Grandmaster"
+    breakFrequency = "Godslayer"
+    setMatchTime(30)
+    wait(5)
+    smallMessage(getAllPlayers(), "Stand in the bouncepad with the correct answer!")
+    wait()
+    waitUntil(getMatchTime() == 0, 999)
+    smallMessage(getAllPlayers(), "The correct answer is...")
+    wait(3)
+    playEffect(getAllPlayers(), DynamicEffect.BUFF_IMPACT_SOUND, Color.AQUA, vect(0, 0, 0), 1000)
+    smallMessage(getAllPlayers(), "Godslayer!")
+    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
+    wait()
+    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5], null)
+    wait(2)
+    smallMessage(getAllPlayers(), "Wow, great work!")
+    wait(4)
+    # QUESTION 6
+    bigMessage(getAllPlayers(), "Question 6:")
     wait(3)
     bigMessage(getAllPlayers(), "Is this cinema?")
     setObjectiveDescription(getAllPlayers(), "Is this cinema?", HudReeval.NONE)
@@ -2137,13 +2170,39 @@ def TriviaTime():
     waitUntil(getMatchTime() == 0, 999)
     smallMessage(getAllPlayers(), "The correct answer is...")
     wait(3)
+    playEffect(getAllPlayers(), DynamicEffect.BUFF_IMPACT_SOUND, Color.AQUA, vect(0, 0, 0), 1000)
     smallMessage(getAllPlayers(), "Of course this is cinema :)")
     [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) < bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
     wait()
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) < bouncePadRange + 1.5], null)
     wait(2)
     smallMessage(getAllPlayers(), "Wow, great work!")
-    wait(5000)
+    wait(5)
+    smallMessage(getAllPlayers(), "That's it for the trivia!")
+    wait(3)
+    isPassingTeam1 = null
+    isPassingTeam2 = null
+    breaksEnabled  = null
+    breakFrequency = null
+    gimmickName = "Nothing"
+    wait()
+    [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() == playerHero].addToScore(1)
+    bigMessage(getAllPlayers(), "Everyone who survived has won the round :)")
+    wait(4)
+    getAllPlayers().respawn()
+    wait(0.25)
+    getAllPlayers().setStatusEffect(null, Status.UNKILLABLE, 9999)
+    setObjectiveDescription(getAllPlayers(), "", HudReeval.NONE)
+    wait(3)
+    bigMessage(getAllPlayers(), "Well, that was fun!")
+    getPlayersOnHero(Hero.TORBJORN, Team.ALL).enablePlayerCollision()
+    wait(3)
+    bigMessage(getAllPlayers(), "Back to your regularly scheduled Torbjörn Dodgeball :)")
+    currentRound += 1
+    targetedPlayer = -1
+    wait(0.5)
+    triviaActive = false
+    wait(4)
     
 
 rule "Dummi":
@@ -2161,6 +2220,5 @@ rule "Dummi":
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-
 
 #!include "./Ending.opy"

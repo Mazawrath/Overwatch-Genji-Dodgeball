@@ -103,22 +103,6 @@ def LongFun():
                 ballPlayer.stopForcingButton(Button.ULTIMATE)
             ballPlayer.startFacing(ballPlayer.getFacingDirection() + Vector.LEFT, 500, Relativity.TO_PLAYER, FacingReeval.DIRECTION_AND_TURN_RATE)
             break
-        case 6:
-            # Torb got a case of the zoomies.
-            ballPlayer.setMoveSpeed(500)
-            ballHeroRandom = vect(random.uniform(-18, 18), 1, random.uniform(-18, 18))
-            ballPlayer.startThrottleInDirection(directionTowards(ballPlayer.getPosition(), ballHeroRandom), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-            ballPlayer.startFacing(directionTowards(ballPlayer.getEyePosition(), ballHeroRandom), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-            createInWorldText(getAllPlayers(), "Zip zoom".format(ballHeroRandom), updateEveryTick(ballPlayer.getEyePosition()) + vect(0, 1, 0), 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
-            ballHeroRegretText = getLastCreatedText()
-            while ballPlayerMock:
-                if (distance(ballPlayer.getPosition(), ballHeroRandom) <  2):
-                    ballHeroRandom = vect(random.uniform(-18, 18), 1, random.uniform(-18, 18))
-                wait(0.1)
-            destroyInWorldText(ballHeroRegretText)
-            ballPlayer.stopThrottleInDirection()
-            ballPlayer.setMoveSpeed(100)
-            break
         case 9:
             ballPlayer.applyImpulse(Vector.UP, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
             ballPlayer.applyImpulse(Vector.BACKWARD, 0.001, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)

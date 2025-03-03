@@ -117,16 +117,6 @@ rule "Don't move while ball isn't in play":
     ballPlayer.setGravity(0)
 
 
-rule "Set hero ball outline":
-    @Condition ballHero
-    @Condition isGameInProgress()
-
-    ballPlayer.startForcingOutlineFor([player for player in getAllPlayers() if player != targetedPlayer], true, Color.WHITE, OutlineVisibility.DEFAULT)
-    ballPlayer.startForcingOutlineFor([player for player in getAllPlayers() if player == targetedPlayer], true, Color.RED, OutlineVisibility.DEFAULT)
-    wait(0.1)
-    goto RULE_START
-
-
 rule "Don't look around while frozen":
     @Condition ballHero
     @Condition isGameInProgress()
