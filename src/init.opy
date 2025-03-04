@@ -20,8 +20,8 @@ rule "Init player variables":
         eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 8, random.randint(-10, 10)))
     wait()
     eventPlayer.hasMoved = true
-    if (ballHero != null and not isGameInProgress()):
-        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), ballPlayer.getEyePosition()), 100, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    if (not isGameInProgress() and eventPlayer != hostPlayer):
+        eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), hostPlayer.getEyePosition()), 100, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     eventPlayer.isDashEnabled = false
     eventPlayer.setStatusEffect(null, Status.UNKILLABLE, 9999)
     if cooldownDashingEnabled:
@@ -45,7 +45,6 @@ rule "Init player variables":
     if invisiblePlayers:
         getAllPlayers().setInvisibility(Invis.ALL)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
-    if (ballHero != null):
         eventPlayer.stopFacing()
     # Force 3rd person if it's toggled on.
     if (perspectiveMode == 2):
@@ -77,6 +76,8 @@ rule "Init global variables":
     disableInspector()
     # Set the countdown to be a bit longer to let players who haven't loaded the map yet load in
     setMatchTime(10)
+    createInWorldText(getAllPlayers(), "I'm so sorry. (I'm not sorry)", hostPlayer.getEyePosition() + vect(0, 0.5, 0), 5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_POSITION, Color.ORANGE, SpecVisibility.ALWAYS)
+    ballHeroRegretText = getLastCreatedText()
     if torbBall == 1 and getCurrentGamemode() == Gamemode.FFA:
         ballHero = Hero.HAMMOND
         name = ballHero
@@ -151,7 +152,6 @@ rule "Create global HUD elements":
         hudSubheader([player for player in getAllPlayers() if player != targetedPlayer and player.getTeam() == targetedPlayer.getTeam()], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.SKY_BLUE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #red when you're targeted
     hudSubheader(targetedPlayer if localPlayer in getAllPlayers() else [], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    hudText(getDeadPlayers(Team.ALL), "Waiting for next round", "You have been eliminated or joined during a round", "You will spawn once the next round starts", HudPosition.TOP, 2, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.DEFAULT)
     if bouncepadDashingEnabled or cooldownDashingEnabled:
         goto lbl_0
     #hudSubtext(getAllPlayers(), "Current Dashing Mode: None", HudPosition.LEFT, -1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
@@ -174,7 +174,7 @@ rule "Create global HUD elements":
     hudSubtext(getAllPlayers(), "Current Ball Speed: {0}".format(ballSpeed), HudPosition.LEFT, -3, rgb(max(0,min(4000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 200, 200)) + 55 * (ballSpeed != maxBallSpeed), max(55, min(455 - 2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed), 255)) + min(2000 / 3 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 100, 0), max(55, 500 / (maxBallSpeed - ballSpawnSpeed) * (ballSpeed - ballSpawnSpeed) - 245) - min(1600000 / 27 / (maxBallSpeed - ballSpawnSpeed)**3 * (ballSpeed - ballSpawnSpeed)**3 - 200, 0)), HudReeval.VISIBILITY_STRING_AND_COLOR, SpecVisibility.DEFAULT)
     #hudSubheader(getAllPlayers(), "Updates by u/FearlessKat, u/Blink, u/TheRedstoneBlaze, tumtum9000#1232,david8686406#1523", HudPosition.LEFT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     hudSubheader(getAllPlayers(), "Current Gimimck: {0}".format(gimmickName), HudPosition.LEFT, 0, [Color.LIME_GREEN if gimmickName == "Nothing" else ballTail1], HudReeval.VISIBILITY_SORT_ORDER_STRING_AND_COLOR, SpecVisibility.DEFAULT)
-    createInWorldText([player for player in getAllPlayers() if ballSpawnCountdown != 0 and player != targetedPlayer], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, Color.SKY_BLUE, SpecVisibility.DEFAULT)
+    createInWorldText([player for player in getAllPlayers() if ballSpawnCountdown != 0 and player != targetedPlayer], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_STRING_AND_COLOR, Color.SKY_BLUE, SpecVisibility.DEFAULT)
     createInWorldText([player for player in targetedPlayer if ballSpawnCountdown != 0], "Ball Spawning In: {0}".format(ceil(ballSpawnCountdown)), updateEveryTick(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z) + directionTowards(vect(circleCenter.x, circleCenter.y + 2.5, circleCenter.z), targetedPlayer.getEyePosition()) / 50), 2.5, Clip.SURFACES, WorldTextReeval.VISIBILITY_POSITION_AND_STRING, rgb(255 , 50, 50), SpecVisibility.DEFAULT)
     if rulesetMode == 1:
         if getCurrentGamemode() == Gamemode.FFA:
@@ -247,8 +247,8 @@ rule "Create ball & targeted effect":
     
     if not ballHero and not invisibleBall:
         #Orb for when ball is not getting passed
-        createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.WHITE, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-        createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.WHITE, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+        createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, ballTail1, updateEveryTick(ballPosition), 0.4, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
+        createEffect(updateEveryTick(getAllPlayers().exclude(targetedPlayer) if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, ballTail1, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_RADIUS_AND_COLOR)
         createEffect(updateEveryTick(targetedPlayer if not isSpectator(localPlayer) and localPlayer.isAlive() and localPlayer.latencyToggle else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, updateEveryTick(ballPosition + ballSpeed * normalize(ballDirection) * (localPlayer.latency if ballSpawnCountdown == 0 else 0)), 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
         createEffect(updateEveryTick(targetedPlayer if not (isSpectator(localPlayer) or (localPlayer.isAlive() and localPlayer.latencyToggle)) else []), Effect.ORB, Color.YELLOW if redGreenColorblindMode else Color.RED, ballPosition, 0.4, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
     if not invisiblePlayers:

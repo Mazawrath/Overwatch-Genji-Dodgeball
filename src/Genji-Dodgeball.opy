@@ -234,6 +234,7 @@ subroutine CorrectTorbHeight 13
 subroutine GenjiReturns
 subroutine HammerDown
 subroutine TriviaTime
+subroutine TriviaFailed
 
 #Activated extensions
 
@@ -1446,11 +1447,9 @@ rule "Ball no down when y < -0.5":
 
 
 rule "RGB Ball Mode":
-    # @Condition ballTailColor == 2
-    # @Condition ballIsOut
 
     ballTail1 = rgb(random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
-    wait(1)
+    wait(0.15)
     if RULE_CONDITION:
         goto RULE_START
 
@@ -1784,7 +1783,6 @@ def ReinTime():
 
 def SkyDiving():
     wait(2)
-    hudHeader(getAllPlayers(), hostPlayer.getEyePosition(), HudPosition.LEFT, 0, Color.BLUE, HudReeval.STRING, SpecVisibility.ALWAYS)
     gimmickName = "BECAUSE I'M FREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE FREEEEE FALLLLLLLLLINNN"
     gimmickEndRound = currentRound + 4
     ballSpawnCountdown = 20
@@ -1806,8 +1804,8 @@ def SkyDiving():
 
 rule "I'm free fallin":
     @Event eachPlayer
-
     @Condition freeFall
+    @Condition gimmickName != "Slippin' Torb"
     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
     @Condition eventPlayer.getPosition().y < 300
     
@@ -1976,6 +1974,7 @@ rule "Rein go too far":
     gimmickPlayer.forceButtonPress(Button.ABILITY_1)
 
 def TriviaTime():
+    triviaActive = true
     ballPlayerMock = false
     wait(1.5)
     smallMessage(getAllPlayers(), "Are you ready for this round's gimmick?")
@@ -2021,6 +2020,8 @@ def TriviaTime():
     [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad1) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
     wait()
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad1) > bouncePadRange + 1.5], null)
+    wait(2)
+    TriviaFailed()
     wait(4)
     smallMessage(getAllPlayers(), "Wait a second...")
     wait(3)
@@ -2028,9 +2029,9 @@ def TriviaTime():
     wait(3.5)
     smallMessage(getAllPlayers(), "Aren't you?")
     wait(4)
-    # hostPlayer.clearStatusEffect(Status.UNKILLABLE)
-    # wait()
-    # kill(hostPlayer, null)
+    hostPlayer.clearStatusEffect(Status.UNKILLABLE)
+    wait()
+    kill(hostPlayer, null)
     wait(1)
     smallMessage(getAllPlayers(), "There, no more Maza :)")
     wait(4)
@@ -2056,7 +2057,7 @@ def TriviaTime():
     wait()
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5], null)
     wait(2)
-    smallMessage(getAllPlayers(), "Wow, great work!")
+    TriviaFailed()
     wait(4)
     # QUESTION 3
     bigMessage(getAllPlayers(), "Question 3:")
@@ -2076,12 +2077,11 @@ def TriviaTime():
     wait(3)
     playEffect(getAllPlayers(), DynamicEffect.BUFF_IMPACT_SOUND, Color.AQUA, vect(0, 0, 0), 1000)
     smallMessage(getAllPlayers(), "It technically had its own seperate version")
+    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
     wait()
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5], null)
     wait(2)
-    smallMessage(getAllPlayers(), "That was a mean one...")
-    wait(3)
-    smallMessage(getAllPlayers(), "I'm just going to act like you all got it right :)")
+    TriviaFailed()
     wait(4)
     # QUESTION 4
     bigMessage(getAllPlayers(), "Question 4:")
@@ -2105,7 +2105,7 @@ def TriviaTime():
     wait()
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad2) > bouncePadRange + 1.5], null)
     wait(2)
-    smallMessage(getAllPlayers(), "Wow, great work!")
+    TriviaFailed()
     wait(4)
 
     # QUESTION 5
@@ -2130,7 +2130,7 @@ def TriviaTime():
     wait()
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5], null)
     wait(2)
-    smallMessage(getAllPlayers(), "Wow, great work!")
+    TriviaFailed()
     wait(4)
     # QUESTION 6
     bigMessage(getAllPlayers(), "Question 6:")
@@ -2154,23 +2154,23 @@ def TriviaTime():
     wait()
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) < bouncePadRange + 1.5], null)
     wait(2)
-    smallMessage(getAllPlayers(), "Wow, great work!")
+    TriviaFailed()
     wait(5)
     smallMessage(getAllPlayers(), "That's it for the trivia!")
     wait(3)
-    isPassingTeam1 = null
-    isPassingTeam2 = null
-    breaksEnabled  = null
-    breakFrequency = null
+    isPassingTeam1 = " "
+    isPassingTeam2 = " "
+    breaksEnabled  = " "
+    breakFrequency = " "
     gimmickName = "Nothing"
     wait()
     [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() == playerHero].addToScore(1)
     bigMessage(getAllPlayers(), "Everyone who survived has won the round :)")
     wait(4)
-    getAllPlayers().respawn()
+    getAllPlayers().resurrect()
     wait(0.25)
     getAllPlayers().setStatusEffect(null, Status.UNKILLABLE, 9999)
-    setObjectiveDescription(getAllPlayers(), "", HudReeval.NONE)
+    setObjectiveDescription(getAllPlayers(), null, HudReeval.NONE)
     wait(3)
     bigMessage(getAllPlayers(), "Well, that was fun!")
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).enablePlayerCollision()
@@ -2182,6 +2182,32 @@ def TriviaTime():
     triviaActive = false
     wait(4)
     
+def TriviaFailed():
+    wait()
+    if len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() == playerHero]) == 0:
+        wait(1)
+        bigMessage(getAllPlayers(), "Did you seriously all die?")
+        wait(3)
+        bigMessage(getAllPlayers(), "Is the trivia that hard?????")
+        wait(3)
+        getAllPlayers().resurrect()
+        wait()
+        getAllPlayers().setStatusEffect(null, Status.UNKILLABLE, 9999)
+        wait(1.5)
+        bigMessage(getAllPlayers(), "Guess I have no choice but to revive all of you morons.")
+        wait(3)
+        hostPlayer.clearStatusEffect(Status.UNKILLABLE)
+        wait()
+        kill(hostPlayer, null)
+        wait(0.5)
+        bigMessage(getAllPlayers(), "Except Maza. He's still dead.")
+        wait(3)
+        bigMessage(getAllPlayers(), "But I'm taking a point from all of you.")
+        getLivingPlayers(Team.ALL).addToScore(-1)
+        bigMessage(getAllPlayers(), "I don't care if your score goes negative.")
+        wait(3)
+    else:
+        smallMessage(getAllPlayers(), "Wow, great work!")
 
 rule "Dummi":
     @Event global
