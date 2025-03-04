@@ -2059,8 +2059,8 @@ def TriviaTime():
     # QUESTION 2
     bigMessage(getAllPlayers(), "Question 2:")
     wait(3)
-    bigMessage(getAllPlayers(), "What is the first map that GDB supported?")
-    setObjectiveDescription(getAllPlayers(), "What is the first map that GDB supported?", HudReeval.NONE)
+    bigMessage(getAllPlayers(), "What is the first map that GDB v2.0 supported?")
+    setObjectiveDescription(getAllPlayers(), "What is the first map that GDB v2.0 supported?", HudReeval.NONE)
     isPassingTeam1 = "King's Row"
     isPassingTeam2 = "Workshop Island"
     breaksEnabled  = "Blizzard World"
