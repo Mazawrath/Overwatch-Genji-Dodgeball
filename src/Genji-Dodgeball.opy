@@ -186,6 +186,7 @@ globalvar disableCenter 97
 globalvar gimmickEndRound
 globalvar hammerDown
 globalvar triviaActive
+globalvar freeFall
 
 
 #Player variables
@@ -223,7 +224,7 @@ subroutine ShortFun 3
 subroutine LongFun 4
 subroutine StartBreak 5
 subroutine ReinTime 6
-subroutine BedTime 7
+subroutine SkyDiving 7
 subroutine CovidTime 8
 subroutine BallCurve 9
 subroutine BallPov 10
@@ -251,7 +252,7 @@ rule "// SETTINGS":
     endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 5)
     bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 6)
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 7)
-    torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 1, 0)
+    torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Fun Settings", "Ball Tail Color", 0, 1)
     invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 2)
     invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 3)
@@ -383,7 +384,6 @@ rule "Check for <2 players - TEAMS":
 
 
 rule "Wait for more players":
-    @Disabled
     @Condition getCurrentGamemode() == Gamemode.FFA
     @Condition getNumberOfHeroes(playerHero, Team.ALL) > 1
     @Condition isEnoughPlayersToStart == false
@@ -754,6 +754,7 @@ rule "Start round":
     @Condition isEnoughPlayersToStart == true
     @Condition isGameInProgress() == true
     
+    destroyInWorldText(ballHeroRegretText)
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     roundInProgress = true
     ballPlayerMock = false
@@ -1216,10 +1217,10 @@ rule "Check for last player surviving":
     elif currentRound == 15:
         async(CorrectTorbHeight(), AsyncBehavior.NOOP)
     elif currentRound == 19:
-        async(BedTime(), AsyncBehavior.NOOP)
-    elif currentRound == 22:
+        async(SkyDiving(), AsyncBehavior.NOOP)
+    elif currentRound == 23:
         async(MeiTime(), AsyncBehavior.NOOP)
-    elif currentRound == 26:
+    elif currentRound == 27:
         async(GenjiReturns(), AsyncBehavior.NOOP)
     elif currentRound == 30:
         TriviaTime()
@@ -1388,7 +1389,6 @@ rule "All players dead failsafe":
 
 rule "Allow one melee":
     @Event eachPlayer
-    @Condition not eventPlayer.isDummy()
     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE)
     @Condition eventPlayer.passingSignal == 0
@@ -1415,7 +1415,10 @@ rule "dash slow":
     if eventPlayer.isOnGround():
         eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
         wait()
-    eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
+    if freeFall:
+        eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    else:
+        eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), eventPlayer.getEyePosition() + (eventPlayer.getFacingDirection() * 20)), 25, Relativity.TO_WORLD, Impulse.INCORPORATE_CONTRARY_MOTION)
 
 
 rule "Ball bounce off surface":
@@ -1663,17 +1666,19 @@ rule "Tell player controls":
 
 
 rule "Randomly teleport ball":
+    @Condition not freeFall
 
     waitUntil(ballIsOut, 9999)
     wait(random.uniform(2, 5))
-    if random.randint(1, 100) <= 50:
+    if random.randint(1, 100) <= 25 and not freeFall:
         if not ballIsOut:
             goto RULE_START
         playEffect(getAllPlayers(), DynamicEffect.SOMBRA_LOGO_SOUND, Color.WHITE, ballPosition, 500)
         smallMessage(getAllPlayers(), "Too much skill detected: Randomizing ball location")
         ballPosition = vect(random.uniform(-35, 35), random.uniform(1, 15), random.uniform(-35, 35))
     wait(random.uniform(5, 30))
-    goto RULE_START
+    if RULE_CONDITION:
+        goto RULE_START
 
 
 rule "Rein Does the Spam":
@@ -1777,66 +1782,37 @@ def ReinTime():
     gimmickName = "Nothing"
     gimmickPlayer = null
 
-def BedTime():
-    gimmickName = "Grandma Bedtime Simulator"
-    gimmickEndRound = currentRound + 1
-    createDummy(Hero.ANA, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
-    createDummy(Hero.ANA, Team.ALL, 16, vect(0, 0, 0), vect(0, 0, 0))
-    createDummy(Hero.ANA, Team.ALL, 17, vect(0, 0, 0), vect(0, 0, 0))
-    createDummy(Hero.ANA, Team.ALL, 18, vect(0, 0, 0), vect(0, 0, 0))
-    gimmickPlayer = getPlayersOnHero(Hero.ANA, Team.ALL)
-    wait(0.25)
-    bouncePadDistance[0] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()])
-    bouncePadDistance[1] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()])
-    bouncePadDistance[2] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()])
-    bouncePadDistance[3] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()])
-    gimmickPlayer[0].startFacing(directionTowards(gimmickPlayer[0].getPosition(), bouncePadDistance[0].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    gimmickPlayer[1].startFacing(directionTowards(gimmickPlayer[1].getPosition(), bouncePadDistance[1].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    gimmickPlayer[2].startFacing(directionTowards(gimmickPlayer[2].getPosition(), bouncePadDistance[2].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    gimmickPlayer[3].startFacing(directionTowards(gimmickPlayer[3].getPosition(), bouncePadDistance[3].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-    wait(0.5)
-    gimmickPlayer.communicate(Comms.HELLO)
-    bigMessage(getAllPlayers(), "Grandma says it's bedtime :(")
-    waitUntil(ballIsOut, 9999)
-    while currentRound != gimmickEndRound:
-        gimmickPlayer.clearStatusEffect(Status.ASLEEP)
-        bouncePadDistance[0] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
-        bouncePadDistance[1] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
-        bouncePadDistance[2] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
-        bouncePadDistance[3] = random.choice([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive() and not player.hasStatusEffect(Status.ASLEEP)])
-        gimmickPlayer[0].startFacing(directionTowards(gimmickPlayer[0].getPosition(), bouncePadDistance[0].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-        gimmickPlayer[1].startFacing(directionTowards(gimmickPlayer[1].getPosition(), bouncePadDistance[1].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-        gimmickPlayer[2].startFacing(directionTowards(gimmickPlayer[2].getPosition(), bouncePadDistance[2].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-        gimmickPlayer[3].startFacing(directionTowards(gimmickPlayer[3].getPosition(), bouncePadDistance[3].getPosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
-        wait(random.uniform(0, 0.25))
-        gimmickPlayer[0].forceButtonPress(Button.ABILITY_1)
-        gimmickPlayer[0].communicate(Comms.SORRY)
-        wait(random.uniform(0, 0.25))
-        gimmickPlayer[1].forceButtonPress(Button.ABILITY_1)
-        gimmickPlayer[1].communicate(Comms.GOODBYE)
-        wait(random.uniform(0, 0.25))
-        gimmickPlayer[2].forceButtonPress(Button.ABILITY_1)
-        gimmickPlayer[2].communicate(Comms.THANKS)
-        wait(random.uniform(0, 0.25))
-        gimmickPlayer[3].forceButtonPress(Button.ABILITY_1)
-        gimmickPlayer[3].communicate(Comms.HELLO)
-        gimmickPlayer[0].startThrottleInDirection(directionTowards(gimmickPlayer[0], [random.uniform(-20, 20), 1, random.uniform(-20, 20)]), 1, Relativity.TO_PLAYER, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-        gimmickPlayer[1].startThrottleInDirection(directionTowards(gimmickPlayer[1], [random.uniform(-20, 20), 1, random.uniform(-20, 20)]), 1, Relativity.TO_PLAYER, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-        gimmickPlayer[2].startThrottleInDirection(directionTowards(gimmickPlayer[2], [random.uniform(-20, 20), 1, random.uniform(-20, 20)]), 1, Relativity.TO_PLAYER, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-        gimmickPlayer[3].startThrottleInDirection(directionTowards(gimmickPlayer[3], [random.uniform(-20, 20), 1, random.uniform(-20, 20)]), 1, Relativity.TO_PLAYER, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-        waitUntil(not gimmickPlayer.isUsingAbility1(), 9999)
-        wait(random.uniform(1, 2))
-    wait(0.25)
-    gimmickPlayer.resurrect()
-    wait(0.25)
-    gimmickPlayer.communicate(Comms.GOODBYE)
+def SkyDiving():
+    wait(2)
+    hudHeader(getAllPlayers(), hostPlayer.getEyePosition(), HudPosition.LEFT, 0, Color.BLUE, HudReeval.STRING, SpecVisibility.ALWAYS)
+    gimmickName = "BECAUSE I'M FREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE FREEEEE FALLLLLLLLLINNN"
+    gimmickEndRound = currentRound + 4
+    ballSpawnCountdown = 20
+    getAllPlayers().setAbilityCooldown(Button.ABILITY_2, 1.5)
+    bigMessage(getAllPlayers(), "BECAUSE I'M FREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    freeFall = true
+    getAllPlayers().teleport(vect(getAllPlayers().getPosition().x, 400, getAllPlayers().getPosition().z))
+    circleCenter = vect(circleCenter.x, circleCenter.y + 310, circleCenter.z)
+    sphereSize += 15
+    createEffect(getAllPlayers(), Effect.LIGHT_SHAFT, Color.BLUE, vect(circleCenter.x, circleCenter.y - 10, circleCenter.z), sphereSize, EffectReeval.NONE)
+    waitUntil(currentRound == gimmickEndRound, 9999)
+    getAllPlayers().setAbilityCooldown(Button.ABILITY_2, 3)
+    circleCenter = vect(circleCenter.x, circleCenter.y - 310, circleCenter.z)
+    sphereSize -= 15
     wait(1)
-    destroyDummy(Team.ALL, gimmickPlayer[0].getSlot())
-    destroyDummy(Team.ALL, gimmickPlayer[1].getSlot())
-    destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
-    destroyDummy(Team.ALL, gimmickPlayer[3].getSlot())
+    getAllPlayers().teleport(vect(getAllPlayers().getPosition().x, 0, getAllPlayers().getPosition().z))
+    freeFall = false
     gimmickName = "Nothing"
-    gimmickPlayer = null
+
+rule "I'm free fallin":
+    @Event eachPlayer
+
+    @Condition freeFall
+    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
+    @Condition eventPlayer.getPosition().y < 300
+    
+    eventPlayer.applyImpulse(Vector.UP, 60, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+
 
 
 def CovidTime():
@@ -1908,6 +1884,7 @@ def CorrectTorbHeight():
 def GenjiReturns():
     gimmickName = "Genji wants his job back"
     gimmickEndRound = currentRound + 2
+    ballSpawnCountdown = 20
     createDummy(Hero.GENJI, Team.ALL, 15, vect(1, 0, 0), vect(0, 0, 0))
     createDummy(Hero.GENJI, Team.ALL, 16, vect(1, 0, 0), vect(0, 0, 0))
     createDummy(Hero.GENJI, Team.ALL, 17, vect(1, 0, 0), vect(0, 0, 0))
@@ -1972,8 +1949,7 @@ rule "Hammer Down":
     @Condition hammerDown
     @Condition attacker.getCurrentHero() == Hero.TORBJORN
 
-    eventPlayer.setStatusEffect(attacker, Status.KNOCKED_DOWN, 0.75)
-    wait(1)
+    eventPlayer.setStatusEffect(attacker, Status.KNOCKED_DOWN, random.uniform(0.375, 1))
 
 rule "Social Distancing":
     @Event eachPlayer
@@ -1996,6 +1972,8 @@ rule "Rein go too far":
     @Condition distance(gimmickPlayer.getPosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL)], lambda player: distance(gimmickPlayer, player))[0]) > 15
 
     gimmickPlayer.teleport(vect(1, 2, 0))
+    wait()
+    gimmickPlayer.forceButtonPress(Button.ABILITY_1)
 
 def TriviaTime():
     ballPlayerMock = false
@@ -2220,5 +2198,46 @@ rule "Dummi":
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+
+rule "Dummi do stuff":
+    @Event eachPlayer
+
+    @Condition isGameInProgress()
+    @Condition eventPlayer.isDummy()
+    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
+    
+    wait(0.5)
+    eventPlayer.startThrottleInDirection(directionTowards(eventPlayer.getPosition(), eventPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    wait(0.5)
+    eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), eventPlayer.playerDeflects.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+
+
+rule "Dummi look around":
+    @Event eachPlayer
+
+    @Condition isGameInProgress()
+    @Condition eventPlayer.isDummy()
+    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
+
+    eventPlayer.playerDeflects = random.choice([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player.isAlive() and player != eventPlayer])
+    waitUntil(eventPlayer.playerDeflects.isDead(), random.uniform(1, 2))
+    wait()
+    goto RULE_START
+
+rule "Dummi do the funni":
+    @Event eachPlayer
+
+    @Condition isGameInProgress()
+    @Condition eventPlayer.isDummy()
+    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
+
+    eventPlayer.startForcingButton(Button.PRIMARY_FIRE)
+    wait(0.2)
+    eventPlayer.stopForcingButton(Button.PRIMARY_FIRE)
+    wait()
+    eventPlayer.forceButtonPress(Button.ABILITY_2)
+
+    wait(random.uniform(0.1, 0.5))
+    goto RULE_START
 
 #!include "./Ending.opy"
