@@ -235,6 +235,7 @@ subroutine GenjiReturns
 subroutine HammerDown
 subroutine TriviaTime
 subroutine TriviaFailed
+subroutine SlideTime
 
 #Activated extensions
 
@@ -1936,6 +1937,26 @@ def HammerDown():
     smallMessage(getAllPlayers(), "Try crushing your friend's skull with it :)")
     waitUntil(currentRound == gimmickEndRound, 9999)
     hammerDown = false
+    gimmickName = "Nothing"
+
+
+def SlideTime():
+    gimmickName = "Slippin' Torb"
+    gimmickEndRound = currentRound + 3
+    ballSpawnCountdown = 15
+    freeFall = true
+    wait(1)
+    getAllPlayers().teleport(vect(getAllPlayers().getPosition().x, 160, getAllPlayers().getPosition().z))
+    wait(2)
+    bigMessage(getAllPlayers(), "Step 1: Cover yourself in oil")
+    circleCenter = vect(circleCenter.x, circleCenter.y + 140, circleCenter.z)
+    sphereSize += 5
+    waitUntil(currentRound == gimmickEndRound, 9999)
+    circleCenter = vect(circleCenter.x, circleCenter.y - 140, circleCenter.z)
+    sphereSize -= 5
+    wait(1)
+    getAllPlayers().teleport(vect(getAllPlayers().getPosition().x, 0, getAllPlayers().getPosition().z))
+    freeFall = false
     gimmickName = "Nothing"
 
 
