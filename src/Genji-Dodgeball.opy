@@ -236,6 +236,7 @@ subroutine HammerDown
 subroutine TriviaTime
 subroutine TriviaFailed
 subroutine SlideTime
+subroutine SetEndingCamera
 
 #Activated extensions
 
@@ -928,10 +929,6 @@ rule "Ball reaches player -TEAMS":
         stopAssist(passingAssistId)
         #passingPlayer = null
         #Check which team is passing
-        if previousTargetedPlayer.getTeam() == Team.1:
-            isPassingTeam1 = true
-        else:
-            isPassingTeam2 = true
         #If the member is the only one left on their team, self pass
         if len([player for player in getLivingPlayers(previousTargetedPlayer.getTeam()) if true]) == 1:
             # Check if using modern rules. Self passing is disabled in retro rules so it's basically a failed deflect.
@@ -981,9 +978,7 @@ rule "End assist after a second - TEAMS":
 
 def DeflectFailed():
     @Name "Player Didn't Deflect - Kill"
-    
-    isPassingTeam1 = false
-    isPassingTeam2 = false
+
     targetedPlayer.setStatusEffect(previousTargetedPlayer, Status.STUNNED, 1)
     targetedPlayer.bouncePadCooldown = 0
     previousTargetedPlayer.currentUltPercent += 15
@@ -1216,10 +1211,10 @@ rule "Check for last player surviving":
     elif currentRound == 10:
         async(ReinTime(), AsyncBehavior.NOOP)
         ballSpawnCountdown = 10
-    elif currentRound == 15:
+    elif currentRound == 14:
         async(CorrectTorbHeight(), AsyncBehavior.NOOP)
-    elif currentRound == 19:
-        async(SkyDiving(), AsyncBehavior.NOOP)
+    elif currentRound == 18:
+        async(SlideTime(), AsyncBehavior.NOOP)
     elif currentRound == 23:
         async(MeiTime(), AsyncBehavior.NOOP)
     elif currentRound == 27:
@@ -1391,6 +1386,7 @@ rule "All players dead failsafe":
 
 rule "Allow one melee":
     @Event eachPlayer
+    @Condition not eventPlayer.isDummy()
     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE)
     @Condition eventPlayer.passingSignal == 0
@@ -1945,12 +1941,13 @@ def SlideTime():
     gimmickEndRound = currentRound + 3
     ballSpawnCountdown = 15
     freeFall = true
+    circleCenter = vect(circleCenter.x, circleCenter.y + 140, circleCenter.z)
+    sphereSize += 5
     wait(1)
     getAllPlayers().teleport(vect(getAllPlayers().getPosition().x, 160, getAllPlayers().getPosition().z))
     wait(2)
+    createEffect(getAllPlayers(), Effect.LIGHT_SHAFT, Color.BLUE, vect(circleCenter.x, circleCenter.y - 10, circleCenter.z), sphereSize, EffectReeval.NONE)
     bigMessage(getAllPlayers(), "Step 1: Cover yourself in oil")
-    circleCenter = vect(circleCenter.x, circleCenter.y + 140, circleCenter.z)
-    sphereSize += 5
     waitUntil(currentRound == gimmickEndRound, 9999)
     circleCenter = vect(circleCenter.x, circleCenter.y - 140, circleCenter.z)
     sphereSize -= 5
@@ -2059,8 +2056,8 @@ def TriviaTime():
     # QUESTION 2
     bigMessage(getAllPlayers(), "Question 2:")
     wait(3)
-    bigMessage(getAllPlayers(), "What is the first map that GDB v2.0 supported?")
-    setObjectiveDescription(getAllPlayers(), "What is the first map that GDB v2.0 supported?", HudReeval.NONE)
+    bigMessage(getAllPlayers(), "What is the first map that GDB supported?")
+    setObjectiveDescription(getAllPlayers(), "What is the first map that GDB supported?", HudReeval.NONE)
     isPassingTeam1 = "King's Row"
     isPassingTeam2 = "Workshop Island"
     breaksEnabled  = "Blizzard World"
@@ -2249,6 +2246,7 @@ rule "Dummi":
 rule "Dummi do stuff":
     @Event eachPlayer
 
+    @Condition not disableCenter
     @Condition isGameInProgress()
     @Condition eventPlayer.isDummy()
     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
@@ -2262,6 +2260,7 @@ rule "Dummi do stuff":
 rule "Dummi look around":
     @Event eachPlayer
 
+    @Condition not disableCenter
     @Condition isGameInProgress()
     @Condition eventPlayer.isDummy()
     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
@@ -2274,6 +2273,7 @@ rule "Dummi look around":
 rule "Dummi do the funni":
     @Event eachPlayer
 
+    @Condition not disableCenter
     @Condition isGameInProgress()
     @Condition eventPlayer.isDummy()
     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN

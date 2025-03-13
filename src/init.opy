@@ -45,7 +45,7 @@ rule "Init player variables":
     if invisiblePlayers:
         getAllPlayers().setInvisibility(Invis.ALL)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
-        eventPlayer.stopFacing()
+    eventPlayer.stopFacing()
     # Force 3rd person if it's toggled on.
     if (perspectiveMode == 2):
         eventPlayer.thirdPerson = true
