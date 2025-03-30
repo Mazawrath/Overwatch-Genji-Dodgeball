@@ -12,7 +12,7 @@ settings {
         "mapRotation": "afterGame",
         "enableMatchVoiceChat": true,
         "spectatorSlots": 6,
-        "returnToLobby": "never",
+        "returnToLobby": "afterGame",
         "swapTeamsAfterMatch": false,
         "teamBalancing": "afterGame"
     },
@@ -762,7 +762,7 @@ rule "Start round":
     roundInProgress = true
     ballPlayerMock = false
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
-    ballSpawnCountdown = 3
+    ballSpawnCountdown = 45
 
 
 rule "Start round - TEAMS":
@@ -1755,7 +1755,7 @@ rule "Dummy pick a victim":
     goto RULE_START
 
 def ReinTime():
-    gimmickName = "HRAH"
+    gimmickName = "HRAH!"
     gimmickEndRound = currentRound + 3
     createDummy(Hero.REINHARDT, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
     gimmickPlayer = getPlayersOnHero(Hero.REINHARDT, Team.ALL)[0]
@@ -2227,64 +2227,64 @@ def TriviaFailed():
     else:
         smallMessage(getAllPlayers(), "Wow, great work!")
 
-rule "Dummi":
-    @Event global
+# rule "Dummi":
+#     @Event global
 
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
-    createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
+#     createDummy(playerHero, Team.ALL, -1, vect(0,0,0), vect(0,0,0))
 
-rule "Dummi do stuff":
-    @Event eachPlayer
+# rule "Dummi do stuff":
+#     @Event eachPlayer
 
-    @Condition not disableCenter
-    @Condition isGameInProgress()
-    @Condition eventPlayer.isDummy()
-    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
+#     @Condition not disableCenter
+#     @Condition isGameInProgress()
+#     @Condition eventPlayer.isDummy()
+#     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
     
-    wait(0.5)
-    eventPlayer.startThrottleInDirection(directionTowards(eventPlayer.getPosition(), eventPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-    wait(0.5)
-    eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), eventPlayer.playerDeflects.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+#     wait(0.5)
+#     eventPlayer.startThrottleInDirection(directionTowards(eventPlayer.getPosition(), eventPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+#     wait(0.5)
+#     eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), eventPlayer.playerDeflects.getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
 
 
-rule "Dummi look around":
-    @Event eachPlayer
+# rule "Dummi look around":
+#     @Event eachPlayer
 
-    @Condition not disableCenter
-    @Condition isGameInProgress()
-    @Condition eventPlayer.isDummy()
-    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
+#     @Condition not disableCenter
+#     @Condition isGameInProgress()
+#     @Condition eventPlayer.isDummy()
+#     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
 
-    eventPlayer.playerDeflects = random.choice([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player.isAlive() and player != eventPlayer])
-    waitUntil(eventPlayer.playerDeflects.isDead(), random.uniform(1, 2))
-    wait()
-    goto RULE_START
+#     eventPlayer.playerDeflects = random.choice([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player.isAlive() and player != eventPlayer])
+#     waitUntil(eventPlayer.playerDeflects.isDead(), random.uniform(1, 2))
+#     wait()
+#     goto RULE_START
 
-rule "Dummi do the funni":
-    @Event eachPlayer
+# rule "Dummi do the funni":
+#     @Event eachPlayer
 
-    @Condition not disableCenter
-    @Condition isGameInProgress()
-    @Condition eventPlayer.isDummy()
-    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
+#     @Condition not disableCenter
+#     @Condition isGameInProgress()
+#     @Condition eventPlayer.isDummy()
+#     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
 
-    eventPlayer.startForcingButton(Button.PRIMARY_FIRE)
-    wait(0.2)
-    eventPlayer.stopForcingButton(Button.PRIMARY_FIRE)
-    wait()
-    eventPlayer.forceButtonPress(Button.ABILITY_2)
+#     eventPlayer.startForcingButton(Button.PRIMARY_FIRE)
+#     wait(0.2)
+#     eventPlayer.stopForcingButton(Button.PRIMARY_FIRE)
+#     wait()
+#     eventPlayer.forceButtonPress(Button.ABILITY_2)
 
-    wait(random.uniform(0.1, 0.5))
-    goto RULE_START
+#     wait(random.uniform(0.1, 0.5))
+#     goto RULE_START
 
 #!include "./Ending.opy"

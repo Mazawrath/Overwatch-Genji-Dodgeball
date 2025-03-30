@@ -107,7 +107,7 @@ def Cinema():
 	wait(1.5)
     getAllPlayers().disablePlayerCollision()
     # TODO: UNCOMMENT
-	# destroyAllDummies()
+	destroyAllDummies()
 	bigMessage(getAllPlayers(), "Now, it's time for the big event!")
 	wait(2)
 	getAllPlayers().startForcingHero(Hero.GENJI)
