@@ -1818,6 +1818,7 @@ def CovidTime():
     wait(0.25)
     gimmickPlayer = getPlayersOnHero(Hero.RAMATTRA, Team.ALL)
     wait(0.25)
+    gimmickPlayer.teleport(vect(10, 0.1, 7))
     gimmickPlayer.startModifyingVoicelinePitch(0.5, false)
     getAllPlayers().startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * 0.65, gimmickPlayer.getEyePosition(), 5000)
     wait(2)
