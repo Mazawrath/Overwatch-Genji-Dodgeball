@@ -2183,9 +2183,6 @@ def TriviaTime():
     breakFrequency = " "
     gimmickName = "Nothing"
     wait()
-    [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() == playerHero].addToScore(1)
-    bigMessage(getAllPlayers(), "Everyone who survived has won the round :)")
-    wait(4)
     getAllPlayers().resurrect()
     wait(0.25)
     getAllPlayers().setStatusEffect(null, Status.UNKILLABLE, 9999)
@@ -2202,31 +2199,13 @@ def TriviaTime():
     wait(4)
     
 def TriviaFailed():
+    getLivingPlayers(Team.ALL).addToScore(1)
     wait()
-    if len([player for player in getLivingPlayers(Team.ALL) if player.isAlive() and player.getCurrentHero() == playerHero]) == 0:
-        wait(1)
-        bigMessage(getAllPlayers(), "Did you seriously all die?")
-        wait(3)
-        bigMessage(getAllPlayers(), "Is the trivia that hard?????")
-        wait(3)
-        getAllPlayers().resurrect()
-        wait()
-        getAllPlayers().setStatusEffect(null, Status.UNKILLABLE, 9999)
-        wait(1.5)
-        bigMessage(getAllPlayers(), "Guess I have no choice but to revive all of you morons.")
-        wait(3)
-        hostPlayer.clearStatusEffect(Status.UNKILLABLE)
-        wait()
-        kill(hostPlayer, null)
-        wait(0.5)
-        bigMessage(getAllPlayers(), "Except Maza. He's still dead.")
-        wait(3)
-        bigMessage(getAllPlayers(), "But I'm taking a point from all of you.")
-        getLivingPlayers(Team.ALL).addToScore(-1)
-        bigMessage(getAllPlayers(), "I don't care if your score goes negative.")
-        wait(3)
-    else:
-        smallMessage(getAllPlayers(), "Wow, great work!")
+    [player for player in getDeadPlayers(Team.ALL) if player != hostPlayer].addToScore(-1)
+    wait(2)
+    [player for player in getAllPlayers() if player != hostPlayer].resurrect()
+    getAllPlayers().setStatusEffect(null, Status.UNKILLABLE, 9999)
+    smallMessage(getAllPlayers(), "Wow, great work!")
 
 # rule "Dummi":
 #     @Event global
