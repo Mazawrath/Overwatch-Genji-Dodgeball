@@ -2086,7 +2086,7 @@ def TriviaTime():
     isPassingTeam1 = "v6.0.0"
     isPassingTeam2 = "v5.1.0"
     breaksEnabled  = "v7.0.0"
-    breakFrequency = "It had it's own seperate version first"
+    breakFrequency = "Had its own seperate version first"
     setMatchTime(30)
     wait(5)
     smallMessage(getAllPlayers(), "Stand in the bouncepad with the correct answer!")
@@ -2105,12 +2105,12 @@ def TriviaTime():
     # QUESTION 4
     bigMessage(getAllPlayers(), "Question 4:")
     wait(3)
-    bigMessage(getAllPlayers(), "Which playstyle is most consistent? :)?")
-    setObjectiveDescription(getAllPlayers(), "Which playstyle is most consistent? :)", HudReeval.NONE)
-    isPassingTeam1 = "Firebending"
-    isPassingTeam2 = "Waterbending"
-    breaksEnabled  = "Earthbending"
-    breakFrequency = "Airbending"
+    bigMessage(getAllPlayers(), "Which section of the GDB rulebook covers change of rank?")
+    setObjectiveDescription(getAllPlayers(), "Which section of the GDB rulebook covers change of rank?", HudReeval.NONE)
+    isPassingTeam1 = "3.1"
+    isPassingTeam2 = "2.1.8"
+    breaksEnabled  = "2.3"
+    breakFrequency = "5.3"
     setMatchTime(30)
     wait(5)
     smallMessage(getAllPlayers(), "Stand in the bouncepad with the correct answer!")
@@ -2119,10 +2119,10 @@ def TriviaTime():
     smallMessage(getAllPlayers(), "The correct answer is...")
     wait(3)
     playEffect(getAllPlayers(), DynamicEffect.BUFF_IMPACT_SOUND, Color.AQUA, vect(0, 0, 0), 1000)
-    smallMessage(getAllPlayers(), "Edge is consistent :)")
-    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad2) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
+    smallMessage(getAllPlayers(), "Section 2.3 Change of rank!")
+    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
     wait()
-    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad2) > bouncePadRange + 1.5], null)
+    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5], null)
     wait(2)
     TriviaFailed()
     wait(4)
@@ -2133,7 +2133,7 @@ def TriviaTime():
     bigMessage(getAllPlayers(), "What is the highest rank in ranked GDB?")
     setObjectiveDescription(getAllPlayers(), "What is the highest rank in ranked GDB?", HudReeval.NONE)
     isPassingTeam1 = "Omnigod"
-    isPassingTeam2 = "God"
+    isPassingTeam2 = "Demigod"
     breaksEnabled  = "Grandmaster"
     breakFrequency = "Godslayer"
     setMatchTime(30)
