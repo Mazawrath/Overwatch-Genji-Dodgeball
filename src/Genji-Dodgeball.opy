@@ -65,6 +65,9 @@ settings {
                 "ability1Cooldown%": 10,
                 "movementSpeed%": "150"
             },
+            "mei": {
+                "ability2Cooldown%": 0
+            },
             "torbjorn": {
                 "enableAbility1": false,
                 "ability2Cooldown%": 30,
@@ -1696,21 +1699,25 @@ rule "Rein Does the Spam":
 
 rule "Mei does the annoying":
     @Event eachPlayer
-    # @Condition eventPlayer.playerKills == 69
+
+    @Condition eventPlayer.isDummy()
+    @Condition eventPlayer.playerKills == 69
     @Condition eventPlayer.getCurrentHero() == Hero.MEI
 
-    if gimmickPlayer.getAbilityCharge(Button.ABILITY_2) == 0:
+    gimmickPlayer.startFacing(vect(0, -1, 0), 10000, Relativity.TO_PLAYER, FacingReeval.NONE)
         gimmickPlayer.stopForcingButton(Button.PRIMARY_FIRE)
-        wait()
+    wait(0.1)
         gimmickPlayer.forceButtonPress(Button.ABILITY_2)
         wait()
     gimmickPlayer.startForcingButton(Button.PRIMARY_FIRE)
-    gimmickPlayer.playerDeflects = random.choice([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if player.isAlive()])
+    wait(0.1)
+    eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(eventPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     wait(6)
     goto RULE_START
 
 rule "Get frozen by Mei":
     @Event playerTookDamage
+    @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
     @Condition attacker.getCurrentHero() == Hero.MEI
 
     eventPlayer.setStatusEffect(attacker, Status.FROZEN, 3)
@@ -1723,11 +1730,13 @@ rule "Get pushed by Genji":
     eventPlayer.setStatusEffect(null, Status.STUNNED, 0.25)
     eventPlayer.applyImpulse(Vector.UP, 3, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     wait()
-    eventPlayer.applyImpulse(directionTowards(attacker, eventPlayer.getPosition()), 15, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
+    eventPlayer.applyImpulse(directionTowards(attacker, eventPlayer.getPosition()), 20, Relativity.TO_WORLD, Impulse.CANCEL_CONTRARY_MOTION)
     wait()
 
 rule "Ramattra does the annoying":
     @Event eachPlayer
+
+    @Condition eventPlayer.isDummy()
     @Condition covidTime
     @Condition eventPlayer == gimmickPlayer
     @Condition eventPlayer.getCurrentHero() == Hero.RAMATTRA
@@ -1741,8 +1750,10 @@ rule "Ramattra does the annoying":
 
 rule "Dummy pick a victim":
     @Event eachPlayer
+
+    @Condition eventPlayer.isDummy()
     @Condition eventPlayer in gimmickPlayer
-    @Condition eventPlayer.getCurrentHero() == Hero.RAMATTRA or eventPlayer.getCurrentHero() == Hero.GENJI
+    @Condition eventPlayer.getCurrentHero() == Hero.RAMATTRA or eventPlayer.getCurrentHero() == Hero.GENJI or eventPlayer.getCurrentHero() == Hero.MEI
 
     if eventPlayer.getCurrentHero() == Hero.GENJI:
         if random.randint(0, 1):
@@ -2130,7 +2141,7 @@ def TriviaTime():
     smallMessage(getAllPlayers(), "The correct answer is...")
     wait(3)
     playEffect(getAllPlayers(), DynamicEffect.BUFF_IMPACT_SOUND, Color.AQUA, vect(0, 0, 0), 1000)
-    smallMessage(getAllPlayers(), "It technically had its own seperate version")
+    smallMessage(getAllPlayers(), "It had its own seperate version!")
     [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
     wait()
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5], null)
