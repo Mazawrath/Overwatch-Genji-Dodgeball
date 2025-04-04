@@ -1978,7 +1978,7 @@ def SlideTime():
     ballSpawnCountdown = 15
     freeFall = true
     circleCenter = vect(circleCenter.x, circleCenter.y + 140, circleCenter.z)
-    sphereSize += 5
+    sphereSize -= 5
     wait(1)
     getAllPlayers().teleport(vect(getAllPlayers().getPosition().x, 160, getAllPlayers().getPosition().z))
     wait(2)
@@ -1986,7 +1986,7 @@ def SlideTime():
     bigMessage(getAllPlayers(), "Step 1: Cover yourself in oil")
     waitUntil(currentRound == gimmickEndRound, 9999)
     circleCenter = vect(circleCenter.x, circleCenter.y - 140, circleCenter.z)
-    sphereSize -= 5
+    sphereSize += 5
     wait(1)
     getAllPlayers().teleport(vect(getAllPlayers().getPosition().x, 0, getAllPlayers().getPosition().z))
     freeFall = false
