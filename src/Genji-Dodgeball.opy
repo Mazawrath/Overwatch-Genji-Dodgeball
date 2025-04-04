@@ -1845,18 +1845,53 @@ def CovidTime():
     gimmickName = "Nothing"
 
 def MeiTime():
-    gimmickName = "Mei Gets Her Freeze Back :)"
+    ballSpawnCountdown = 25
     gimmickEndRound = currentRound + 2
-    wait(0.25)
-    bigMessage(getAllPlayers(), "Mei wants her OW1 freeze back...")
-    createDummy(Hero.MEI, Team.ALL, -1, vect(5, 0.1, 8), vect(0, 0, 0))
+    createDummy(Hero.MEI, Team.ALL, 15, vect(1, 0, 0), vect(0, 0, 0))
+    createDummy(Hero.MEI, Team.ALL, 16, vect(1, 0, 0), vect(0, 0, 0))
+    createDummy(Hero.MEI, Team.ALL, 17, vect(1, 0, 0), vect(0, 0, 0))
     gimmickPlayer = getPlayersOnHero(Hero.MEI, Team.ALL)
+    gimmickPlayer[0].setInvisibility(Invis.ALL)
+    gimmickPlayer[1].setInvisibility(Invis.ALL)
+    gimmickPlayer[2].setInvisibility(Invis.ALL)
+    wait()
+    getAllPlayers().startCamera(vect(0, 10, 20), vect(0, 1.5, 0), 0)
+    wait()
+    bigMessage(getAllPlayers(), " Are you ready for this round?")
+    wait(0.5)
+    getAllPlayers().communicate(Comms.NO)
+    wait(1.5)
+    bigMessage(getAllPlayers(), " (You aren't)")
+    getAllPlayers().communicate(Comms.NO)
+    wait(2)
+    bigMessage(getAllPlayers(), " welcome to...")
+    getAllPlayers().communicate(Comms.NO)
     wait(5)
+    getAllPlayers().startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * 0.45, gimmickPlayer.getEyePosition(), 5)
+    wait(3)
+    gimmickPlayer[0].setInvisibility(Invis.NONE)
+    gimmickPlayer[1].setInvisibility(Invis.NONE)
+    gimmickPlayer[2].setInvisibility(Invis.NONE)
+    gimmickName = "The Nightmare Rounds"
+    bigMessage(getAllPlayers(), "THE NIGHTMARE ROUNDS")
+    wait(4.5)
+    getAllPlayers().stopCamera()
     gimmickPlayer.startForcingButton(Button.PRIMARY_FIRE)
-    gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), gimmickPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-    gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer[0].startThrottleInDirection(directionTowards(gimmickPlayer[0].getPosition(), gimmickPlayer[0].playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    gimmickPlayer[1].startThrottleInDirection(directionTowards(gimmickPlayer[1].getPosition(), gimmickPlayer[1].playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    gimmickPlayer[2].startThrottleInDirection(directionTowards(gimmickPlayer[2].getPosition(), gimmickPlayer[2].playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    gimmickPlayer[0].startFacing(directionTowards(gimmickPlayer[0].getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer[0], player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer[1].startFacing(directionTowards(gimmickPlayer[1].getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer[1], player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer[2].startFacing(directionTowards(gimmickPlayer[2].getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer[2], player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
+    gimmickPlayer[0].playerKills = 69
+    gimmickPlayer[1].playerKills = 69
+    gimmickPlayer[2].playerKills = 69
     waitUntil(currentRound == gimmickEndRound, 9999)
-    destroyDummy(Team.ALL, gimmickPlayer.getSlot())
+    destroyDummy(Team.ALL, gimmickPlayer[0].getSlot())
+    destroyDummy(Team.ALL, gimmickPlayer[1].getSlot())
+    destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
+    bigMessage(getAllPlayers(), "The nightmares are over")
+    bigMessage(getAllPlayers(), "(For now)")
     gimmickName = "Nothing"
     gimmickPlayer = null
 
