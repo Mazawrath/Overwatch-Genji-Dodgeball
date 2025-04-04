@@ -2001,7 +2001,7 @@ rule "Hammer Down":
     @Condition hammerDown
     @Condition attacker.getCurrentHero() == Hero.TORBJORN
 
-    eventPlayer.setStatusEffect(attacker, Status.KNOCKED_DOWN, random.uniform(0.375, 1))
+    eventPlayer.setStatusEffect(attacker, Status.KNOCKED_DOWN, random.uniform(0.5, 1.5))
 
 rule "Social Distancing":
     @Event eachPlayer
