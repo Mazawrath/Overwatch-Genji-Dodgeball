@@ -1662,7 +1662,7 @@ rule "Tell player controls":
     smallMessage(eventPlayer, "Primary fire aka swing hammer = deflect")
     wait(2)
     smallMessage(eventPlayer, "Ability 2 aka overload = dash")
-    wait(3)
+    wait(6)
 
 
 rule "Randomly teleport ball":
@@ -1776,9 +1776,10 @@ def ReinTime():
     gimmickPlayer.playerKills = 0
     # gimmickPlayer.ult
     wait(0.25)
-    getAllPlayers().startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * 0.65, gimmickPlayer.getEyePosition(), 5000)
-    bigMessage(getAllPlayers(), "Oh, hi Reinhart!")
+    getAllPlayers().startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * 0.9, gimmickPlayer.getEyePosition(), 5000)
+    theVoice = "Oh, hi Reinhart!"
     wait(5)
+    theVoice = ""
     getAllPlayers().stopCamera()
     getAllPlayers().communicate(Comms.HELLO)
     gimmickPlayer.playerKills = 69
@@ -1796,12 +1797,14 @@ def SkyDiving():
     gimmickEndRound = currentRound + 4
     ballSpawnCountdown = 20
     getAllPlayers().setAbilityCooldown(Button.ABILITY_2, 1.5)
-    bigMessage(getAllPlayers(), "BECAUSE I'M FREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    theVoice = "BECAUSE I'M FREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"
     freeFall = true
     getAllPlayers().teleport(vect(getAllPlayers().getPosition().x, 400, getAllPlayers().getPosition().z))
     circleCenter = vect(circleCenter.x, circleCenter.y + 310, circleCenter.z)
     sphereSize += 15
     createEffect(getAllPlayers(), Effect.LIGHT_SHAFT, Color.BLUE, vect(circleCenter.x, circleCenter.y - 10, circleCenter.z), sphereSize, EffectReeval.NONE)
+    wait(3.5)
+    theVoice = ""
     waitUntil(currentRound == gimmickEndRound, 9999)
     getAllPlayers().setAbilityCooldown(Button.ABILITY_2, 3)
     circleCenter = vect(circleCenter.x, circleCenter.y - 310, circleCenter.z)
@@ -1834,18 +1837,20 @@ def CovidTime():
     gimmickPlayer.startModifyingVoicelinePitch(0.5, false)
     getAllPlayers().startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * 0.65, gimmickPlayer.getEyePosition(), 5000)
     wait(2)
-    smallMessage(getAllPlayers(), "Oh no! Ramattra has a cold!")
+    theVoice = "Oh no! Ramattra has a cold!"
     wait(2)
     gimmickPlayer.setUltCharge(100)
     gimmickPlayer.forceButtonPress(Button.ULTIMATE)
     wait(1)
-    smallMessage(getAllPlayers(), "But he also wants a hug!")
+    theVoice = "But he also wants a hug!"
     wait(2)
-    smallMessage(getAllPlayers(), "Stay away from him!")
+    theVoice = "Stay away from him!"
     wait(2)
     getAllPlayers().stopCamera()
     wait(3)
-    smallMessage(getAllPlayers(), "Contagious virus detected! Social distancing activated!")
+    theVoice = "Contagious virus detected! Social distancing activated!"
+    wait(5)
+    theVoice = ""
     waitUntil(roundInProgress, 9999)
     gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), gimmickPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
@@ -1867,26 +1872,29 @@ def MeiTime():
     gimmickPlayer[1].setInvisibility(Invis.ALL)
     gimmickPlayer[2].setInvisibility(Invis.ALL)
     wait()
+    getAllPlayers().setStatusEffect(null, Status.ROOTED, 10)
     getAllPlayers().startCamera(vect(0, 10, 20), vect(0, 1.5, 0), 0)
     wait()
-    bigMessage(getAllPlayers(), " Are you ready for this round?")
+    theVoice = "Are you ready for this round?"
     wait(0.5)
     getAllPlayers().communicate(Comms.NO)
-    wait(1.5)
-    bigMessage(getAllPlayers(), " (You aren't)")
+    wait(3.5)
+    theVoice = "(You aren't)"
     getAllPlayers().communicate(Comms.NO)
-    wait(2)
-    bigMessage(getAllPlayers(), " welcome to...")
+    wait(3.5)
+    theVoice = "welcome to..."
     getAllPlayers().communicate(Comms.NO)
-    wait(5)
+    wait(4)
     getAllPlayers().startCamera(gimmickPlayer.getEyePosition() + gimmickPlayer.getFacingDirection() * 0.45, gimmickPlayer.getEyePosition(), 5)
     wait(3)
     gimmickPlayer[0].setInvisibility(Invis.NONE)
     gimmickPlayer[1].setInvisibility(Invis.NONE)
     gimmickPlayer[2].setInvisibility(Invis.NONE)
     gimmickName = "The Nightmare Rounds"
-    bigMessage(getAllPlayers(), "THE NIGHTMARE ROUNDS")
-    wait(4.5)
+    wait(0.5)
+    theVoice = "THE NIGHTMARE ROUNDS"
+    wait(4)
+    theVoice = ""
     getAllPlayers().stopCamera()
     gimmickPlayer.startForcingButton(Button.PRIMARY_FIRE)
     gimmickPlayer[0].startThrottleInDirection(directionTowards(gimmickPlayer[0].getPosition(), gimmickPlayer[0].playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
@@ -1902,20 +1910,25 @@ def MeiTime():
     destroyDummy(Team.ALL, gimmickPlayer[0].getSlot())
     destroyDummy(Team.ALL, gimmickPlayer[1].getSlot())
     destroyDummy(Team.ALL, gimmickPlayer[2].getSlot())
-    bigMessage(getAllPlayers(), "The nightmares are over")
-    bigMessage(getAllPlayers(), "(For now)")
     gimmickName = "Nothing"
     gimmickPlayer = null
+    theVoice = "The nightmares are over"
+    wait(3.5)
+    theVoice = "(For now)"
+    wait(2)
+    theVoice = ""
 
 def CorrectTorbHeight():
     gimmickName = "Correct Torb height (and speed)"
     gimmickEndRound = currentRound + 3
     wait(0.25)
-    bigMessage(getAllPlayers(), "Lore Accurate Torb Height Activated")
+    theVoice = "Lore Accurate Torb Height Activated"
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).startScalingSize(0, false)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setMoveSpeed(200)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setJumpVerticalSpeed(200)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).startModifyingVoicelinePitch(1.5, false)
+    wait(3.5)
+    theVoice = ""
     waitUntil(currentRound == gimmickEndRound, 9999)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).startScalingSize(1, false)
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).setMoveSpeed(100)
@@ -1935,12 +1948,13 @@ def GenjiReturns():
     wait(0.25)
     getAllPlayers().startCamera(gimmickPlayer[0].getEyePosition() + gimmickPlayer[0].getFacingDirection() * 0.65, gimmickPlayer[0].getEyePosition(), 50)
     wait(2.5)
-    smallMessage(getAllPlayers(), "Wait...Genji???")
+    theVoice = "Wait...Genji???"
     wait(3)
-    smallMessage(getAllPlayers(), "Genji isn't suppoed to be here!")
+    theVoice = "Genji isn't supposed to be here!"
     wait(3.25)
-    smallMessage(getAllPlayers(), "Uh oh...I think he's pissed you took his job!")
+    theVoice = "Uh oh...I think he's pissed you took his job!"
     wait(3)
+    theVoice = ""
     getAllPlayers().stopCamera()
     gimmickPlayer[0].setPrimaryFireEnabled(true)
     gimmickPlayer[0].setAbility1Enabled(true)
@@ -1974,11 +1988,13 @@ def HammerDown():
     gimmickEndRound = currentRound + 3
     ballSpawnCountdown = 13
     wait(1)
-    smallMessage(getAllPlayers(), "New gimmick!")
+    theVoice = "New gimmick!"
     wait(3.5)
-    smallMessage(getAllPlayers(), "Torb's hammer has gotten 20 pounds heavier!")
-    wait(3.5)
-    smallMessage(getAllPlayers(), "Try crushing your friend's skull with it :)")
+    theVoice = "Torb's hammer has gotten 20 pounds heavier!"
+    wait(4)
+    theVoice = "Try crushing your friend's skull with it :)"
+    wait(4.5)
+    theVoice = ""
     waitUntil(currentRound == gimmickEndRound, 9999)
     hammerDown = false
     gimmickName = "Nothing"
@@ -1995,7 +2011,9 @@ def SlideTime():
     getAllPlayers().teleport(vect(getAllPlayers().getPosition().x, 160, getAllPlayers().getPosition().z))
     wait(2)
     createEffect(getAllPlayers(), Effect.LIGHT_SHAFT, Color.BLUE, vect(circleCenter.x, circleCenter.y - 10, circleCenter.z), sphereSize, EffectReeval.NONE)
-    bigMessage(getAllPlayers(), "Step 1: Cover yourself in oil")
+    theVoice = "Step 1: Cover yourself in oil"
+    wait(5)
+    theVoice = ""
     waitUntil(currentRound == gimmickEndRound, 9999)
     circleCenter = vect(circleCenter.x, circleCenter.y - 140, circleCenter.z)
     sphereSize += 5
@@ -2043,11 +2061,12 @@ def TriviaTime():
     triviaActive = true
     ballPlayerMock = false
     wait(1.5)
-    smallMessage(getAllPlayers(), "Are you ready for this round's gimmick?")
+    theVoice = "Are you ready for this round's gimmick?"
     wait(2.5)
-    smallMessage(getAllPlayers(), "This round's gimmick is...")
+    theVoice = "This round's gimmick is..."
     wait(3.5)
     gimmickName = "TRIVIA!!!!!!"
+    theVoice = "TRIVIA!!!!!!"
     bigMessage(getAllPlayers(), "TRIVIA!!!!!!!!!!!!!!!")
     enableMusic()
     targetedPlayer = null
@@ -2059,10 +2078,11 @@ def TriviaTime():
     wait(0.25)
     getAllPlayers().communicate(Comms.YES)
     wait(3)
-    smallMessage(getAllPlayers(), "How well do you know your Genji Dodgeball lore?")
+    theVoice = "How well do you know your Genji Dodgeball lore?"
     wait(3.5)
-    smallMessage(getAllPlayers(), "Let's find out!")
+    theVoice =  "Let's find out!"
     wait(5)
+    theVoice = ""
     bigMessage(getAllPlayers(), "Question 1:")
     isPassingTeam1 = "Genji"
     isPassingTeam2 = "Torbjörn"
@@ -2088,19 +2108,20 @@ def TriviaTime():
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad1) > bouncePadRange + 1.5], null)
     wait(2)
     TriviaFailed()
-    wait(4)
-    smallMessage(getAllPlayers(), "Wait a second...")
+    wait(2)
+    theVoice = "Wait a second..."
     wait(3)
-    smallMessage(getAllPlayers(), "You're just going to copy whatever answer Maza picks")
+    theVoice = "You're just going to copy whatever answer Maza picks"
     wait(3.5)
-    smallMessage(getAllPlayers(), "Aren't you?")
+    theVoice = "Aren't you?"
     wait(4)
     hostPlayer.clearStatusEffect(Status.UNKILLABLE)
     wait()
     kill(hostPlayer, null)
     wait(1)
-    smallMessage(getAllPlayers(), "There, no more Maza :)")
-    wait(4)
+    theVoice = "There, no more Maza :)"
+    wait(3.5)
+    theVoice = ""
     # QUESTION 2
     bigMessage(getAllPlayers(), "Question 2:")
     wait(3)
@@ -2124,7 +2145,7 @@ def TriviaTime():
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5], null)
     wait(2)
     TriviaFailed()
-    wait(4)
+    wait(2)
     # QUESTION 3
     bigMessage(getAllPlayers(), "Question 3:")
     wait(3)
@@ -2148,12 +2169,12 @@ def TriviaTime():
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5], null)
     wait(2)
     TriviaFailed()
-    wait(4)
+    wait(2)
     # QUESTION 4
     bigMessage(getAllPlayers(), "Question 4:")
     wait(3)
-    bigMessage(getAllPlayers(), "Which section of the GDB rulebook covers change of rank?")
-    setObjectiveDescription(getAllPlayers(), "Which section of the GDB rulebook covers change of rank?", HudReeval.NONE)
+    bigMessage(getAllPlayers(), "Which section of the GDB guidebook covers change of rank?")
+    setObjectiveDescription(getAllPlayers(), "Which section of the GDB guidebook covers change of rank?", HudReeval.NONE)
     isPassingTeam1 = "3.1"
     isPassingTeam2 = "2.1.8"
     breaksEnabled  = "2.3"
@@ -2172,17 +2193,17 @@ def TriviaTime():
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5], null)
     wait(2)
     TriviaFailed()
-    wait(4)
+    wait(2)
 
     # QUESTION 5
     bigMessage(getAllPlayers(), "Question 5:")
     wait(3)
-    bigMessage(getAllPlayers(), "What is the highest rank in ranked GDB?")
-    setObjectiveDescription(getAllPlayers(), "What is the highest rank in ranked GDB?", HudReeval.NONE)
-    isPassingTeam1 = "Omnigod"
-    isPassingTeam2 = "Demigod"
-    breaksEnabled  = "Grandmaster"
-    breakFrequency = "Godslayer"
+    bigMessage(getAllPlayers(), "What firebending move lets you \"Unpredictably dash the ball in the middle of an orbit to catch the opponent off guard with a fast beam\"?")
+    setObjectiveDescription(getAllPlayers(), "What firebending move lets you \"Unpredictably dash the ball in the middle of an orbit to catch the opponent off guard with a fast beam\"?", HudReeval.NONE)
+    isPassingTeam1 = "Fake arc serve"
+    isPassingTeam2 = "Banana Dash"
+    breaksEnabled  = "Brad dash"
+    breakFrequency = "Reverse Ghost dash"
     setMatchTime(30)
     wait(5)
     smallMessage(getAllPlayers(), "Stand in the bouncepad with the correct answer!")
@@ -2191,13 +2212,13 @@ def TriviaTime():
     smallMessage(getAllPlayers(), "The correct answer is...")
     wait(3)
     playEffect(getAllPlayers(), DynamicEffect.BUFF_IMPACT_SOUND, Color.AQUA, vect(0, 0, 0), 1000)
-    smallMessage(getAllPlayers(), "Godslayer!")
-    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
+    smallMessage(getAllPlayers(), "Brad dash! (Sorry for the easy question)")
+    [player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5].clearStatusEffect(Status.UNKILLABLE)
     wait()
-    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) > bouncePadRange + 1.5], null)
+    kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad3) > bouncePadRange + 1.5], null)
     wait(2)
     TriviaFailed()
-    wait(4)
+    wait(2)
     # QUESTION 6
     bigMessage(getAllPlayers(), "Question 6:")
     wait(3)
@@ -2221,7 +2242,8 @@ def TriviaTime():
     kill([player for player in getPlayersOnHero(Hero.TORBJORN, Team.ALL) if distance(player.getPosition(), bouncePad4) < bouncePadRange + 1.5], null)
     wait(2)
     TriviaFailed()
-    wait(5)
+    wait(2)
+    disableMusic()
     smallMessage(getAllPlayers(), "That's it for the trivia!")
     wait(3)
     isPassingTeam1 = " "
@@ -2233,7 +2255,7 @@ def TriviaTime():
     getAllPlayers().resurrect()
     wait(0.25)
     getAllPlayers().setStatusEffect(null, Status.UNKILLABLE, 9999)
-    setObjectiveDescription(getAllPlayers(), null, HudReeval.NONE)
+    setObjectiveDescription(getAllPlayers(), "", HudReeval.NONE)
     wait(3)
     bigMessage(getAllPlayers(), "Well, that was fun!")
     getPlayersOnHero(Hero.TORBJORN, Team.ALL).enablePlayerCollision()
@@ -2249,7 +2271,7 @@ def TriviaFailed():
     getLivingPlayers(Team.ALL).addToScore(1)
     wait()
     [player for player in getDeadPlayers(Team.ALL) if player != hostPlayer].addToScore(-1)
-    wait(2)
+    wait(1.5)
     [player for player in getAllPlayers() if player != hostPlayer].resurrect()
     getAllPlayers().setStatusEffect(null, Status.UNKILLABLE, 9999)
     smallMessage(getAllPlayers(), "Wow, great work!")
