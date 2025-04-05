@@ -53,7 +53,7 @@ settings {
                 "passiveUltGen%": 0
             },
             "reinhardt": {
-                "ability1Cooldown%": 0,
+                "ability1Cooldown%": 2,
                 "ability1Kb%": 300,
                 "movementSpeed%": 125,
                 "enableSpawningWithUlt": true,
@@ -1686,15 +1686,15 @@ rule "Rein Does the Spam":
     @Condition eventPlayer.playerKills == 69
     @Condition eventPlayer.getCurrentHero() == Hero.REINHARDT
 
-    if gimmickPlayer.isDead() and len(getPlayersOnHero(playerHero, Team.ALL)) > 2:
+    if eventPlayer.isDead() and len(getPlayersOnHero(playerHero, Team.ALL)) > 2:
         wait(0.25)
-        gimmickPlayer.resurrect()
-    gimmickPlayer.forceButtonPress(Button.ABILITY_1)
-    gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), targetedPlayer.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
-    waitUntil(not gimmickPlayer.isUsingAbility1() or not roundInProgress, 9999)
-    gimmickPlayer.stopThrottleInDirection()
+        eventPlayer.resurrect()
+    eventPlayer.forceButtonPress(Button.ABILITY_1)
+    eventPlayer.startThrottleInDirection(directionTowards(eventPlayer.getPosition(), eventPlayer.playerDeflects), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
+    waitUntil(not eventPlayer.isUsingAbility1() or not roundInProgress, 9999)
+    eventPlayer.stopThrottleInDirection()
     wait()
-    gimmickPlayer.forceButtonPress(Button.ULTIMATE)
+    eventPlayer.forceButtonPress(Button.ULTIMATE)
     wait(0.25)
     goto RULE_START
 
@@ -1754,7 +1754,7 @@ rule "Dummy pick a victim":
 
     @Condition eventPlayer.isDummy()
     @Condition eventPlayer in gimmickPlayer
-    @Condition eventPlayer.getCurrentHero() == Hero.RAMATTRA or eventPlayer.getCurrentHero() == Hero.GENJI or eventPlayer.getCurrentHero() == Hero.MEI
+    @Condition eventPlayer.getCurrentHero() == Hero.RAMATTRA or eventPlayer.getCurrentHero() == Hero.GENJI or eventPlayer.getCurrentHero() == Hero.MEI or eventPlayer.getCurrentHero() == Hero.REINHARDT
 
     if eventPlayer.getCurrentHero() == Hero.GENJI:
         if random.randint(0, 1):
@@ -1772,7 +1772,7 @@ def ReinTime():
     createDummy(Hero.REINHARDT, Team.ALL, 15, vect(0, 0, 0), vect(0, 0, 0))
     gimmickPlayer = getPlayersOnHero(Hero.REINHARDT, Team.ALL)[0]
     gimmickPlayer.startModifyingVoicelinePitch(0.5, false)
-    gimmickPlayer.startScalingSize(1.1, false)
+    gimmickPlayer.startScalingSize(1.6, false)
     gimmickPlayer.playerKills = 0
     # gimmickPlayer.ult
     wait(0.25)
