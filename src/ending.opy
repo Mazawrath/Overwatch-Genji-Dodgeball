@@ -226,9 +226,8 @@ def Cinema():
     ballSpeed = 0
     chase(ballSpeed, 15, duration=8, ChaseReeval.NONE)
     getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(10, 15 + ballSpeed, -10), vect(10, 0, -10), 0)
-    wait()
-    enableMusic()
     wait(5)
+    enableMusic()
     declarePlayerVictory(gimmickPlayer)
     wait(20)
 

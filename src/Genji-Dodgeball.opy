@@ -1079,7 +1079,7 @@ rule "Final duel":
     @Condition isInFinalDuel == false
     @Condition not endlessBall
     
-    ballSpawnCountdown = 5
+    # ballSpawnCountdown = 5
     getLivingPlayers(Team.ALL).isDashEnabled = false
     if ballIsOut == false:
         goto lbl_0
@@ -1849,12 +1849,11 @@ def CovidTime():
     getAllPlayers().stopCamera()
     wait(3)
     theVoice = "Contagious virus detected! Social distancing activated!"
-    wait(5)
-    theVoice = ""
-    waitUntil(roundInProgress, 9999)
     gimmickPlayer.startThrottleInDirection(directionTowards(gimmickPlayer.getPosition(), gimmickPlayer.playerDeflects.getPosition()), 1, Relativity.TO_WORLD, Throttle.REPLACE_EXISTING, ThrottleReeval.DIRECTION_AND_MAGNITUDE)
     gimmickPlayer.startFacing(directionTowards(gimmickPlayer.getEyePosition(), sorted([player for player in getPlayersOnHero(playerHero, Team.ALL) if player.isAlive()], lambda player: distance(gimmickPlayer, player))[0].getEyePosition()), 1000, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     covidTime = true
+    wait(5)
+    theVoice = ""
     waitUntil(currentRound == gimmickEndRound, 9999)
     destroyDummy(Team.ALL, gimmickPlayer.getSlot())
     gimmickPlayer = null
