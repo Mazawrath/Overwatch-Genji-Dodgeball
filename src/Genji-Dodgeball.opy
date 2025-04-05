@@ -190,6 +190,7 @@ globalvar gimmickEndRound
 globalvar hammerDown
 globalvar triviaActive
 globalvar freeFall
+globalvar theVoice
 
 
 #Player variables
@@ -765,7 +766,7 @@ rule "Start round":
     roundInProgress = true
     ballPlayerMock = false
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
-    ballSpawnCountdown = 45
+    theVoice = ""
 
 
 rule "Start round - TEAMS":

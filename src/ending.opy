@@ -158,7 +158,7 @@ def Cinema():
     wait(4)
     gimmickPlayer.setFacing(vect(0,0,0), Relativity.TO_PLAYER)
     gimmickPlayer.teleport(vect(-5, 0, -5))
-    smallMessage(getAllPlayers(), "Are you ready for the S-E-X update {0}?".format(wonPlayer))
+    smallMessage(getAllPlayers(), "Are you ready for the S-E-X, {0}?".format(wonPlayer))
     wait(1)
     wonPlayer.startFacing(directionTowards(wonPlayer.getEyePosition(), vect(random.uniform(-25, 30), random.uniform(-5, 15), random.uniform(-5, 5))), 1500, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     wonPlayer.communicate(Comms.NO)

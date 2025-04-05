@@ -62,6 +62,7 @@ rule "Init player variables":
 
 
 rule "Init global variables":
+    theVoice = "Welcome to hell :)"
     disableCenter = false
     targetedPlayer = -1
     previousTargetedPlayer = -1
@@ -98,7 +99,7 @@ rule "Init global variables":
             centerOffLimitsSize = 12.5
     else:
         centerOffLimitsSize = 3.5
-    spawnPoints = [vect(circleCenter.x + 12, circleCenter.y, 0), vect(circleCenter.x - 12, circleCenter.y, 0), vect(0, circleCenter.y, circleCenter.z + 12), vect(0, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z + 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z + 12), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z + 6), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z - 6), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z - 6), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z + 6)]
+    spawnPoints = [vect(0, 5, 0), vect(circleCenter.x - 12, circleCenter.y, 0), vect(0, circleCenter.y, circleCenter.z + 12), vect(0, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z + 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z + 12), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z - 12), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z + 6), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z - 6), vect(circleCenter.x + 12, circleCenter.y, circleCenter.z - 6), vect(circleCenter.x - 12, circleCenter.y, circleCenter.z + 6)]
     isInFinalDuel = false
     bouncePadCooldownLengthStart = 3
     bouncePadCooldownLength = 3
@@ -152,6 +153,33 @@ rule "Create global HUD elements":
         hudSubheader([player for player in getAllPlayers() if player != targetedPlayer and player.getTeam() == targetedPlayer.getTeam()], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.SKY_BLUE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #red when you're targeted
     hudSubheader(targetedPlayer if localPlayer in getAllPlayers() else [], "Current Player Targeted: {0}".format(targetedPlayer), HudPosition.LEFT, -2, Color.RED, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudText(getAllPlayers(), null, " ",null, HudPosition.TOP,  5, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    hudHeader(getAllPlayers(), theVoice, HudPosition.TOP, 99, Color.GREEN, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    
     if bouncepadDashingEnabled or cooldownDashingEnabled:
         goto lbl_0
     #hudSubtext(getAllPlayers(), "Current Dashing Mode: None", HudPosition.LEFT, -1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
@@ -164,9 +192,9 @@ rule "Create global HUD elements":
     lbl_1:
     #hudSubtext(getAllPlayers(), "Current Dashing Mode: Cooldown", HudPosition.LEFT, -1, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #server load text for lobby owner only
-    #hudText(hostPlayer, null, "Server Load", getServerLoad(), HudPosition.RIGHT, 0, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    #hudText(hostPlayer, null, "Server Load Average", getAverageServerLoad(), HudPosition.RIGHT, 0, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
-    #hudText(hostPlayer, null, "Server Load Peak", getPeakServerLoad(), HudPosition.RIGHT, 0, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    # hudText(getAllPlayers(), null, "Server Load", getServerLoad(), HudPosition.RIGHT, 0, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    # hudText(getAllPlayers(), null, "Server Load Average", getAverageServerLoad(), HudPosition.RIGHT, 0, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
+    # hudText(getAllPlayers(), null, "Server Load Peak", getPeakServerLoad(), HudPosition.RIGHT, 0, Color.WHITE, Color.WHITE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #gameplay tips text
     #hudSubtext(getAllPlayers(), "Deflect or Dash will deflect the ball to an enemy", HudPosition.RIGHT, -10, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
     #hudSubtext(getAllPlayers(), "If you get hit, you die.  Last man standing wins!", HudPosition.RIGHT, -9, Color.WHITE, HudReeval.VISIBILITY_AND_STRING, SpecVisibility.DEFAULT)
