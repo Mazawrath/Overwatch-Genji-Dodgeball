@@ -41,7 +41,7 @@ rule "Init player variables":
     eventPlayer.passingSignal = 0
     chase(eventPlayer.passingSignal, 0, rate=1, ChaseReeval.NONE)
     waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
-    eventPlayer.setInvisibility(Invis.NONE)
+    # eventPlayer.setInvisibility(Invis.NONE)
     if invisiblePlayers:
         getAllPlayers().setInvisibility(Invis.ALL)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
@@ -52,21 +52,13 @@ rule "Init player variables":
         eventPlayer.startCamera(eventPlayer + worldVector(vect(-0.75, 0.25, -0.25), eventPlayer, Transform.ROTATION) + Vector.UP * 1.5 + eventPlayer.getFacingDirection() * -2, eventPlayer + eventPlayer.getFacingDirection() * 1000, 0)
     elif invisiblePlayers:
         eventPlayer.startCamera(updateEveryTick(eventPlayer.getEyePosition()), updateEveryTick(eventPlayer + eventPlayer.getFacingDirection() * 1000), 0)
-    wait(3)
-    smallMessage(eventPlayer, "Here's a tip:")
-    wait(1)
-    smallMessage(eventPlayer, "Primary fire aka swing hammer = deflect")
-    wait(2)
-    smallMessage(eventPlayer, "Ability 2 aka overload = dash")
-    wait(3) 
-
 
 rule "Init global variables":
     theVoice = "Welcome to hell :)"
     disableCenter = false
     targetedPlayer = -1
     previousTargetedPlayer = -1
-    ballSpawnCountdown = 30
+    ballSpawnCountdown = 45
     if tournamentMode and getCurrentGamemode() != Gamemode.FFA:
         tournamentMode = false
         hudText(hostPlayer, null, null, "Tournament mode is only supported in FFA", HudPosition.LEFT, -20, null, null, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
@@ -130,6 +122,15 @@ rule "Init global variables":
     createEffect([], Effect.SPHERE, false, Vector.DOWN, false, EffectReeval.NONE)
     destroyEffect(getLastCreatedEntity())
     entityReference = getLastCreatedEntity()
+    waitUntil(isGameInProgress(), 9999)
+    wait(4)
+    theVoice = "Here's a tip:"
+    wait(4)
+    theVoice = "Primary fire aka swing hammer = deflect"
+    wait(6)
+    theVoice = "E ability aka overload = dash"
+    wait(6)
+    theVoice = ""
 
 
 rule "Create game sphere":

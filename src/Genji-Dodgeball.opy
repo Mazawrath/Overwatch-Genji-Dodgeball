@@ -4,7 +4,7 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v4.1.25",
+        "modeName": "Genji Dodgeball 2",
         "description": "Genji Dodgeball v4.1.25. APRIL FOOLS!!!!!"
     },
     "lobby": {

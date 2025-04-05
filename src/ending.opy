@@ -107,7 +107,7 @@ def Cinema():
 	wait(1.5)
     getAllPlayers().disablePlayerCollision()
     # TODO: UNCOMMENT
-	destroyAllDummies()
+	# destroyAllDummies()
 	bigMessage(getAllPlayers(), "Now, it's time for the big event!")
 	wait(2)
 	getAllPlayers().startForcingHero(Hero.GENJI)
@@ -226,6 +226,8 @@ def Cinema():
     ballSpeed = 0
     chase(ballSpeed, 15, duration=8, ChaseReeval.NONE)
     getPlayersOnHero(Hero.GENJI, Team.ALL).startCamera(vect(10, 15 + ballSpeed, -10), vect(10, 0, -10), 0)
+    wait()
+    enableMusic()
     wait(5)
     declarePlayerVictory(gimmickPlayer)
     wait(20)
