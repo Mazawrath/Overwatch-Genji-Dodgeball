@@ -1625,10 +1625,10 @@ rule "Toggle Latency":
 
 rule "Lag-O-Rama":
     @Event eachPlayer
+    @Condition theVoice == ""
     @Condition eventPlayer.latencyToggle
     @Condition eventPlayer.getCurrentHero() == Hero.TORBJORN
 
-    wait(random.uniform(0.58, 2))
     if random.randint(1, 100) <= 75:
         if random.randint(1, 100) <= 75:
             eventPlayer.teleport(vect(eventPlayer.getPosition().x + random.uniform(-25, 25), eventPlayer.getPosition().y + random.uniform(0, 0.5), eventPlayer.getPosition().z+ random.uniform(-25, 25)))
@@ -1642,12 +1642,13 @@ rule "Lag-O-Rama":
     if random.randint(1, 100) <= 50:
             eventPlayer.setFacing(vect(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)), Relativity.TO_PLAYER)
     wait(random.uniform(0, 0.5))
-    if eventPlayer.latencyToggle:
+    if eventPlayer.latencyToggle and theVoice == "":
         smallMessage(eventPlayer, "Lag-O-Rama activated with ultimate!")
     # Make them spam their deflect!
     # if random.randint(1, 100) <= 50:
     #     eventPlayer.forceButtonPress()
     # wait(random.uniform(5, 15))
+    wait(random.uniform(0.58, 2))
     if RULE_CONDITION:
         goto RULE_START
 
