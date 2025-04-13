@@ -41,7 +41,8 @@ rule "Init player variables":
     eventPlayer.passingSignal = 0
     chase(eventPlayer.passingSignal, 0, rate=1, ChaseReeval.NONE)
     waitUntil((not roundInProgress or not isGameInProgress()) or eventPlayer.isAlive(), 9999)
-    # eventPlayer.setInvisibility(Invis.NONE)
+    if eventPlayer.getCurrentHero() != Hero.MEI:
+        eventPlayer.setInvisibility(Invis.NONE)
     if invisiblePlayers:
         getAllPlayers().setInvisibility(Invis.ALL)
     waitUntil(eventPlayer.isAlive() and isGameInProgress(), 90)
