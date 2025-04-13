@@ -55,7 +55,10 @@ settings {
             },
             "enabledHeroes": [
                 "genji"
-            ]
+            ],
+            "general": {
+                "passiveHealthRegen": false
+            }
         }
     }
 }

@@ -24,7 +24,6 @@ rule "Init player variables":
         eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), ballPlayer.getEyePosition()), 100, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     eventPlayer.isDashEnabled = false
     eventPlayer.setStatusEffect(null, Status.INVINCIBLE, 9999)
-    eventPlayer.setHealingReceived(0)
     if not dashingEnabled:
         eventPlayer.setAbility1Enabled(false)
     eventPlayer.disableRespawn()
