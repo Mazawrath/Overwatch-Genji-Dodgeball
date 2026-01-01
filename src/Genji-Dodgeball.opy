@@ -4,8 +4,8 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.9.1",
-        "description": "Genji Dodgeball v7.9.1. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.9.2",
+        "description": "Genji Dodgeball v7.9.2. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -55,7 +55,10 @@ settings {
             },
             "enabledHeroes": [
                 "genji"
-            ]
+            ],
+            "general": {
+                "passiveHealthRegen": false
+            }
         }
     }
 }
@@ -90,9 +93,9 @@ globalvar sphereSize 24
 globalvar circleCenter 25
 globalvar redGreenColorblindMode 26
 globalvar watermarkEnabled 27
-globalvar bouncepadDashingEnabled 28
+globalvar dashingEnabled 28
 globalvar gameEndEnabled 29
-globalvar cooldownDashingEnabled 30
+# globalvar cooldownDashingEnabled 30
 globalvar deathSpherePos 31
 globalvar deathBeam 32
 globalvar ballDirection 33
@@ -113,7 +116,6 @@ globalvar finalDuelNuke 47
 globalvar ballDirectionRate 48
 globalvar entityReference 49
 globalvar allowMatchEnd 51
-globalvar passingDamage 52
 globalvar isPassingTeam1 53
 globalvar isPassingTeam2 54
 globalvar scoreToWin 55
@@ -208,13 +210,14 @@ rule "// SETTINGS":
     arenaType = createWorkshopSetting(enum["Standard", "Airbending", "Earth/waterbending", "Firebending"], "Dodgeball Settings", "Arena Type", 0, 2)
     startingBallSpeed = createWorkshopSetting(int[30:100], "Dodgeball Settings", "Starting Ball Speed", 40, 3)
     maxBallSpeed = createWorkshopSetting(int[100:500], "Dodgeball Settings", "Maximum Ball Speed", 500, 4)
-    endlessBall = createWorkshopSetting(bool, "Dodgeball Settings", "Endless Ball", false, 5)
+    dashingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Dashing", true, 5)
     bouncePadToggle = createWorkshopSetting(bool, "Dodgeball Settings", "Bouncepads", true, 6)
     passingEnabled = createWorkshopSetting(bool, "Dodgeball Settings", "Passing", false, 7)
     torbBall = createWorkshopSetting(enum["Please don't.", "Torb Ball"], "Fun Settings", "Torb Ball", 0, 0)
     ballTailColor = createWorkshopSetting(enum["Sky Blue", "Lethality", "Lethality+"], "Fun Settings", "Ball Tail Color", 0, 1)
-    invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 2)
-    invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 3)
+    endlessBall = createWorkshopSetting(bool, "Fun Settings", "Endless Ball", false, 2)
+    invisibleBall = createWorkshopSetting(bool, "Fun Settings", "Invisible Ball", false, 3)
+    invisiblePlayers = createWorkshopSetting(bool, "Fun Settings", "Invisible Players", false, 4)
     tournamentMode = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Tournament Mode", false, 0)
     maxRounds = createWorkshopSetting(int[1:50], "Tournament Settings (FFA Only)", "Total Rounds", 30, 1)
     breaksEnabled = createWorkshopSetting(bool, "Tournament Settings (FFA Only)", "Breaks", true, 2)
@@ -226,7 +229,6 @@ rule "// SETTINGS":
     #Currently, there is an issue where the server will end, based on how many players there are. If there are less it will take longer to crash. But it WILL crash. This rule simply lets there be a "winner" at the end VS crashing in the middle of Final Duel.
     gameEndEnabled = createWorkshopSetting(bool, "Teams Settings", "Allow Match to End At Time", false, 2)
     watermarkEnabled = createWorkshopSetting(bool, "Visual Settings", "Watermark", true, 0)
-    cooldownDashingEnabled = true
     redGreenColorblindMode = createWorkshopSetting(bool, "Visual Settings", "Red/Green Colorblind Mode", false, 2)
     finalDuelNuke = createWorkshopSetting(bool, "Visual Settings", "Final Duel Explosion", true, 3)
 
@@ -324,7 +326,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.9.1".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.9.2".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -412,26 +414,8 @@ rule "Shorten Deflect Length":
     eventPlayer.setAbility1Enabled(false)
     wait(0.5)
     eventPlayer.setAbility2Enabled(true)
-    eventPlayer.setAbility1Enabled(true)
-
-
-rule "Unlock dash after using jumppad":
-    @Event eachPlayer
-    @Hero all
-    @Condition bouncepadDashingEnabled == true
-    @Condition eventPlayer.isDashEnabled == true
-    
-    eventPlayer.setAbility1Enabled(true)
-
-
-rule "Disable dash after using":
-    @Event eachPlayer
-    @Hero all
-    @Condition bouncepadDashingEnabled == true
-    @Condition eventPlayer.isUsingAbility1() == true
-    
-    eventPlayer.setAbility1Enabled(false)
-    eventPlayer.isDashEnabled = false
+    if dashingEnabled:
+        eventPlayer.setAbility1Enabled(true)
 
 
 rule "Target random player":
@@ -852,8 +836,8 @@ rule "Ball reaches player":
                 goto RULE_START
         return
     if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
-        #If they don't have enough health, kill em
-        if targetedPlayer.getHealth() <= 100:
+        #Player already deflected once
+        if targetedPlayer.getHealth() != targetedPlayer.getMaxHealth():
             DeflectFailed()
             if rulesetMode == 1:
                 wait()
@@ -884,11 +868,11 @@ rule "Ball reaches player":
         if not invisiblePlayers:
             playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
-        previousTargetedPlayer.setHealth(passingDamage)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth() * 0.5)
         targetedPlayer = previousTargetedPlayer
     else:
         isPassingTeam1 = false
-        heal(previousTargetedPlayer, null, passingDamage)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth())
         targetedPlayer = ((sorted([player for player in getLivingPlayers(Team.ALL) if player != previousTargetedPlayer and player.getCurrentHero() != ballHero], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
     async(BallCurve(), AsyncBehavior.RESTART)
 
@@ -906,8 +890,8 @@ rule "Ball reaches player -TEAMS":
                 goto RULE_START
         return
     if targetedPlayer.isHoldingButton(Button.SECONDARY_FIRE):
-        #If they don't have enough health, kill em
-        if targetedPlayer.getHealth() <= 100:
+        #Player already deflected once
+        if targetedPlayer.getHealth() != targetedPlayer.getMaxHealth():
             DeflectFailed()
             if rulesetMode == 1:
                 wait()
@@ -934,7 +918,7 @@ rule "Ball reaches player -TEAMS":
         if not invisiblePlayers:
             playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
-        previousTargetedPlayer.setHealth(passingDamage)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth() * 0.5)
         stopAssist(passingAssistId)
         #passingPlayer = null
         #Check which team is passing
@@ -961,7 +945,7 @@ rule "Ball reaches player -TEAMS":
         if isPassingTeam1 == false or isPassingTeam2 == false:
             stopAssist(passingAssistId)
             #passingPlayer = null
-        heal(previousTargetedPlayer, null, passingDamage)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth())
         isPassingTeam1 = false
         isPassingTeam2 = false
         targetedPlayer = ((sorted([player for player in getLivingPlayers(getOppositeTeam(previousTargetedPlayer.getTeam())) if player != previousTargetedPlayer], lambda i: angleBetweenVectors(targetedPlayer.getFacingDirection(), directionTowards(targetedPlayer, i.getPosition()))))[0])
@@ -992,7 +976,7 @@ rule "End assist after a second - TEAMS":
 def DeflectFailed():
     @Name "Player Didn't Deflect - Kill"
     
-    heal(getLivingPlayers(Team.ALL), null, 200)
+    getAllPlayers().setHealth(9001)
     isPassingTeam1 = false
     isPassingTeam2 = false
     targetedPlayer.setStatusEffect(previousTargetedPlayer, Status.STUNNED, 1)
@@ -1220,11 +1204,6 @@ rule "Check for last player surviving":
     wait(0.025)
     roundInProgress = true
     wait(0.975)
-    if not bouncepadDashingEnabled:
-        goto lbl_0
-    getAllPlayers().isDashEnabled = false
-    getAllPlayers().setAbility1Enabled(false)
-    lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
@@ -1265,7 +1244,7 @@ rule "Team 1 Last Surviving - TEAMS":
         wait(0.25)
         targetedPlayer = -1
         bigMessage(getAllPlayers(), "Tiebreaker!")
-    heal(getAllPlayers(), null, 200)
+    getAllPlayers().setHealth(9001)
     if not isEnoughPlayersToStart:
         return
     currentRound += 1
@@ -1274,11 +1253,6 @@ rule "Team 1 Last Surviving - TEAMS":
     wait(0.025)
     roundInProgress = true
     wait(0.975)
-    if not bouncepadDashingEnabled:
-        goto lbl_0
-    getAllPlayers().isDashEnabled = false
-    getAllPlayers().setAbility1Enabled(false)
-    lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
 
@@ -1319,7 +1293,7 @@ rule "Team 2 Last Surviving - TEAMS":
         wait(0.25)
         targetedPlayer = -1
         bigMessage(getAllPlayers(), "Tiebreaker!")
-    heal(getAllPlayers(), null, 200)
+    getAllPlayers().setHealth(9001)
     if not isEnoughPlayersToStart:
         return
     currentRound += 1
@@ -1328,26 +1302,8 @@ rule "Team 2 Last Surviving - TEAMS":
     wait(0.025)
     roundInProgress = true
     wait(0.975)
-    if not bouncepadDashingEnabled:
-        goto lbl_0
-    getAllPlayers().isDashEnabled = false
-    getAllPlayers().setAbility1Enabled(false)
-    lbl_0:
     chase(ballSpawnCountdown, 0, rate=1, ChaseReeval.NONE)
     chase(getAllPlayers().bouncePadCooldown, 0, rate=1, ChaseReeval.NONE)
-
-
-rule "Player check":
-    @Event eachPlayer
-    @Hero all
-    @Condition eventPlayer.isAlive() == true
-    @Condition "{0}".format(eventPlayer) == "daboss"
-    
-    kill(eventPlayer, null)
-    wait(1)
-    if RULE_CONDITION:
-        goto RULE_START
-
 
 rule "All players dead failsafe":
     @Condition getNumberOfLivingPlayers(Team.ALL) == 0
