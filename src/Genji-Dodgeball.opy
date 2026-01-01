@@ -868,7 +868,7 @@ rule "Ball reaches player":
         if not invisiblePlayers:
             playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
-        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth() * 0.1)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth() * 0.5)
         targetedPlayer = previousTargetedPlayer
     else:
         isPassingTeam1 = false
@@ -918,7 +918,7 @@ rule "Ball reaches player -TEAMS":
         if not invisiblePlayers:
             playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.SKY_BLUE, previousTargetedPlayer.getPosition(), 10)
         playEffect(previousTargetedPlayer, DynamicEffect.MOIRA_FADE_DISAPPEAR_SOUND, Color.WHITE, previousTargetedPlayer.getPosition(), 100)
-        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth() * 0.1)
+        previousTargetedPlayer.setHealth(previousTargetedPlayer.getMaxHealth() * 0.5)
         stopAssist(passingAssistId)
         #passingPlayer = null
         #Check which team is passing
