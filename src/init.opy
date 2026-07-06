@@ -8,11 +8,13 @@ rule "Init player variables":
     @Hero all
 
     waitUntil(eventPlayer.hasSpawned(), 20)
+    eventPlayer.playerScore = 0
     if roundInProgress and isGameInProgress():
         eventPlayer.teleport(circleCenter + vect(0, 500, 0))
         eventPlayer.setInvisibility(Invis.ALL)
         wait(0.05)
         kill(eventPlayer, null)
+        eventPlayer.setScore(eventPlayer.playerScore)
         wait(0.25)
     if eventPlayer.getSlot() <= len(spawnPoints) and getCurrentGamemode() == Gamemode.FFA:
         eventPlayer.teleport(spawnPoints[eventPlayer.getSlot()])
@@ -71,7 +73,8 @@ rule "Init global variables":
     if tournamentMode and getCurrentGamemode() != Gamemode.FFA:
         tournamentMode = false
         hudText(hostPlayer, null, null, "Tournament mode is only supported in FFA", HudPosition.LEFT, -20, null, null, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
-    disableScoring()
+    # Temporary fix where disabling game mode scoring breaks kill counts
+    # disableScoring()
     disableGamemodeCompletion()
     disableMusic()
     disableAnnouncer()

@@ -93,6 +93,7 @@ rule "Torb must die":
     eventPlayer.detach()
     eventPlayer.clearStatusEffect(Status.UNKILLABLE)
     kill(eventPlayer, null)
+    eventPlayer.setScore(eventPlayer.playerScore)
     eventPlayer.setStatusEffect(null, Status.UNKILLABLE, 9999)
     waitUntil(eventPlayer.isAlive(), 9999)
     eventPlayer.teleport(vect(random.randint(-10, 10), 8, random.randint(-10, 10)))

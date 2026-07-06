@@ -4,8 +4,8 @@
 
 settings {
     "main": {
-        "modeName": "Genji Dodgeball v7.9.2",
-        "description": "Genji Dodgeball v7.9.2. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
+        "modeName": "Genji Dodgeball v7.9.3",
+        "description": "Genji Dodgeball v7.9.3. Developed by Mazawrath. Credit for others avaliable in GitHub repository https://github.com/Mazawrath/Overwatch-Genji-Dodgeball. Deflect the ball when it is red to target someone else! Use jump pads to get air!"
     },
     "lobby": {
         "allowPlayersInQueue": true,
@@ -157,6 +157,8 @@ globalvar stressTorbs 90
 globalvar breakInProgress 91
 globalvar spawnPoints 92
 globalvar invisTeamsAntiCheat 93
+# Temporary fix where disabling game mode scoring breaks kill counts
+globalvar winningPlayer 94
 
 
 #Player variables
@@ -183,6 +185,8 @@ playervar latency 19
 playervar latencyToggle 20
 playervar emoteCheatCount 21
 playervar stunCooldown 22
+# Temporary fix where disabling game mode scoring breaks kill counts
+playervar playerScore 23
 
 
 #Subroutine names
@@ -326,7 +330,7 @@ rule "Disable Scoreboard":
 rule "// Not enough players testing":
     if not watermarkEnabled:
         goto lbl_0
-    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.9.2".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
+    hudSubheader(getAllPlayers(), "Original by {0}. Version 7.9.3".format(name), HudPosition.LEFT, -1000, Color.AQUA, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     lbl_0:
 
 
@@ -513,6 +517,7 @@ rule "Player falls off Workshop Island":
     if tournamentMode:
         hudSubtext(hostPlayer, "{0} has undermapped themself".format(eventPlayer), HudPosition.RIGHT, -1, Color.WHITE, HudReeval.VISIBILITY, SpecVisibility.ALWAYS)
     kill(eventPlayer, null)
+    eventPlayer.setScore(eventPlayer.playerScore)
     #A MAN HAS FALLEN INTO THE LAKE IN WORKSHOP ISLAND! START THE NEW RESCUE RULE! HEY! BUILD THE NEW WORSHOP RULE, AND OFF TO THE RESCUE! PREPARE THE CONDITION, TELEPORT THE PLAYER, AND MAKE THE RESCUE! THE NEW 2.3.0 UPDATE FROM OVERWATCH WORKSHOP!
     eventPlayer.teleport(circleCenter + vect(random.randint(-10, 10), 0, random.randint(-10, 10)))
     if eventPlayer == targetedPlayer:
@@ -985,6 +990,9 @@ def DeflectFailed():
     if ballHero and previousTargetedPlayer == -1:
         previousTargetedPlayer = ballPlayer
     kill(targetedPlayer, previousTargetedPlayer)
+    # Temporary fix where disabling game mode scoring breaks kill counts
+    targetedPlayer.setScore(targetedPlayer.playerScore)
+    previousTargetedPlayer.setScore(previousTargetedPlayer.playerScore)
     if ballHero and not ballPlayer.hasStatusEffect(Status.FROZEN):
         ballPlayer.stopFacing()
         ballPlayer.setFacing(directionTowards(ballPlayer.getEyePosition(), targetedPlayer.getPosition()), Relativity.TO_WORLD)
@@ -1164,7 +1172,10 @@ rule "Check for last player surviving":
     @Condition isEnoughPlayersToStart == true
     
     isInFinalDuel = false
-    [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero].addToScore(1)
+    # Temporary fix where disabling game mode scoring breaks kill counts
+    winningPlayer = [player for player in getLivingPlayers(Team.ALL) if player.getCurrentHero() != ballHero][0]
+    winningPlayer.playerScore++
+    winningPlayer.setScore(winningPlayer.playerScore)
     wait(0.25)
     if (getMatchTime() == 0 or tieBreakerActive) and gameEndEnabled:
         #If there is alredy a tiebreaker, then the tiebreaker has ended.
